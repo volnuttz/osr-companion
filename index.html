@@ -16,8 +16,6 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
 
 <div class="max-w-2xl mx-auto bg-white p-3 font-crimson">
 
-  <!-- TOAST -->
-  <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-gray-700 text-white font-cinzel text-xs font-bold tracking-widest px-4 py-2 rounded-full shadow-lg transition-opacity duration-500 opacity-0 pointer-events-none z-50"></div>
 
 
   <div class="grid grid-cols-3 gap-2 mb-3">
@@ -216,17 +214,8 @@ function scheduleSave() {
   saveTimer = setTimeout(function() {
     try {
       localStorage.setItem(SAVE_KEY, JSON.stringify(getSheetData()));
-      showToast('Saved');
     } catch(e) {}
   }, 800);
-}
-
-function showToast(text) {
-  var t = document.getElementById('toast');
-  t.textContent = text;
-  t.style.opacity = '1';
-  clearTimeout(t._t);
-  t._t = setTimeout(function() { t.style.opacity = '0'; }, 1200);
 }
 
 // Auto-save on any input change
