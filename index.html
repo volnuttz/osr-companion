@@ -110,9 +110,9 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
     <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
       <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block">GEAR</span>
       <div class="flex gap-4 items-center">
-        <div class="flex items-center gap-1"><span class="font-cinzel text-xs font-bold text-gray-500">GP</span><input type="number" class="w-10 border-b border-gray-300 text-center text-sm outline-none" placeholder="0"></div>
-        <div class="flex items-center gap-1"><span class="font-cinzel text-xs font-bold text-gray-500">SP</span><input type="number" class="w-10 border-b border-gray-300 text-center text-sm outline-none" placeholder="0"></div>
-        <div class="flex items-center gap-1"><span class="font-cinzel text-xs font-bold text-gray-500">CP</span><input type="number" class="w-10 border-b border-gray-300 text-center text-sm outline-none" placeholder="0"></div>
+        <div class="flex items-center gap-1"><span class="font-cinzel text-xs font-bold text-gray-500">GP</span><input id="gp" type="number" class="w-10 border-b border-gray-300 text-center text-sm outline-none" placeholder="0"></div>
+        <div class="flex items-center gap-1"><span class="font-cinzel text-xs font-bold text-gray-500">SP</span><input id="sp" type="number" class="w-10 border-b border-gray-300 text-center text-sm outline-none" placeholder="0"></div>
+        <div class="flex items-center gap-1"><span class="font-cinzel text-xs font-bold text-gray-500">CP</span><input id="cp" type="number" class="w-10 border-b border-gray-300 text-center text-sm outline-none" placeholder="0"></div>
       </div>
     </div>
     <ul id="gear-list"></ul>
@@ -153,6 +153,7 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
 
 <script>
 var fabOpen = false;
+var isLoading = false;
 function toggleFab() {
   fabOpen = !fabOpen;
   var items = document.getElementById('fab-items');
@@ -168,7 +169,7 @@ var saveTimer = null;
 function getSheetData() {
   var data = {};
   // Simple inputs
-  ['str','int','dex','wis','con','cha','hp','hp-max','ac'].forEach(function(id) {
+  ['str','int','dex','wis','con','cha','hp','hp-max','ac','gp','sp','cp'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) data[id] = el.value;
   });
@@ -194,7 +195,8 @@ function getSheetData() {
 
 function loadSheetData(data) {
   if (!data) return;
-  ['str','int','dex','wis','con','cha','hp','hp-max','ac'].forEach(function(id) {
+  isLoading = true;
+  ['str','int','dex','wis','con','cha','hp','hp-max','ac','gp','sp','cp'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el && data[id] !== undefined) { el.value = data[id]; if (['str','int','dex','wis','con','cha'].includes(id)) calcMod(id); }
   });
@@ -207,6 +209,7 @@ function loadSheetData(data) {
   if (data.spells) data.spells.forEach(function(row) { addSpellRow(); var tr = document.querySelector('#spells-body tr:last-child'); row.inputs.forEach(function(val, i) { var inp = tr.querySelectorAll('input')[i]; if (inp) inp.value = val; }); row.selects.forEach(function(val, i) { var sel = tr.querySelectorAll('select')[i]; if (sel) sel.value = val; }); });
   if (data.gear) data.gear.forEach(function(val) { addGearRow(); var inputs = document.querySelectorAll('#gear-list input'); inputs[inputs.length-1].value = val; });
   if (data.freeCarry) data.freeCarry.forEach(function(val) { addFreeCarryRow(); var inputs = document.querySelectorAll('#free-carry-list input'); inputs[inputs.length-1].value = val; });
+  isLoading = false;
 }
 
 function scheduleSave() {
@@ -244,6 +247,7 @@ function rollAllAbilities() {
     document.getElementById(s).value = total;
     calcMod(s);
   });
+  scheduleSave();
   var msg = document.getElementById('roll-msg');
   msg.style.opacity = '1';
   setTimeout(function() { msg.style.opacity = '0'; }, 1500);
@@ -269,7 +273,7 @@ function addTalentRow() {
   li.className = 'flex items-center gap-2 border-b border-gray-100 py-2';
   li.innerHTML = '<span class="text-gray-300">&#8226;</span><input type="text" placeholder="Talent..." class="flex-1 text-sm outline-none font-crimson"><button onclick="this.closest(\'li\').remove()" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>';
   ul.appendChild(li);
-  li.querySelector('input').focus();
+  if (!isLoading) li.querySelector('input').focus();
 }
 
 function addAttackRow() {
@@ -305,7 +309,7 @@ function addGearRow() {
   li.className = 'flex items-center gap-2 border-b border-gray-100 py-2';
   li.innerHTML = '<span class="gear-num font-cinzel text-xs text-gray-400 w-5">' + num + '.</span><input type="text" placeholder="Item..." class="flex-1 text-sm outline-none font-crimson"><button onclick="removeGearRow(this)" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>';
   ul.appendChild(li);
-  li.querySelector('input').focus();
+  if (!isLoading) li.querySelector('input').focus();
 }
 
 function removeGearRow(btn) {
@@ -322,6 +326,6 @@ function addFreeCarryRow() {
   li.className = 'flex items-center gap-2 border-b border-gray-100 py-2';
   li.innerHTML = '<span class="text-gray-300">&#8226;</span><input type="text" placeholder="Torches..." class="flex-1 text-sm outline-none font-crimson"><button onclick="this.closest(\'li\').remove()" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>';
   ul.appendChild(li);
-  li.querySelector('input').focus();
+  if (!isLoading) li.querySelector('input').focus();
 }
 </script>
