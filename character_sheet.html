@@ -1,0 +1,338 @@
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: { fontFamily: { cinzel: ['Cinzel','serif'], crimson: ['Crimson Text','Georgia','serif'] } } }
+}
+</script>
+<style>
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+input[type=number] { -moz-appearance: textfield; }
+input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !important; }
+@keyframes flashRoll { 0% { color: #f5c842; } 100% { color: #111; } }
+.flash { animation: flashRoll 0.5s ease-out; }
+</style>
+
+<div class="max-w-2xl mx-auto bg-white p-3 font-crimson">
+
+  <!-- TOAST -->
+  <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-gray-700 text-white font-cinzel text-xs font-bold tracking-widest px-4 py-2 rounded-full shadow-lg transition-opacity duration-500 opacity-0 pointer-events-none z-50"></div>
+
+
+  <div class="grid grid-cols-3 gap-2 mb-3">
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">NAME</p><input type="text" class="w-full text-sm outline-none" placeholder="Character name..."></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">ANCESTRY</p><input type="text" class="w-full text-sm outline-none" placeholder="Human, Elf..."></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">CLASS</p><input type="text" class="w-full text-sm outline-none" placeholder="Fighter..."></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">LEVEL</p><input type="number" class="w-full text-sm outline-none" placeholder="1"></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">XP</p>
+      <div class="flex items-center gap-1"><input type="number" class="w-1/2 text-sm outline-none" placeholder="0"><span class="text-gray-300">/</span><input type="number" class="w-1/2 text-sm outline-none" placeholder="10"></div>
+    </div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">TITLE</p><input type="text" class="w-full text-sm outline-none" placeholder="Wanderer..."></div>
+  </div>
+
+  <!-- SECOND ROW -->
+  <div class="grid grid-cols-3 gap-2 mb-4">
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">ALIGNMENT</p><input type="text" class="w-full text-sm outline-none" placeholder="Lawful..."></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">BACKGROUND</p><input type="text" class="w-full text-sm outline-none" placeholder="Soldier..."></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">DEITY</p><input type="text" class="w-full text-sm outline-none" placeholder="God or none..."></div>
+  </div>
+
+  <!-- ABILITIES -->
+  <div class="grid grid-cols-3 gap-2 mb-3">
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 text-center"><p class="font-cinzel text-xs font-bold mb-2">STR</p><div class="flex items-center justify-center gap-1"><input id="str" type="number" min="1" max="20" oninput="calcMod('str')" placeholder="—" class="w-9 border-b border-gray-300 text-center text-base outline-none"><span class="text-gray-300">/</span><span id="str-mod" class="w-7 text-center text-sm font-semibold text-gray-500">—</span></div></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 text-center"><p class="font-cinzel text-xs font-bold mb-2">INT</p><div class="flex items-center justify-center gap-1"><input id="int" type="number" min="1" max="20" oninput="calcMod('int')" placeholder="—" class="w-9 border-b border-gray-300 text-center text-base outline-none"><span class="text-gray-300">/</span><span id="int-mod" class="w-7 text-center text-sm font-semibold text-gray-500">—</span></div></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 text-center"><p class="font-cinzel text-xs font-bold mb-2">DEX</p><div class="flex items-center justify-center gap-1"><input id="dex" type="number" min="1" max="20" oninput="calcMod('dex')" placeholder="—" class="w-9 border-b border-gray-300 text-center text-base outline-none"><span class="text-gray-300">/</span><span id="dex-mod" class="w-7 text-center text-sm font-semibold text-gray-500">—</span></div></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 text-center"><p class="font-cinzel text-xs font-bold mb-2">WIS</p><div class="flex items-center justify-center gap-1"><input id="wis" type="number" min="1" max="20" oninput="calcMod('wis')" placeholder="—" class="w-9 border-b border-gray-300 text-center text-base outline-none"><span class="text-gray-300">/</span><span id="wis-mod" class="w-7 text-center text-sm font-semibold text-gray-500">—</span></div></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 text-center"><p class="font-cinzel text-xs font-bold mb-2">CON</p><div class="flex items-center justify-center gap-1"><input id="con" type="number" min="1" max="20" oninput="calcMod('con')" placeholder="—" class="w-9 border-b border-gray-300 text-center text-base outline-none"><span class="text-gray-300">/</span><span id="con-mod" class="w-7 text-center text-sm font-semibold text-gray-500">—</span></div></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 text-center"><p class="font-cinzel text-xs font-bold mb-2">CHA</p><div class="flex items-center justify-center gap-1"><input id="cha" type="number" min="1" max="20" oninput="calcMod('cha')" placeholder="—" class="w-9 border-b border-gray-300 text-center text-base outline-none"><span class="text-gray-300">/</span><span id="cha-mod" class="w-7 text-center text-sm font-semibold text-gray-500">—</span></div></div>
+  </div>
+
+  <!-- HP / AC -->
+  <div class="grid grid-cols-2 gap-3 mb-4">
+    <div class="border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div class="bg-black text-white font-cinzel text-xs font-bold tracking-widest text-center py-1.5">HP</div>
+      <div class="flex items-center justify-center gap-2 py-3">
+        <input id="hp" type="number" min="0" placeholder="0" class="w-12 text-2xl font-bold font-cinzel text-center outline-none">
+        <span class="text-xl text-gray-200">/</span>
+        <input id="hp-max" type="number" min="0" placeholder="0" class="w-12 text-2xl font-bold font-cinzel text-center text-gray-300 outline-none">
+      </div>
+    </div>
+    <div class="border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div class="bg-black text-white font-cinzel text-xs font-bold tracking-widest text-center py-1.5">AC</div>
+      <div class="flex items-center justify-center py-3">
+        <input id="ac" type="number" min="0" placeholder="0" class="w-12 text-2xl font-bold font-cinzel text-center outline-none">
+      </div>
+    </div>
+  </div>
+
+  <!-- TALENTS -->
+  <div class="border border-gray-200 rounded-xl shadow-sm p-4 mb-4">
+    <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block mb-3">TALENTS</span>
+    <ul id="talents-list"></ul>
+    <button onclick="addTalentRow()" class="mt-3 border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Talent</button>
+  </div>
+
+  <!-- ATTACKS -->
+  <div class="border border-gray-200 rounded-xl shadow-sm p-4 mb-4">
+    <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block mb-3">ATTACKS</span>
+    <table class="w-full" style="table-layout:fixed;border-collapse:collapse;">
+      <thead><tr class="border-b-2 border-gray-100">
+        <th class="font-cinzel text-xs font-bold text-left py-1 px-1">WEAPON</th>
+        <th class="font-cinzel text-xs font-bold text-left py-1 px-1 w-16">MOD</th>
+        <th class="font-cinzel text-xs font-bold text-left py-1 px-1 w-20">DAMAGE</th>
+        <th class="w-6"></th>
+      </tr></thead>
+      <tbody id="attacks-body"></tbody>
+    </table>
+    <button onclick="addAttackRow()" class="mt-3 border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Attack</button>
+  </div>
+
+  <!-- SPELLS -->
+  <div class="border border-gray-200 rounded-xl shadow-sm p-4 mb-4">
+    <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block mb-3">SPELLS</span>
+    <div class="overflow-x-auto">
+      <table class="w-full" style="table-layout:fixed;border-collapse:collapse;min-width:340px;">
+        <thead><tr class="border-b-2 border-gray-100">
+          <th class="font-cinzel text-xs font-bold text-left py-1 px-1 w-10">TIER</th>
+          <th class="font-cinzel text-xs font-bold text-left py-1 px-1">NAME</th>
+          <th class="font-cinzel text-xs font-bold text-left py-1 px-1 w-14">DUR.</th>
+          <th class="font-cinzel text-xs font-bold text-left py-1 px-1 w-14">RANGE</th>
+          <th class="font-cinzel text-xs font-bold text-left py-1 px-1">DESC</th>
+          <th class="w-6"></th>
+        </tr></thead>
+        <tbody id="spells-body"></tbody>
+      </table>
+    </div>
+    <button onclick="addSpellRow()" class="mt-3 border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Spell</button>
+  </div>
+
+  <!-- GEAR -->
+  <div class="border border-gray-200 rounded-xl shadow-sm p-4 mb-4">
+    <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
+      <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block">GEAR</span>
+      <div class="flex gap-4 items-center">
+        <div class="flex items-center gap-1"><span class="font-cinzel text-xs font-bold text-gray-500">GP</span><input type="number" class="w-10 border-b border-gray-300 text-center text-sm outline-none" placeholder="0"></div>
+        <div class="flex items-center gap-1"><span class="font-cinzel text-xs font-bold text-gray-500">SP</span><input type="number" class="w-10 border-b border-gray-300 text-center text-sm outline-none" placeholder="0"></div>
+        <div class="flex items-center gap-1"><span class="font-cinzel text-xs font-bold text-gray-500">CP</span><input type="number" class="w-10 border-b border-gray-300 text-center text-sm outline-none" placeholder="0"></div>
+      </div>
+    </div>
+    <ul id="gear-list"></ul>
+    <button onclick="addGearRow()" class="mt-3 border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Item</button>
+    <div class="mt-4">
+      <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-2">FREE TO CARRY</p>
+      <div class="border border-gray-100 rounded-lg p-2">
+        <ul id="free-carry-list"></ul>
+        <button onclick="addFreeCarryRow()" class="mt-2 border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Item</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="roll-msg" class="fixed top-4 left-1/2 -translate-x-1/2 bg-black text-white font-cinzel text-xs font-bold tracking-widest px-4 py-2 rounded-full shadow-lg transition-opacity duration-500 opacity-0 pointer-events-none z-50">Scores rolled!</div>
+
+
+
+  <!-- DICE POPUP -->
+  <div id="dice-msg" class="fixed top-4 left-1/2 -translate-x-1/2 bg-black text-white font-cinzel text-sm font-bold tracking-widest px-5 py-2 rounded-full shadow-lg transition-opacity duration-500 opacity-0 pointer-events-none z-50"></div>
+
+  <!-- FAB SPEED DIAL -->
+  <div id="fab-container" class="fixed bottom-6 right-5 flex flex-col items-end gap-2 z-40">
+    <!-- Dice options (hidden by default) -->
+    <div id="fab-items" class="flex flex-col items-end gap-2 mb-1" style="display:none!important;">
+      <button onclick="rollAllAbilities();toggleFab()" class="h-10 px-3 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800 whitespace-nowrap">Stats</button>
+      <button onclick="quickRoll('1d4');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800">d4</button>
+      <button onclick="quickRoll('1d6');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800">d6</button>
+      <button onclick="quickRoll('1d8');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800">d8</button>
+      <button onclick="quickRoll('1d10');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800">d10</button>
+      <button onclick="quickRoll('1d12');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800">d12</button>
+      <button onclick="quickRoll('1d20');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800">d20</button>
+    </div>
+    <!-- Main FAB -->
+    <button id="fab-main" onclick="toggleFab()" class="w-14 h-14 bg-black text-white rounded-full shadow-xl flex items-center justify-center text-xl hover:bg-gray-800 transition-transform duration-200">&#9858;</button>
+  </div>
+
+</div>
+
+<script>
+var fabOpen = false;
+function toggleFab() {
+  fabOpen = !fabOpen;
+  var items = document.getElementById('fab-items');
+  var btn = document.getElementById('fab-main');
+  items.style.cssText = fabOpen ? 'display:flex;flex-direction:column;align-items:flex-end;gap:8px;margin-bottom:4px;' : 'display:none!important;';
+  btn.style.transform = fabOpen ? 'rotate(45deg)' : 'rotate(0deg)';
+}
+
+// ── LOCAL STORAGE AUTO-SAVE ──────────────────────────────────────────
+var SAVE_KEY = 'shadowdark_sheet';
+var saveTimer = null;
+
+function getSheetData() {
+  var data = {};
+  // Simple inputs
+  ['str','int','dex','wis','con','cha','hp','hp-max','ac'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) data[id] = el.value;
+  });
+  // Named text inputs by placeholder
+  document.querySelectorAll('input[type="text"], input[type="number"]').forEach(function(el, i) {
+    if (el.id) return; // already saved above
+    data['input_' + i] = el.value;
+  });
+  // Dynamic lists
+  data.talents = Array.from(document.querySelectorAll('#talents-list input')).map(function(el) { return el.value; });
+  data.attacks = Array.from(document.querySelectorAll('#attacks-body tr')).map(function(tr) {
+    return Array.from(tr.querySelectorAll('input')).map(function(el) { return el.value; });
+  });
+  data.spells = Array.from(document.querySelectorAll('#spells-body tr')).map(function(tr) {
+    var inputs = Array.from(tr.querySelectorAll('input')).map(function(el) { return el.value; });
+    var selects = Array.from(tr.querySelectorAll('select')).map(function(el) { return el.value; });
+    return { inputs: inputs, selects: selects };
+  });
+  data.gear = Array.from(document.querySelectorAll('#gear-list input')).map(function(el) { return el.value; });
+  data.freeCarry = Array.from(document.querySelectorAll('#free-carry-list input')).map(function(el) { return el.value; });
+  return data;
+}
+
+function loadSheetData(data) {
+  if (!data) return;
+  ['str','int','dex','wis','con','cha','hp','hp-max','ac'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && data[id] !== undefined) { el.value = data[id]; if (['str','int','dex','wis','con','cha'].includes(id)) calcMod(id); }
+  });
+  document.querySelectorAll('input[type="text"], input[type="number"]').forEach(function(el, i) {
+    if (el.id) return;
+    if (data['input_' + i] !== undefined) el.value = data['input_' + i];
+  });
+  if (data.talents) data.talents.forEach(function(val) { addTalentRow(); var inputs = document.querySelectorAll('#talents-list input'); inputs[inputs.length-1].value = val; });
+  if (data.attacks) data.attacks.forEach(function(row) { addAttackRow(); var tr = document.querySelector('#attacks-body tr:last-child'); row.forEach(function(val, i) { var inp = tr.querySelectorAll('input')[i]; if (inp) inp.value = val; }); });
+  if (data.spells) data.spells.forEach(function(row) { addSpellRow(); var tr = document.querySelector('#spells-body tr:last-child'); row.inputs.forEach(function(val, i) { var inp = tr.querySelectorAll('input')[i]; if (inp) inp.value = val; }); row.selects.forEach(function(val, i) { var sel = tr.querySelectorAll('select')[i]; if (sel) sel.value = val; }); });
+  if (data.gear) data.gear.forEach(function(val) { addGearRow(); var inputs = document.querySelectorAll('#gear-list input'); inputs[inputs.length-1].value = val; });
+  if (data.freeCarry) data.freeCarry.forEach(function(val) { addFreeCarryRow(); var inputs = document.querySelectorAll('#free-carry-list input'); inputs[inputs.length-1].value = val; });
+}
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function() {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(getSheetData()));
+      showToast('Saved');
+    } catch(e) {}
+  }, 800);
+}
+
+function showToast(text) {
+  var t = document.getElementById('toast');
+  t.textContent = text;
+  t.style.opacity = '1';
+  clearTimeout(t._t);
+  t._t = setTimeout(function() { t.style.opacity = '0'; }, 1200);
+}
+
+// Auto-save on any input change
+document.addEventListener('input', scheduleSave);
+document.addEventListener('change', scheduleSave);
+
+// Load on startup
+var saved = null;
+try { saved = JSON.parse(localStorage.getItem(SAVE_KEY)); } catch(e) {}
+if (saved) loadSheetData(saved);
+
+
+function calcMod(stat) {
+  var val = parseInt(document.getElementById(stat).value);
+  var el = document.getElementById(stat + '-mod');
+  if (isNaN(val) || val < 1) { el.textContent = '—'; return; }
+  var mod = Math.floor((val - 10) / 2);
+  el.textContent = (mod >= 0 ? '+' : '') + mod;
+}
+
+function d(sides) { return Math.floor(Math.random() * sides) + 1; }
+
+function rollAllAbilities() {
+  ['str','int','dex','wis','con','cha'].forEach(function(s) {
+    var total = d(6) + d(6) + d(6);
+    document.getElementById(s).value = total;
+    calcMod(s);
+  });
+  var msg = document.getElementById('roll-msg');
+  msg.style.opacity = '1';
+  setTimeout(function() { msg.style.opacity = '0'; }, 1500);
+}
+
+function quickRoll(expr) {
+  var parts = expr.match(/(\d+)d(\d+)/i);
+  if (!parts) return;
+  var n = parseInt(parts[1]), s = parseInt(parts[2]);
+  var rolls = [], total = 0;
+  for (var i = 0; i < n; i++) { var r = d(s); rolls.push(r); total += r; }
+  var label = 'd' + s + ' = ' + total;
+  var msg = document.getElementById('dice-msg');
+  msg.textContent = label;
+  msg.style.opacity = '1';
+  clearTimeout(msg._t);
+  msg._t = setTimeout(function() { msg.style.opacity = '0'; }, 1800);
+}
+
+function addTalentRow() {
+  var ul = document.getElementById('talents-list');
+  var li = document.createElement('li');
+  li.className = 'flex items-center gap-2 border-b border-gray-100 py-2';
+  li.innerHTML = '<span class="text-gray-300">&#8226;</span><input type="text" placeholder="Talent..." class="flex-1 text-sm outline-none font-crimson"><button onclick="this.closest(\'li\').remove()" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>';
+  ul.appendChild(li);
+  li.querySelector('input').focus();
+}
+
+function addAttackRow() {
+  var tbody = document.getElementById('attacks-body');
+  var tr = document.createElement('tr');
+  tr.className = 'border-b border-gray-100';
+  tr.innerHTML =
+    '<td class="py-2 px-1"><input type="text" placeholder="Sword..." class="w-full text-sm outline-none font-crimson"></td>' +
+    '<td class="py-2 px-1"><input type="text" placeholder="+3..." class="w-full text-sm outline-none font-crimson"></td>' +
+    '<td class="py-2 px-1"><input type="text" placeholder="1d8..." class="w-full text-sm outline-none font-crimson"></td>' +
+    '<td class="py-2 px-1 text-center"><button onclick="this.closest(\'tr\').remove()" class="text-gray-300 hover:text-gray-500 text-sm">&#x2715;</button></td>';
+  tbody.appendChild(tr);
+}
+
+function addSpellRow() {
+  var tbody = document.getElementById('spells-body');
+  var tr = document.createElement('tr');
+  tr.className = 'border-b border-gray-100';
+  tr.innerHTML =
+    '<td class="py-2 px-1"><select class="text-sm outline-none font-crimson w-10" style="background:white;"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>' +
+    '<td class="py-2 px-1"><input type="text" placeholder="Name..." class="w-full text-sm outline-none font-crimson"></td>' +
+    '<td class="py-2 px-1"><input type="text" placeholder="1 min..." class="w-full text-sm outline-none font-crimson"></td>' +
+    '<td class="py-2 px-1"><select class="text-sm outline-none font-crimson w-14" style="background:white;"><option>Self</option><option>Close</option><option>Near</option><option>Far</option></select></td>' +
+    '<td class="py-2 px-1"><input type="text" placeholder="Effect..." class="w-full text-sm outline-none font-crimson"></td>' +
+    '<td class="py-2 px-1 text-center"><button onclick="this.closest(\'tr\').remove()" class="text-gray-300 hover:text-gray-500 text-sm">&#x2715;</button></td>';
+  tbody.appendChild(tr);
+}
+
+function addGearRow() {
+  var ul = document.getElementById('gear-list');
+  var num = ul.children.length + 1;
+  var li = document.createElement('li');
+  li.className = 'flex items-center gap-2 border-b border-gray-100 py-2';
+  li.innerHTML = '<span class="gear-num font-cinzel text-xs text-gray-400 w-5">' + num + '.</span><input type="text" placeholder="Item..." class="flex-1 text-sm outline-none font-crimson"><button onclick="removeGearRow(this)" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>';
+  ul.appendChild(li);
+  li.querySelector('input').focus();
+}
+
+function removeGearRow(btn) {
+  var ul = document.getElementById('gear-list');
+  btn.closest('li').remove();
+  Array.from(ul.children).forEach(function(li, i) {
+    li.querySelector('.gear-num').textContent = (i + 1) + '.';
+  });
+}
+
+function addFreeCarryRow() {
+  var ul = document.getElementById('free-carry-list');
+  var li = document.createElement('li');
+  li.className = 'flex items-center gap-2 border-b border-gray-100 py-2';
+  li.innerHTML = '<span class="text-gray-300">&#8226;</span><input type="text" placeholder="Torches..." class="flex-1 text-sm outline-none font-crimson"><button onclick="this.closest(\'li\').remove()" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>';
+  ul.appendChild(li);
+  li.querySelector('input').focus();
+}
+</script>
