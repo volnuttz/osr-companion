@@ -2,7 +2,7 @@
 
 A self-contained OSR TTRPG character sheet and DM dashboard, playable in the browser with no installation required.
 
-**Live site:** https://volnuttz.github.io/character-sheet/
+**Live site:** https://volnuttz.github.io/osr-companion/
 
 ---
 
