@@ -59,8 +59,8 @@ input[type=number]{-moz-appearance:textfield;}
   <div class="bg-white border-b border-gray-200 sticky top-[44px] z-20">
     <div class="max-w-2xl mx-auto flex">
       <button onclick="showTab('players')" id="tbtn-players" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 bg-black text-white">PLAYERS</button>
-      <button onclick="showTab('combat')" id="tbtn-combat" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">COMBAT</button>
-      <button onclick="showTab('treasure')" id="tbtn-treasure" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">TREASURE</button>
+      <button onclick="showTab('combat')" id="tbtn-combat" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">BATTLEFIELD</button>
+      <button onclick="showTab('treasure')" id="tbtn-treasure" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">TREASURES</button>
       <button onclick="showTab('shop')" id="tbtn-shop" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">SHOPS</button>
       <button onclick="showTab('notes')" id="tbtn-notes" class="tab-btn flex-1 font-cinzel text-xs py-2.5 text-gray-500 hover:bg-gray-50">NOTES</button>
     </div>
@@ -79,11 +79,11 @@ input[type=number]{-moz-appearance:textfield;}
       </div>
     </div>
 
-    <!-- ── COMBAT ── -->
+    <!-- ── BATTLEFIELD ── -->
     <div id="tab-combat" style="display:none">
       <div class="mt-1">
         <div class="flex items-center justify-between mb-3">
-          <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded">COMBAT</span>
+          <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded">BATTLEFIELD</span>
         </div>
         <div id="initiative-list" class="mb-3"></div>
         <button onclick="openCombatantModal()" class="w-full border border-dashed border-gray-300 rounded-xl font-cinzel text-xs text-gray-400 font-bold py-3 hover:bg-gray-50 mt-2">+ Add Combatant</button>
@@ -119,11 +119,11 @@ input[type=number]{-moz-appearance:textfield;}
           <p class="font-cinzel text-xs text-gray-400 mb-1">ATTACKS</p>
           <input id="npc-attacks" type="text" placeholder="Claw +2 (1d6), Bite +1 (1d4)…" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none font-crimson">
         </div>
-        <button onclick="addCombatant()" class="w-full bg-black text-white font-cinzel text-xs font-bold py-2.5 rounded-lg hover:bg-gray-800 tracking-widest">ADD TO COMBAT</button>
+        <button onclick="addCombatant()" class="w-full bg-black text-white font-cinzel text-xs font-bold py-2.5 rounded-lg hover:bg-gray-800 tracking-widest">ADD TO BATTLEFIELD</button>
       </div>
     </div>
 
-    <!-- ── TREASURE ── -->
+    <!-- ── TREASURES ── -->
     <div id="tab-treasure" style="display:none">
       <div class="mt-1">
         <div class="border border-gray-200 rounded-xl p-3 mb-3">
