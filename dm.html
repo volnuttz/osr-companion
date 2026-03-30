@@ -10,28 +10,48 @@ input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 input[type=number]{-moz-appearance:textfield;}
 @media(max-width:640px){input,select,textarea{font-size:16px!important;}}
+#dm-hamburger-menu{transition:opacity 0.15s,transform 0.15s;}
+#dm-hamburger-menu.hidden-menu{opacity:0;pointer-events:none;transform:translateY(-6px);}
 </style>
+
+<!-- HAMBURGER BUTTON -->
+<button id="dm-hamburger-btn" onclick="toggleDmHamburger()" aria-label="Menu"
+  class="fixed top-2.5 right-3 z-50 w-9 h-9 flex flex-col items-center justify-center gap-1.5 bg-gray-900 border border-gray-700 rounded-lg hover:bg-gray-800" style="position:fixed">
+  <span class="block h-px bg-gray-300" style="width:18px"></span>
+  <span class="block h-px bg-gray-300" style="width:18px"></span>
+  <span class="block h-px bg-gray-300" style="width:18px"></span>
+</button>
+
+<!-- HAMBURGER DROPDOWN -->
+<div id="dm-hamburger-menu" class="hidden-menu fixed top-12 right-3 z-50 w-72 bg-white border border-gray-200 rounded-xl shadow-lg p-3 font-crimson">
+  <div class="mb-3">
+    <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-2">SESSION</p>
+    <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+      <span class="font-cinzel text-xs text-gray-500">ROOM</span>
+      <span id="room-code" class="font-cinzel text-sm font-bold tracking-widest text-black flex-1 select-all">—</span>
+      <button onclick="copyCode()" class="font-cinzel text-xs border border-gray-300 px-2 py-0.5 rounded hover:bg-gray-100 text-gray-600">Copy</button>
+    </div>
+    <p id="peer-status" class="font-cinzel text-xs text-yellow-600 mt-1.5">Connecting…</p>
+  </div>
+  <div class="border-t border-gray-100 pt-3">
+    <a href="index.html" class="font-cinzel text-xs text-gray-500 hover:text-black transition-colors">← Player Sheet</a>
+  </div>
+</div>
+<!-- Click-outside backdrop -->
+<div id="dm-hamburger-backdrop" onclick="closeDmHamburger()" class="hidden fixed inset-0 z-40"></div>
 
 <div class="min-h-screen bg-gray-50 font-crimson">
 
   <!-- HEADER -->
   <div class="bg-black text-white sticky top-0 z-30">
-    <div class="max-w-2xl mx-auto px-3 py-2 flex items-center justify-between">
-      <a href="index.html" class="font-cinzel text-xs text-gray-400 hover:text-white transition-colors">← Player Sheet</a>
+    <div class="max-w-2xl mx-auto px-3 py-3 flex items-center justify-center relative">
       <span class="font-cinzel font-bold text-sm tracking-widest">DM DASHBOARD</span>
-      <span id="conn-count" class="font-cinzel text-xs text-gray-400">0 players</span>
-    </div>
-    <!-- Session bar -->
-    <div class="border-t border-gray-800 px-3 py-1.5 flex items-center gap-3 flex-wrap">
-      <span class="font-cinzel text-xs text-gray-500">ROOM:</span>
-      <span id="room-code" class="font-cinzel text-sm font-bold tracking-widest text-yellow-300 select-all">—</span>
-      <button onclick="copyCode()" class="font-cinzel text-xs border border-gray-700 px-2 py-0.5 rounded hover:bg-gray-800 text-gray-300">Copy</button>
-      <span id="peer-status" class="font-cinzel text-xs text-yellow-500 ml-auto">Connecting…</span>
+      <span id="conn-count" class="font-cinzel text-xs text-gray-400 absolute right-12">0 players</span>
     </div>
   </div>
 
   <!-- TABS -->
-  <div class="bg-white border-b border-gray-200 sticky top-[72px] z-20">
+  <div class="bg-white border-b border-gray-200 sticky top-[44px] z-20">
     <div class="max-w-2xl mx-auto flex">
       <button onclick="showTab('players')" id="tbtn-players" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 bg-black text-white">PLAYERS</button>
       <button onclick="showTab('combat')" id="tbtn-combat" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">COMBAT</button>
@@ -170,6 +190,20 @@ input[type=number]{-moz-appearance:textfield;}
 <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-black text-white font-cinzel text-xs font-bold tracking-widest px-4 py-2 rounded-full shadow-lg transition-opacity duration-500 opacity-0 pointer-events-none z-50"></div>
 
 <script>
+// ── HAMBURGER MENU ────────────────────────────────────────────────────
+function toggleDmHamburger(){
+  var menu=document.getElementById('dm-hamburger-menu');
+  var backdrop=document.getElementById('dm-hamburger-backdrop');
+  if(menu.classList.contains('hidden-menu')){
+    menu.classList.remove('hidden-menu');
+    backdrop.classList.remove('hidden');
+  } else { closeDmHamburger(); }
+}
+function closeDmHamburger(){
+  document.getElementById('dm-hamburger-menu').classList.add('hidden-menu');
+  document.getElementById('dm-hamburger-backdrop').classList.add('hidden');
+}
+
 // ── UTILS ─────────────────────────────────────────────────────────────
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 

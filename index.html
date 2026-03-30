@@ -19,33 +19,48 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
   input, select, textarea { font-size: 16px !important; }
   input.text-sm, input.text-xs { font-size: 16px !important; }
 }
+#hamburger-menu { transition: opacity 0.15s, transform 0.15s; }
+#hamburger-menu.hidden-menu { opacity: 0; pointer-events: none; transform: translateY(-6px); }
 </style>
 
-<div class="max-w-2xl mx-auto bg-white p-2 sm:p-3 pb-24 font-crimson">
+<!-- HAMBURGER BUTTON (fixed top-right) -->
+<button id="hamburger-btn" onclick="toggleHamburger()" aria-label="Menu"
+  class="fixed top-3 right-3 z-50 w-9 h-9 flex flex-col items-center justify-center gap-1.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50" style="position:fixed">
+  <span class="block h-px bg-gray-700" style="width:18px"></span>
+  <span class="block h-px bg-gray-700" style="width:18px"></span>
+  <span class="block h-px bg-gray-700" style="width:18px"></span>
+  <span id="dm-indicator" style="display:none;position:absolute;top:6px;right:6px;width:7px;height:7px;background:#16a34a;border-radius:50%;border:1.5px solid #fff"></span>
+</button>
 
-  <!-- DM SESSION PANEL -->
-  <div id="dm-session" class="mb-3">
-    <div id="session-form" class="border border-gray-200 rounded-xl p-3">
-      <div class="flex items-center justify-between mb-2">
-        <span class="font-cinzel text-xs font-bold text-gray-500 tracking-widest">DM SESSION</span>
-        <a href="dm.html" class="font-cinzel text-xs text-gray-400 hover:text-black transition-colors">DM View →</a>
-      </div>
-      <div class="flex gap-2">
-        <input id="dm-room-input" type="text" placeholder="Room code from your DM…" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-cinzel tracking-wider">
-        <button onclick="joinDmSession()" class="bg-black text-white font-cinzel text-xs font-bold px-3 py-1.5 rounded hover:bg-gray-800 whitespace-nowrap">Join</button>
-      </div>
-      <p id="session-status" class="font-cinzel text-xs text-gray-400 mt-1.5"></p>
+<!-- HAMBURGER DROPDOWN MENU -->
+<div id="hamburger-menu" class="hidden-menu fixed top-12 right-3 z-50 w-72 bg-white border border-gray-200 rounded-xl shadow-lg p-3">
+  <div class="flex items-center justify-between mb-3">
+    <span class="font-cinzel text-xs font-bold text-gray-500 tracking-widest">MENU</span>
+    <a href="dm.html" class="font-cinzel text-xs text-gray-400 hover:text-black transition-colors">DM View →</a>
+  </div>
+  <!-- DM SESSION -->
+  <div id="session-form">
+    <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-2">DM SESSION</p>
+    <div class="flex gap-2">
+      <input id="dm-room-input" type="text" placeholder="Room code from your DM…" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-cinzel tracking-wider">
+      <button onclick="joinDmSession()" class="bg-black text-white font-cinzel text-xs font-bold px-3 py-1.5 rounded hover:bg-gray-800 whitespace-nowrap">Join</button>
     </div>
-    <div id="session-connected" style="display:none" class="border border-green-200 rounded-xl p-3 bg-green-50">
-      <div class="flex items-center justify-between">
-        <div>
-          <span class="font-cinzel text-xs font-bold text-green-700 tracking-widest">CONNECTED TO DM</span>
-          <span id="session-code-label" class="font-cinzel text-xs text-green-600 ml-2"></span>
-        </div>
-        <button onclick="disconnectDm()" class="font-cinzel text-xs text-gray-500 border border-gray-300 bg-white px-2 py-0.5 rounded hover:bg-gray-50">Leave</button>
+    <p id="session-status" class="font-cinzel text-xs text-gray-400 mt-1.5"></p>
+  </div>
+  <div id="session-connected" style="display:none" class="border border-green-200 rounded-xl p-3 bg-green-50">
+    <div class="flex items-center justify-between">
+      <div>
+        <span class="font-cinzel text-xs font-bold text-green-700 tracking-widest">CONNECTED TO DM</span>
+        <span id="session-code-label" class="font-cinzel text-xs text-green-600 ml-2"></span>
       </div>
+      <button onclick="disconnectDm()" class="font-cinzel text-xs text-gray-500 border border-gray-300 bg-white px-2 py-0.5 rounded hover:bg-gray-50">Leave</button>
     </div>
   </div>
+</div>
+<!-- Click-outside backdrop -->
+<div id="hamburger-backdrop" onclick="closeHamburger()" class="hidden fixed inset-0 z-40"></div>
+
+<div class="max-w-2xl mx-auto bg-white p-2 sm:p-3 pb-24 font-crimson">
 
   <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
     <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">NAME</p><input type="text" class="w-full text-sm outline-none" placeholder="Character name..."></div>
@@ -186,6 +201,22 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
 </div>
 
 <script>
+// ── HAMBURGER MENU ────────────────────────────────────────────────────
+function toggleHamburger() {
+  var menu = document.getElementById('hamburger-menu');
+  var backdrop = document.getElementById('hamburger-backdrop');
+  if (menu.classList.contains('hidden-menu')) {
+    menu.classList.remove('hidden-menu');
+    backdrop.classList.remove('hidden');
+  } else {
+    closeHamburger();
+  }
+}
+function closeHamburger() {
+  document.getElementById('hamburger-menu').classList.add('hidden-menu');
+  document.getElementById('hamburger-backdrop').classList.add('hidden');
+}
+
 var fabOpen = false;
 var isLoading = false;
 function toggleFab() {
@@ -397,6 +428,7 @@ function doConnect(code) {
     document.getElementById('session-form').style.display = 'none';
     document.getElementById('session-connected').style.display = 'block';
     document.getElementById('session-code-label').textContent = code.slice(0,12) + '…';
+    document.getElementById('dm-indicator').style.display = 'block';
     sendJoin();
   });
   dmConn.on('data', function(data) { handleDmMsg(data); });
@@ -404,6 +436,7 @@ function doConnect(code) {
     dmConnected = false; dmConn = null;
     document.getElementById('session-form').style.display = 'block';
     document.getElementById('session-connected').style.display = 'none';
+    document.getElementById('dm-indicator').style.display = 'none';
     setSessionStatus('Disconnected from DM');
     showDmMsg('DM disconnected');
   });
@@ -416,6 +449,7 @@ function disconnectDm() {
   dmConn = null; dmPeer = null; dmConnected = false;
   document.getElementById('session-form').style.display = 'block';
   document.getElementById('session-connected').style.display = 'none';
+  document.getElementById('dm-indicator').style.display = 'none';
   setSessionStatus('');
 }
 
