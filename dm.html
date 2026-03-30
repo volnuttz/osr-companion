@@ -76,6 +76,10 @@ input[type=number]{-moz-appearance:textfield;}
               <option value="player">Player (manual)</option>
             </select>
           </div>
+          <div class="mb-2">
+            <p class="font-cinzel text-xs text-gray-400 mb-1">DESCRIPTION</p>
+            <textarea id="npc-desc" placeholder="Rotting skeleton, hollow eye sockets…" rows="2" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none font-crimson resize-none"></textarea>
+          </div>
           <div class="grid grid-cols-3 gap-2 mb-2">
             <div>
               <p class="font-cinzel text-xs text-gray-400 mb-1">MAX HP</p>
@@ -89,6 +93,10 @@ input[type=number]{-moz-appearance:textfield;}
               <p class="font-cinzel text-xs text-gray-400 mb-1">INITIATIVE</p>
               <input id="npc-init" type="number" placeholder="0" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
             </div>
+          </div>
+          <div class="mb-2">
+            <p class="font-cinzel text-xs text-gray-400 mb-1">ATTACKS</p>
+            <input id="npc-attacks" type="text" placeholder="Claw +2 (1d6), Bite +1 (1d4)…" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none font-crimson">
           </div>
           <button onclick="addCombatant()" class="w-full border border-gray-200 rounded font-cinzel text-xs text-gray-500 font-bold py-1.5 hover:bg-gray-50">+ Add to Combat</button>
         </div>
@@ -324,15 +332,19 @@ function addCombatant(){
   var name=document.getElementById('npc-name').value.trim();
   if(!name){toast('Enter a name');return;}
   var type=document.getElementById('npc-type').value;
+  var desc=document.getElementById('npc-desc').value.trim();
   var hp=parseInt(document.getElementById('npc-hp').value)||10;
   var ac=parseInt(document.getElementById('npc-ac').value)||10;
   var init=parseInt(document.getElementById('npc-init').value)||0;
-  combatants.push({id:nextId++,name:name,type:type,hp:hp,hpMax:hp,ac:ac,init:init,peerId:null});
+  var attacks=document.getElementById('npc-attacks').value.trim();
+  combatants.push({id:nextId++,name:name,type:type,desc:desc,hp:hp,hpMax:hp,ac:ac,init:init,attacks:attacks,peerId:null});
   combatants.sort(function(a,b){return b.init-a.init;});
   document.getElementById('npc-name').value='';
+  document.getElementById('npc-desc').value='';
   document.getElementById('npc-hp').value='';
   document.getElementById('npc-ac').value='';
   document.getElementById('npc-init').value='';
+  document.getElementById('npc-attacks').value='';
   renderCombat();
 }
 
@@ -399,7 +411,7 @@ function renderCombat(){
     var border=active?'border-2 border-black':'border border-'+(c.type==='player'?'blue-200':'gray-200');
     var bg=active?'bg-gray-50':'';
     html+='<div class="'+border+' rounded-xl p-2.5 mb-2 '+bg+'">'+
-      '<div class="flex items-center gap-1.5 mb-1.5">'+
+      '<div class="flex items-center gap-1.5 mb-1">'+
         '<span class="font-cinzel text-xs text-gray-400 w-5 text-right shrink-0">'+(active?'▶':i+1)+'</span>'+
         '<span class="font-cinzel text-sm font-bold flex-1 truncate">'+esc(c.name)+'</span>'+
         '<span class="text-xs text-gray-400">AC '+c.ac+'</span>'+
@@ -407,6 +419,7 @@ function renderCombat(){
         '<input type="number" value="'+c.init+'" onchange="setCombatInit('+c.id+',this.value)" class="w-8 border-b border-gray-300 text-center text-xs outline-none ml-0.5">'+
         '<button onclick="removeCombatant('+c.id+')" class="text-gray-300 hover:text-gray-500 text-xs px-1 ml-1">&#x2715;</button>'+
       '</div>'+
+      (c.desc?'<p class="text-xs text-gray-500 font-crimson italic ml-6 mb-1.5 leading-snug">'+esc(c.desc)+'</p>':'')+
       '<div class="h-1 bg-gray-100 rounded-full mb-2 overflow-hidden"><div class="h-full '+bar+' rounded-full" style="width:'+pct+'%"></div></div>'+
       '<div class="flex items-center gap-1.5 flex-wrap">'+
         '<span class="font-cinzel text-xs font-bold text-gray-400">HP</span>'+
@@ -417,6 +430,7 @@ function renderCombat(){
         '<button onclick="adjCombatHp('+c.id+',1)" class="w-6 h-6 rounded-full bg-green-50 text-green-700 text-xs font-bold hover:bg-green-100">+1</button>'+
         '<button onclick="adjCombatHp('+c.id+',5)" class="w-6 h-6 rounded-full bg-green-100 text-green-800 text-xs font-bold hover:bg-green-200">+5</button>'+
       '</div>'+
+      (c.attacks?'<div class="mt-1.5 ml-6 flex gap-1.5 items-baseline"><span class="font-cinzel text-xs font-bold text-gray-400 shrink-0">ATK</span><span class="text-xs font-crimson text-gray-600">'+esc(c.attacks)+'</span></div>':'')+
     '</div>';
   });
   div.innerHTML=html;
