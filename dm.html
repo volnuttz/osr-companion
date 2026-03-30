@@ -61,7 +61,7 @@ input[type=number]{-moz-appearance:textfield;}
       <button onclick="showTab('players')" id="tbtn-players" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 bg-black text-white">PLAYERS</button>
       <button onclick="showTab('combat')" id="tbtn-combat" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">COMBAT</button>
       <button onclick="showTab('treasure')" id="tbtn-treasure" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">TREASURE</button>
-      <button onclick="showTab('shop')" id="tbtn-shop" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">SHOP</button>
+      <button onclick="showTab('shop')" id="tbtn-shop" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">SHOPS</button>
       <button onclick="showTab('notes')" id="tbtn-notes" class="tab-btn flex-1 font-cinzel text-xs py-2.5 text-gray-500 hover:bg-gray-50">NOTES</button>
     </div>
   </div>
@@ -621,7 +621,7 @@ function renderAllShops(){
     return '<div class="border border-gray-200 rounded-xl p-3 mb-3">'+
       '<div class="flex items-center justify-between mb-3">'+
         '<span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded">SHOP</span>'+
-        '<button onclick="removeShop('+s.id+')" class="font-cinzel text-xs border border-red-200 text-red-400 px-2 py-0.5 rounded hover:bg-red-50">Remove</button>'+
+        '<button onclick="removeShop('+s.id+')" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>'+
       '</div>'+
       '<div class="mb-3">'+
         '<p class="font-cinzel text-xs text-gray-400 mb-1">SHOP NAME</p>'+
