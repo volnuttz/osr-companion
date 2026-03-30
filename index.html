@@ -33,7 +33,7 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
     <span class="block h-px bg-gray-700" style="width:18px"></span>
     <span id="dm-indicator" style="display:none;position:absolute;top:6px;right:6px;width:7px;height:7px;background:#16a34a;border-radius:50%;border:1.5px solid #fff"></span>
   </button>
-  <span class="font-cinzel font-bold text-sm tracking-widest absolute left-1/2 -translate-x-1/2">OSR COMPANION</span>
+  <span class="font-cinzel font-bold text-sm tracking-widest absolute left-1/2 -translate-x-1/2">CHARACTER SHEET</span>
 </div>
 
 <!-- SIDEBAR -->
@@ -43,12 +43,12 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
     <button onclick="closeHamburger()" aria-label="Close menu" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-lg text-gray-500 text-lg leading-none">&times;</button>
   </div>
   <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-    <a href="dm.html" class="font-cinzel text-xs text-gray-500 hover:text-black transition-colors">DM View →</a>
-    <!-- DM SESSION -->
+    <a href="dm.html" class="font-cinzel text-xs text-gray-500 hover:text-black transition-colors">GM View →</a>
+    <!-- GM SESSION -->
     <div id="session-form">
-      <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-2">DM SESSION</p>
+      <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-2">GM SESSION</p>
       <div class="flex gap-2">
-        <input id="dm-room-input" type="text" placeholder="Room code from your DM…" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-cinzel tracking-wider">
+        <input id="dm-room-input" type="text" placeholder="Room code…" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-cinzel tracking-wider">
         <button onclick="joinDmSession()" class="bg-black text-white font-cinzel text-xs font-bold px-3 py-1.5 rounded hover:bg-gray-800 whitespace-nowrap">Join</button>
       </div>
       <p id="session-status" class="font-cinzel text-xs text-gray-400 mt-1.5"></p>
@@ -56,7 +56,7 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
     <div id="session-connected" style="display:none" class="border border-green-200 rounded-xl p-3 bg-green-50">
       <div class="flex items-center justify-between">
         <div>
-          <span class="font-cinzel text-xs font-bold text-green-700 tracking-widest">CONNECTED TO DM</span>
+          <span class="font-cinzel text-xs font-bold text-green-700 tracking-widest">CONNECTED TO GM</span>
           <span id="session-code-label" class="font-cinzel text-xs text-green-600 ml-2"></span>
         </div>
         <button onclick="disconnectDm()" class="font-cinzel text-xs text-gray-500 border border-gray-300 bg-white px-2 py-0.5 rounded hover:bg-gray-50">Leave</button>
@@ -179,7 +179,7 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
     </div>
   </div>
 
-  <!-- DM NOTIFICATION -->
+  <!-- GM NOTIFICATION -->
   <div id="dm-msg" class="fixed top-4 left-1/2 -translate-x-1/2 bg-black text-white font-cinzel text-xs font-bold tracking-widest px-4 py-2 rounded-full shadow-lg transition-opacity duration-500 opacity-0 pointer-events-none z-50"></div>
 
   <div id="roll-msg" class="fixed top-4 left-1/2 -translate-x-1/2 bg-black text-white font-cinzel text-xs font-bold tracking-widest px-4 py-2 rounded-full shadow-lg transition-opacity duration-500 opacity-0 pointer-events-none z-50">Scores rolled!</div>
@@ -401,7 +401,7 @@ function addFreeCarryRow() {
   if (!isLoading) li.querySelector('input').focus();
 }
 
-// ── DM SESSION (PeerJS) ───────────────────────────────────────────────
+// ── GM SESSION (PeerJS) ───────────────────────────────────────────────
 var dmPeer = null;
 var dmConn = null;
 var dmConnected = false;
@@ -444,8 +444,8 @@ function doConnect(code) {
     document.getElementById('session-form').style.display = 'block';
     document.getElementById('session-connected').style.display = 'none';
     document.getElementById('dm-indicator').style.display = 'none';
-    setSessionStatus('Disconnected from DM');
-    showDmMsg('DM disconnected');
+    setSessionStatus('Disconnected from GM');
+    showDmMsg('GM disconnected');
   });
   dmConn.on('error', function() { clearTimeout(timeout); setSessionStatus('Connection failed'); });
 }
@@ -487,7 +487,7 @@ function handleDmMsg(data) {
   if (data.type === 'set_hp') {
     document.getElementById('hp').value = data.hp;
     scheduleSave();
-    showDmMsg('HP set to ' + data.hp + ' by DM');
+    showDmMsg('HP set to ' + data.hp + ' by GM');
   }
   if (data.type === 'set_hp_max') {
     document.getElementById('hp-max').value = data.hpMax;
@@ -535,7 +535,7 @@ function showDmMsg(msg) {
   clearTimeout(el._t); el._t = setTimeout(function() { el.style.opacity = '0'; }, 2500);
 }
 
-// Sync HP to DM when HP inputs change
+// Sync HP to GM when HP inputs change
 document.addEventListener('input', function(e) {
   if ((e.target.id === 'hp' || e.target.id === 'hp-max') && dmConnected) syncHpToDm();
 });
