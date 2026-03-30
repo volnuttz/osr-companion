@@ -89,9 +89,13 @@ input[type=number]{-moz-appearance:textfield;}
           </div>
         </div>
         <div id="initiative-list" class="mb-3"></div>
-        <!-- Add combatant -->
-        <div class="border border-dashed border-gray-200 rounded-xl p-3 mt-2">
-          <p class="font-cinzel text-xs font-bold text-gray-400 mb-2 tracking-widest">ADD COMBATANT</p>
+        <button id="add-combatant-btn" onclick="toggleCombatantForm()" class="w-full border border-dashed border-gray-300 rounded-xl font-cinzel text-xs text-gray-400 font-bold py-3 hover:bg-gray-50 mt-2">+ Add Combatant</button>
+        <!-- Add combatant (hidden by default) -->
+        <div id="add-combatant-form" style="display:none" class="border border-dashed border-gray-200 rounded-xl p-3 mt-2">
+          <div class="flex items-center justify-between mb-2">
+            <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest">ADD COMBATANT</p>
+            <button onclick="toggleCombatantForm()" class="text-gray-400 hover:text-gray-600 text-xs px-1">&times;</button>
+          </div>
           <div class="mb-2">
             <input id="npc-name" type="text" placeholder="Name…" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson">
           </div>
@@ -337,6 +341,17 @@ function adjHp(pid,delta){if(players[pid])setHp(pid,players[pid].hp+delta);}
 var combatants=[];
 var nextId=1;
 var dragSrcIdx=null;
+
+function toggleCombatantForm(){
+  var form=document.getElementById('add-combatant-form');
+  var btn=document.getElementById('add-combatant-btn');
+  if(form.style.display==='none'){
+    form.style.display='block'; btn.style.display='none';
+    document.getElementById('npc-name').focus();
+  } else {
+    form.style.display='none'; btn.style.display='block';
+  }
+}
 
 function addCombatant(){
   var name=document.getElementById('npc-name').value.trim();
