@@ -125,7 +125,11 @@ input[type=number]{-moz-appearance:textfield;}
           <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block mb-3">LOOT DROP</span>
           <div id="treasure-items"></div>
           <button onclick="addTreasureItem()" class="mt-2 border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Item</button>
-          <div class="flex gap-3 mt-3">
+        </div>
+        <!-- Currency -->
+        <div class="border border-gray-200 rounded-xl p-3 mb-3">
+          <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block mb-3">CURRENCY</span>
+          <div class="flex gap-3 mb-3">
             <div>
               <p class="font-cinzel text-xs text-gray-400 mb-1">GP</p>
               <input id="t-gp" type="number" placeholder="0" class="w-14 border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
@@ -139,14 +143,14 @@ input[type=number]{-moz-appearance:textfield;}
               <input id="t-cp" type="number" placeholder="0" class="w-14 border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
             </div>
           </div>
+          <div class="flex gap-2 items-center mb-3">
+            <p class="font-cinzel text-xs font-bold text-gray-500 shrink-0">SEND TO</p>
+            <select id="currency-target" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none bg-white font-crimson">
+              <option value="all">All Players</option>
+            </select>
+          </div>
+          <button onclick="sendCurrency()" class="w-full bg-black text-white font-cinzel text-xs font-bold py-2.5 rounded-lg hover:bg-gray-800 tracking-widest">SEND CURRENCY</button>
         </div>
-        <div class="flex gap-2 items-center mb-3">
-          <p class="font-cinzel text-xs font-bold text-gray-500 shrink-0">SEND TO</p>
-          <select id="treasure-target" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none bg-white font-crimson">
-            <option value="all">All Players</option>
-          </select>
-        </div>
-        <button onclick="sendTreasure()" class="w-full bg-black text-white font-cinzel text-xs font-bold py-2.5 rounded-lg hover:bg-gray-800 tracking-widest">SEND TREASURE</button>
       </div>
     </div>
 
@@ -266,16 +270,17 @@ function updateConnCount(){
 }
 
 function updateTargetSelects(){
-  var tSel=document.getElementById('treasure-target');
-  if(tSel){
-    var prev=tSel.value;
-    tSel.innerHTML='<option value="all">All Players</option>';
+  var cSel=document.getElementById('currency-target');
+  if(cSel){
+    var prev=cSel.value;
+    cSel.innerHTML='<option value="all">All Players</option>';
     Object.keys(players).forEach(function(pid){
       var o=document.createElement('option');
-      o.value=pid; o.textContent=players[pid].name; tSel.appendChild(o);
+      o.value=pid; o.textContent=players[pid].name; cSel.appendChild(o);
     });
-    if(prev)tSel.value=prev;
+    if(prev)cSel.value=prev;
   }
+  renderTreasure();
   renderAllShops();
 }
 
@@ -503,37 +508,51 @@ var tItems=[];
 var tNextId=1;
 
 function addTreasureItem(){
-  tItems.push({id:tNextId++,val:''});
+  tItems.push({id:tNextId++,val:'',target:'all'});
   renderTreasure();
 }
 function removeTreasureItem(id){
   tItems=tItems.filter(function(x){return x.id!==id;});
   renderTreasure();
 }
-function setTreasureItem(id,val){
+function setTreasureItem(id,field,val){
   var x=tItems.find(function(x){return x.id===id;});
-  if(x)x.val=val;
+  if(x)x[field]=val;
+}
+function sendTreasureItem(id){
+  var x=tItems.find(function(x){return x.id===id;});
+  if(!x||!x.val){toast('Enter an item name first');return;}
+  var msg={type:'treasure',items:[x.val],gp:0,sp:0,cp:0};
+  if(x.target==='all')broadcast(msg); else send(x.target,msg);
+  toast('Sent "'+x.val+'"!');
+  tItems=tItems.filter(function(t){return t.id!==id;});
+  renderTreasure();
 }
 function renderTreasure(){
+  var playerOpts='<option value="all">All</option>';
+  Object.keys(players).forEach(function(pid){
+    playerOpts+='<option value="'+pid+'">'+esc(players[pid].name)+'</option>';
+  });
   document.getElementById('treasure-items').innerHTML=tItems.map(function(x){
-    return '<div class="flex items-center gap-2 border-b border-gray-100 py-1.5">'+
-      '<span class="text-gray-300">&#8226;</span>'+
-      '<input type="text" placeholder="Item name…" value="'+esc(x.val)+'" oninput="setTreasureItem('+x.id+',this.value)" class="flex-1 text-sm outline-none font-crimson">'+
+    var opts=playerOpts.replace('value="'+x.target+'"','value="'+x.target+'" selected');
+    return '<div class="flex items-center gap-1.5 border-b border-gray-100 py-1.5">'+
+      '<input type="text" placeholder="Item name…" value="'+esc(x.val)+'" oninput="setTreasureItem('+x.id+',\'val\',this.value)" class="flex-1 text-sm outline-none font-crimson min-w-0">'+
+      '<select onchange="setTreasureItem('+x.id+',\'target\',this.value)" class="text-xs outline-none bg-white border border-gray-200 rounded px-1 py-0.5 font-crimson">'+opts+'</select>'+
+      '<button onclick="sendTreasureItem('+x.id+')" class="bg-black text-white font-cinzel text-xs px-2 py-0.5 rounded hover:bg-gray-700 whitespace-nowrap">Send</button>'+
       '<button onclick="removeTreasureItem('+x.id+')" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>'+
     '</div>';
   }).join('');
 }
 
-function sendTreasure(){
-  var items=tItems.map(function(x){return x.val;}).filter(Boolean);
+function sendCurrency(){
   var gp=parseInt(document.getElementById('t-gp').value)||0;
   var sp=parseInt(document.getElementById('t-sp').value)||0;
   var cp=parseInt(document.getElementById('t-cp').value)||0;
-  if(!items.length&&!gp&&!sp&&!cp){toast('Add items or gold first');return;}
-  var target=document.getElementById('treasure-target').value;
-  var msg={type:'treasure',items:items,gp:gp,sp:sp,cp:cp};
+  if(!gp&&!sp&&!cp){toast('Enter an amount first');return;}
+  var target=document.getElementById('currency-target').value;
+  var msg={type:'treasure',items:[],gp:gp,sp:sp,cp:cp};
   if(target==='all')broadcast(msg); else send(target,msg);
-  toast('Treasure sent!');
+  toast('Currency sent!');
 }
 
 // ── SHOP TAB ─────────────────────────────────────────────────────────
