@@ -1,0 +1,546 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DM Dashboard · OSR Companion</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{fontFamily:{cinzel:['Cinzel','serif'],crimson:['Crimson Text','Georgia','serif']}}}}</script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+input[type=number]{-moz-appearance:textfield;}
+@media(max-width:640px){input,select,textarea{font-size:16px!important;}}
+</style>
+
+<div class="min-h-screen bg-gray-50 font-crimson">
+
+  <!-- HEADER -->
+  <div class="bg-black text-white sticky top-0 z-30">
+    <div class="max-w-2xl mx-auto px-3 py-2 flex items-center justify-between">
+      <a href="index.html" class="font-cinzel text-xs text-gray-400 hover:text-white transition-colors">← Player Sheet</a>
+      <span class="font-cinzel font-bold text-sm tracking-widest">DM DASHBOARD</span>
+      <span id="conn-count" class="font-cinzel text-xs text-gray-400">0 players</span>
+    </div>
+    <!-- Session bar -->
+    <div class="border-t border-gray-800 px-3 py-1.5 flex items-center gap-3 flex-wrap">
+      <span class="font-cinzel text-xs text-gray-500">ROOM:</span>
+      <span id="room-code" class="font-cinzel text-sm font-bold tracking-widest text-yellow-300 select-all">—</span>
+      <button onclick="copyCode()" class="font-cinzel text-xs border border-gray-700 px-2 py-0.5 rounded hover:bg-gray-800 text-gray-300">Copy</button>
+      <span id="peer-status" class="font-cinzel text-xs text-yellow-500 ml-auto">Connecting…</span>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="bg-white border-b border-gray-200 sticky top-[72px] z-20">
+    <div class="max-w-2xl mx-auto flex">
+      <button onclick="showTab('players')" id="tbtn-players" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 bg-black text-white">PLAYERS</button>
+      <button onclick="showTab('combat')" id="tbtn-combat" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">COMBAT</button>
+      <button onclick="showTab('treasure')" id="tbtn-treasure" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">TREASURE</button>
+      <button onclick="showTab('shop')" id="tbtn-shop" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">SHOP</button>
+      <button onclick="showTab('notes')" id="tbtn-notes" class="tab-btn flex-1 font-cinzel text-xs py-2.5 text-gray-500 hover:bg-gray-50">NOTES</button>
+    </div>
+  </div>
+
+  <!-- TAB CONTENT -->
+  <div class="max-w-2xl mx-auto p-3 pb-12">
+
+    <!-- ── PLAYERS ── -->
+    <div id="tab-players">
+      <div id="players-list" class="mt-1">
+        <div class="text-center py-14">
+          <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-1">NO PLAYERS CONNECTED</p>
+          <p class="text-sm text-gray-400">Share the room code with your players</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COMBAT ── -->
+    <div id="tab-combat" style="display:none">
+      <div class="mt-1">
+        <div class="flex items-center justify-between mb-3">
+          <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded">INITIATIVE</span>
+          <div class="flex gap-1.5">
+            <button onclick="prevTurn()" class="font-cinzel text-xs border border-gray-200 px-2 py-1 rounded hover:bg-gray-50">← Prev</button>
+            <button onclick="nextTurn()" class="font-cinzel text-xs border border-gray-200 px-2 py-1 rounded hover:bg-gray-50">Next →</button>
+            <button onclick="clearCombat()" class="font-cinzel text-xs border border-red-200 text-red-400 px-2 py-1 rounded hover:bg-red-50">Clear</button>
+          </div>
+        </div>
+        <div id="initiative-list" class="mb-3"></div>
+        <!-- Add combatant -->
+        <div class="border border-dashed border-gray-200 rounded-xl p-3 mt-2">
+          <p class="font-cinzel text-xs font-bold text-gray-400 mb-2 tracking-widest">ADD COMBATANT</p>
+          <div class="grid grid-cols-2 gap-2 mb-2">
+            <input id="npc-name" type="text" placeholder="Name…" class="border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson">
+            <select id="npc-type" class="border border-gray-200 rounded px-2 py-1.5 text-sm outline-none bg-white font-crimson">
+              <option value="npc">NPC / Monster</option>
+              <option value="player">Player (manual)</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <p class="font-cinzel text-xs text-gray-400 mb-1">DESCRIPTION</p>
+            <textarea id="npc-desc" placeholder="Rotting skeleton, hollow eye sockets…" rows="2" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none font-crimson resize-none"></textarea>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mb-2">
+            <div>
+              <p class="font-cinzel text-xs text-gray-400 mb-1">MAX HP</p>
+              <input id="npc-hp" type="number" placeholder="10" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
+            </div>
+            <div>
+              <p class="font-cinzel text-xs text-gray-400 mb-1">AC</p>
+              <input id="npc-ac" type="number" placeholder="12" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
+            </div>
+            <div>
+              <p class="font-cinzel text-xs text-gray-400 mb-1">INITIATIVE</p>
+              <input id="npc-init" type="number" placeholder="0" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
+            </div>
+          </div>
+          <div class="mb-2">
+            <p class="font-cinzel text-xs text-gray-400 mb-1">ATTACKS</p>
+            <input id="npc-attacks" type="text" placeholder="Claw +2 (1d6), Bite +1 (1d4)…" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none font-crimson">
+          </div>
+          <button onclick="addCombatant()" class="w-full border border-gray-200 rounded font-cinzel text-xs text-gray-500 font-bold py-1.5 hover:bg-gray-50">+ Add to Combat</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TREASURE ── -->
+    <div id="tab-treasure" style="display:none">
+      <div class="mt-1">
+        <div class="border border-gray-200 rounded-xl p-3 mb-3">
+          <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block mb-3">LOOT DROP</span>
+          <div id="treasure-items"></div>
+          <button onclick="addTreasureItem()" class="mt-2 border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Item</button>
+          <div class="flex gap-3 mt-3">
+            <div>
+              <p class="font-cinzel text-xs text-gray-400 mb-1">GP</p>
+              <input id="t-gp" type="number" placeholder="0" class="w-14 border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
+            </div>
+            <div>
+              <p class="font-cinzel text-xs text-gray-400 mb-1">SP</p>
+              <input id="t-sp" type="number" placeholder="0" class="w-14 border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
+            </div>
+            <div>
+              <p class="font-cinzel text-xs text-gray-400 mb-1">CP</p>
+              <input id="t-cp" type="number" placeholder="0" class="w-14 border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-2 items-center mb-3">
+          <p class="font-cinzel text-xs font-bold text-gray-500 shrink-0">SEND TO</p>
+          <select id="treasure-target" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none bg-white font-crimson">
+            <option value="all">All Players</option>
+          </select>
+        </div>
+        <button onclick="sendTreasure()" class="w-full bg-black text-white font-cinzel text-xs font-bold py-2.5 rounded-lg hover:bg-gray-800 tracking-widest">SEND TREASURE</button>
+      </div>
+    </div>
+
+    <!-- ── SHOP ── -->
+    <div id="tab-shop" style="display:none">
+      <div class="mt-1">
+        <div class="border border-gray-200 rounded-xl p-3 mb-3">
+          <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block mb-3">SHOP</span>
+          <div class="mb-3">
+            <p class="font-cinzel text-xs text-gray-400 mb-1">SHOP NAME</p>
+            <input id="shop-name" type="text" placeholder="The Iron Anvil…" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson">
+          </div>
+          <div class="flex gap-2 items-center mb-3">
+            <p class="font-cinzel text-xs font-bold text-gray-500 shrink-0">SELL TO</p>
+            <select id="shop-target" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none bg-white font-crimson">
+              <option value="">— select player —</option>
+            </select>
+          </div>
+          <div id="shop-items" class="mb-2"></div>
+          <button onclick="addShopItem()" class="border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Item</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NOTES ── -->
+    <div id="tab-notes" style="display:none">
+      <div class="mt-1">
+        <textarea id="dm-notes" oninput="saveNotes()" placeholder="Session notes, encounters, secret doors, NPC names…" class="w-full h-96 border border-gray-200 rounded-xl p-3 text-sm outline-none resize-none font-crimson leading-relaxed"></textarea>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-black text-white font-cinzel text-xs font-bold tracking-widest px-4 py-2 rounded-full shadow-lg transition-opacity duration-500 opacity-0 pointer-events-none z-50"></div>
+
+<script>
+// ── UTILS ─────────────────────────────────────────────────────────────
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function toast(msg){
+  var el=document.getElementById('toast');
+  el.textContent=msg; el.style.opacity='1';
+  clearTimeout(el._t); el._t=setTimeout(function(){el.style.opacity='0';},2200);
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────
+var TABS=['players','combat','treasure','shop','notes'];
+function showTab(name){
+  TABS.forEach(function(t){
+    document.getElementById('tab-'+t).style.display=t===name?'block':'none';
+    var btn=document.getElementById('tbtn-'+t);
+    if(t===name){btn.classList.add('bg-black','text-white');btn.classList.remove('text-gray-500','hover:bg-gray-50');}
+    else{btn.classList.remove('bg-black','text-white');btn.classList.add('text-gray-500','hover:bg-gray-50');}
+  });
+}
+
+// ── PEERJS ────────────────────────────────────────────────────────────
+var peer=null;
+var connections={};
+var players={};
+
+function initPeer(){
+  peer=new Peer();
+  peer.on('open',function(id){
+    document.getElementById('room-code').textContent=id;
+    document.getElementById('peer-status').textContent='Ready';
+    document.getElementById('peer-status').className='font-cinzel text-xs text-green-400 ml-auto';
+  });
+  peer.on('connection',function(conn){
+    conn.on('open',function(){
+      connections[conn.peer]=conn;
+      conn.on('data',function(data){handleMsg(conn.peer,data);});
+      conn.on('close',function(){
+        var name=players[conn.peer]?players[conn.peer].name:'A player';
+        delete players[conn.peer]; delete connections[conn.peer];
+        renderPlayers(); updateConnCount(); updateTargetSelects();
+        toast(name+' disconnected');
+      });
+    });
+  });
+  peer.on('error',function(err){
+    document.getElementById('peer-status').textContent='Error — retrying…';
+    document.getElementById('peer-status').className='font-cinzel text-xs text-red-400 ml-auto';
+    try{peer.destroy();}catch(e){}
+    setTimeout(initPeer,4000);
+  });
+}
+
+function handleMsg(pid,data){
+  if(data.type==='join'){
+    players[pid]={name:data.name||'Unknown',cls:data.cls||'',hp:parseInt(data.hp)||0,hpMax:parseInt(data.hpMax)||0,ac:parseInt(data.ac)||0};
+    renderPlayers(); updateConnCount(); updateTargetSelects();
+    toast((players[pid].name||'A player')+' joined the session');
+  }
+  if(data.type==='hp_sync'&&players[pid]){
+    players[pid].hp=parseInt(data.hp)||0;
+    players[pid].hpMax=parseInt(data.hpMax)||0;
+    renderPlayers(); syncCombatantFromPlayer(pid,players[pid].hp,players[pid].hpMax);
+  }
+}
+
+function send(pid,msg){if(connections[pid])try{connections[pid].send(msg);}catch(e){}}
+function broadcast(msg){Object.keys(connections).forEach(function(pid){send(pid,msg);});}
+
+function copyCode(){
+  var code=document.getElementById('room-code').textContent;
+  if(navigator.clipboard){navigator.clipboard.writeText(code).then(function(){toast('Room code copied!');});}
+  else{var ta=document.createElement('textarea');ta.value=code;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Room code copied!');}
+}
+
+function updateConnCount(){
+  var n=Object.keys(players).length;
+  document.getElementById('conn-count').textContent=n+(n===1?' player':' players');
+}
+
+function updateTargetSelects(){
+  var tSel=document.getElementById('treasure-target');
+  if(tSel){
+    var prev=tSel.value;
+    tSel.innerHTML='<option value="all">All Players</option>';
+    Object.keys(players).forEach(function(pid){
+      var o=document.createElement('option');
+      o.value=pid; o.textContent=players[pid].name; tSel.appendChild(o);
+    });
+    if(prev)tSel.value=prev;
+  }
+  var sSel=document.getElementById('shop-target');
+  if(sSel){
+    var sPrev=sSel.value;
+    sSel.innerHTML='<option value="">— select player —</option>';
+    Object.keys(players).forEach(function(pid){
+      var o=document.createElement('option');
+      o.value=pid; o.textContent=players[pid].name; sSel.appendChild(o);
+    });
+    if(sPrev)sSel.value=sPrev;
+  }
+}
+
+// ── PLAYERS TAB ───────────────────────────────────────────────────────
+function renderPlayers(){
+  var div=document.getElementById('players-list');
+  var pids=Object.keys(players);
+  if(!pids.length){
+    div.innerHTML='<div class="text-center py-14"><p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-1">NO PLAYERS CONNECTED</p><p class="text-sm text-gray-400">Share the room code above</p></div>';
+    return;
+  }
+  div.innerHTML=pids.map(function(pid){
+    var p=players[pid];
+    var pct=p.hpMax>0?Math.min(100,Math.max(0,Math.round(p.hp/p.hpMax*100))):0;
+    var bar=pct>50?'bg-green-500':pct>25?'bg-yellow-400':'bg-red-500';
+    var dead=p.hp<=0;
+    return '<div class="border border-gray-200 rounded-xl shadow-sm p-3 mb-3'+(dead?' opacity-60':'')+'">'+
+      '<div class="flex items-center justify-between mb-2">'+
+        '<div><span class="font-cinzel font-bold text-sm">'+esc(p.name)+'</span>'+(p.cls?'<span class="text-xs text-gray-400 ml-2 font-crimson">'+esc(p.cls)+'</span>':'')+
+        (dead?'<span class="ml-2 font-cinzel text-xs text-red-500">DEAD</span>':'')+
+        '</div>'+
+        '<span class="font-cinzel text-xs text-gray-500 border border-gray-200 rounded px-1.5 py-0.5">AC '+esc(p.ac||'—')+'</span>'+
+      '</div>'+
+      '<div class="h-1.5 bg-gray-100 rounded-full mb-2.5 overflow-hidden"><div class="h-full '+bar+' rounded-full transition-all" style="width:'+pct+'%"></div></div>'+
+      '<div class="flex items-center gap-2 flex-wrap">'+
+        '<span class="font-cinzel text-xs font-bold text-gray-400">HP</span>'+
+        '<input type="number" value="'+p.hp+'" onchange="setHp(\''+pid+'\',+this.value)" class="w-10 border-b border-gray-300 text-center text-sm outline-none">'+
+        '<span class="text-gray-300">/</span>'+
+        '<input type="number" value="'+p.hpMax+'" onchange="setHpMax(\''+pid+'\',+this.value)" class="w-10 border-b border-gray-300 text-center text-sm outline-none text-gray-400">'+
+        '<button onclick="adjHp(\''+pid+'\',-1)" class="w-7 h-7 rounded-full bg-red-50 text-red-600 text-xs font-bold font-cinzel hover:bg-red-100">-1</button>'+
+        '<button onclick="adjHp(\''+pid+'\',-5)" class="w-7 h-7 rounded-full bg-red-100 text-red-700 text-xs font-bold font-cinzel hover:bg-red-200">-5</button>'+
+        '<button onclick="adjHp(\''+pid+'\',1)" class="w-7 h-7 rounded-full bg-green-50 text-green-700 text-xs font-bold font-cinzel hover:bg-green-100">+1</button>'+
+        '<button onclick="adjHp(\''+pid+'\',5)" class="w-7 h-7 rounded-full bg-green-100 text-green-800 text-xs font-bold font-cinzel hover:bg-green-200">+5</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function setHp(pid,val){
+  if(!players[pid])return;
+  players[pid].hp=Math.max(0,val);
+  send(pid,{type:'set_hp',hp:players[pid].hp});
+  renderPlayers(); syncCombatantFromPlayer(pid,players[pid].hp,players[pid].hpMax);
+}
+function setHpMax(pid,val){
+  if(!players[pid])return;
+  players[pid].hpMax=Math.max(0,val);
+  send(pid,{type:'set_hp_max',hpMax:players[pid].hpMax});
+  renderPlayers();
+}
+function adjHp(pid,delta){if(players[pid])setHp(pid,players[pid].hp+delta);}
+
+// ── COMBAT TAB ────────────────────────────────────────────────────────
+var combatants=[];
+var activeCombatantId=null;
+var nextId=1;
+
+function addCombatant(){
+  var name=document.getElementById('npc-name').value.trim();
+  if(!name){toast('Enter a name');return;}
+  var type=document.getElementById('npc-type').value;
+  var desc=document.getElementById('npc-desc').value.trim();
+  var hp=parseInt(document.getElementById('npc-hp').value)||10;
+  var ac=parseInt(document.getElementById('npc-ac').value)||10;
+  var init=parseInt(document.getElementById('npc-init').value)||0;
+  var attacks=document.getElementById('npc-attacks').value.trim();
+  combatants.push({id:nextId++,name:name,type:type,desc:desc,hp:hp,hpMax:hp,ac:ac,init:init,attacks:attacks,peerId:null});
+  combatants.sort(function(a,b){return b.init-a.init;});
+  if(!activeCombatantId)activeCombatantId=combatants[0].id;
+  document.getElementById('npc-name').value='';
+  document.getElementById('npc-desc').value='';
+  document.getElementById('npc-hp').value='';
+  document.getElementById('npc-ac').value='';
+  document.getElementById('npc-init').value='';
+  document.getElementById('npc-attacks').value='';
+  renderCombat();
+}
+
+function addPlayersToCombat(){
+  Object.keys(players).forEach(function(pid){
+    if(!combatants.find(function(c){return c.peerId===pid;})){
+      var p=players[pid];
+      combatants.push({id:nextId++,name:p.name,type:'player',desc:'',hp:p.hp,hpMax:p.hpMax,ac:p.ac,init:0,attacks:'',peerId:pid});
+    }
+  });
+  if(!activeCombatantId&&combatants.length)activeCombatantId=combatants[0].id;
+  renderCombat();
+}
+
+function syncCombatantFromPlayer(pid,hp,hpMax){
+  var c=combatants.find(function(c){return c.peerId===pid;});
+  if(c){c.hp=hp;c.hpMax=hpMax;renderCombat();}
+}
+
+function adjCombatHp(id,delta){
+  var c=combatants.find(function(c){return c.id===id;});
+  if(!c)return;
+  c.hp=Math.max(0,c.hp+delta);
+  if(c.peerId&&players[c.peerId]){players[c.peerId].hp=c.hp;send(c.peerId,{type:'set_hp',hp:c.hp});renderPlayers();}
+  renderCombat();
+}
+
+function setCombatHp(id,val){
+  var c=combatants.find(function(c){return c.id===id;});
+  if(!c)return;
+  c.hp=Math.max(0,parseInt(val)||0);
+  if(c.peerId&&players[c.peerId]){players[c.peerId].hp=c.hp;send(c.peerId,{type:'set_hp',hp:c.hp});renderPlayers();}
+  renderCombat();
+}
+
+function setCombatInit(id,val){
+  var c=combatants.find(function(c){return c.id===id;});
+  if(c){c.init=parseInt(val)||0;combatants.sort(function(a,b){return b.init-a.init;});renderCombat();}
+}
+
+function removeCombatant(id){
+  var wasActive=activeCombatantId===id;
+  combatants=combatants.filter(function(c){return c.id!==id;});
+  if(wasActive)activeCombatantId=combatants.length?combatants[0].id:null;
+  renderCombat();
+}
+
+function nextTurn(){
+  if(!combatants.length)return;
+  var idx=combatants.findIndex(function(c){return c.id===activeCombatantId;});
+  activeCombatantId=combatants[(idx+1)%combatants.length].id;
+  renderCombat();
+}
+function prevTurn(){
+  if(!combatants.length)return;
+  var idx=combatants.findIndex(function(c){return c.id===activeCombatantId;});
+  activeCombatantId=combatants[(idx-1+combatants.length)%combatants.length].id;
+  renderCombat();
+}
+function clearCombat(){if(confirm('Clear all combatants?')){combatants=[];activeCombatantId=null;renderCombat();}}
+
+function renderCombat(){
+  var div=document.getElementById('initiative-list');
+  var syncBtn=Object.keys(players).length
+    ?'<button onclick="addPlayersToCombat()" class="w-full border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold py-1.5 hover:bg-gray-50 mb-2">+ Sync Connected Players</button>'
+    :'';
+  if(!combatants.length){
+    div.innerHTML=syncBtn+'<p class="text-center text-xs text-gray-400 font-cinzel py-4">No combatants yet. Add below.</p>';
+    return;
+  }
+  var html=syncBtn;
+  combatants.forEach(function(c,i){
+    var active=c.id===activeCombatantId;
+    var pct=c.hpMax>0?Math.min(100,Math.max(0,Math.round(c.hp/c.hpMax*100))):0;
+    var bar=pct>50?'bg-green-400':pct>25?'bg-yellow-400':'bg-red-400';
+    var border=active?'border-2 border-black':'border border-'+(c.type==='player'?'blue-200':'gray-200');
+    var bg=active?'bg-gray-50':'';
+    html+='<div class="'+border+' rounded-xl p-2.5 mb-2 '+bg+'">'+
+      '<div class="flex items-center gap-1.5 mb-1">'+
+        '<span class="font-cinzel text-xs text-gray-400 w-5 text-right shrink-0">'+(active?'▶':i+1)+'</span>'+
+        '<span class="font-cinzel text-sm font-bold flex-1 truncate">'+esc(c.name)+'</span>'+
+        '<span class="text-xs text-gray-400">AC '+c.ac+'</span>'+
+        '<span class="font-cinzel text-xs text-gray-400 ml-2">Init</span>'+
+        '<input type="number" value="'+c.init+'" onchange="setCombatInit('+c.id+',this.value)" class="w-8 border-b border-gray-300 text-center text-xs outline-none ml-0.5">'+
+        '<button onclick="removeCombatant('+c.id+')" class="text-gray-300 hover:text-gray-500 text-xs px-1 ml-1">&#x2715;</button>'+
+      '</div>'+
+      (c.desc?'<p class="text-xs text-gray-500 font-crimson italic ml-6 mb-1.5 leading-snug">'+esc(c.desc)+'</p>':'')+
+      '<div class="h-1 bg-gray-100 rounded-full mb-2 overflow-hidden"><div class="h-full '+bar+' rounded-full" style="width:'+pct+'%"></div></div>'+
+      '<div class="flex items-center gap-1.5 flex-wrap">'+
+        '<span class="font-cinzel text-xs font-bold text-gray-400">HP</span>'+
+        '<input type="number" value="'+c.hp+'" onchange="setCombatHp('+c.id+',this.value)" class="w-9 border-b border-gray-300 text-center text-xs outline-none">'+
+        '<span class="text-gray-300 text-xs">/'+c.hpMax+'</span>'+
+        '<button onclick="adjCombatHp('+c.id+',-1)" class="w-6 h-6 rounded-full bg-red-50 text-red-600 text-xs font-bold hover:bg-red-100">-1</button>'+
+        '<button onclick="adjCombatHp('+c.id+',-5)" class="w-6 h-6 rounded-full bg-red-100 text-red-700 text-xs font-bold hover:bg-red-200">-5</button>'+
+        '<button onclick="adjCombatHp('+c.id+',1)" class="w-6 h-6 rounded-full bg-green-50 text-green-700 text-xs font-bold hover:bg-green-100">+1</button>'+
+        '<button onclick="adjCombatHp('+c.id+',5)" class="w-6 h-6 rounded-full bg-green-100 text-green-800 text-xs font-bold hover:bg-green-200">+5</button>'+
+      '</div>'+
+      (c.attacks?'<div class="mt-1.5 ml-6 flex gap-1.5 items-baseline"><span class="font-cinzel text-xs font-bold text-gray-400 shrink-0">ATK</span><span class="text-xs font-crimson text-gray-600">'+esc(c.attacks)+'</span></div>':'')+
+    '</div>';
+  });
+  div.innerHTML=html;
+}
+
+// ── TREASURE TAB ──────────────────────────────────────────────────────
+var tItems=[];
+var tNextId=1;
+
+function addTreasureItem(){
+  tItems.push({id:tNextId++,val:''});
+  renderTreasure();
+}
+function removeTreasureItem(id){
+  tItems=tItems.filter(function(x){return x.id!==id;});
+  renderTreasure();
+}
+function setTreasureItem(id,val){
+  var x=tItems.find(function(x){return x.id===id;});
+  if(x)x.val=val;
+}
+function renderTreasure(){
+  document.getElementById('treasure-items').innerHTML=tItems.map(function(x){
+    return '<div class="flex items-center gap-2 border-b border-gray-100 py-1.5">'+
+      '<span class="text-gray-300">&#8226;</span>'+
+      '<input type="text" placeholder="Item name…" value="'+esc(x.val)+'" oninput="setTreasureItem('+x.id+',this.value)" class="flex-1 text-sm outline-none font-crimson">'+
+      '<button onclick="removeTreasureItem('+x.id+')" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>'+
+    '</div>';
+  }).join('');
+}
+
+function sendTreasure(){
+  var items=tItems.map(function(x){return x.val;}).filter(Boolean);
+  var gp=parseInt(document.getElementById('t-gp').value)||0;
+  var sp=parseInt(document.getElementById('t-sp').value)||0;
+  var cp=parseInt(document.getElementById('t-cp').value)||0;
+  if(!items.length&&!gp&&!sp&&!cp){toast('Add items or gold first');return;}
+  var target=document.getElementById('treasure-target').value;
+  var msg={type:'treasure',items:items,gp:gp,sp:sp,cp:cp};
+  if(target==='all')broadcast(msg); else send(target,msg);
+  toast('Treasure sent!');
+}
+
+// ── SHOP TAB ─────────────────────────────────────────────────────────
+var sItems=[];
+var sNextId=1;
+
+function addShopItem(){
+  sItems.push({id:sNextId++,name:'',price:0,currency:'gp'});
+  renderShop();
+}
+function removeShopItem(id){
+  sItems=sItems.filter(function(x){return x.id!==id;});
+  renderShop();
+}
+function setShopItem(id,field,val){
+  var x=sItems.find(function(x){return x.id===id;});
+  if(x)x[field]=(field==='price'?(parseInt(val)||0):val);
+}
+function renderShop(){
+  document.getElementById('shop-items').innerHTML=sItems.map(function(x){
+    return '<div class="flex items-center gap-1.5 border-b border-gray-100 py-1.5">'+
+      '<input type="text" placeholder="Item…" value="'+esc(x.name)+'" oninput="setShopItem('+x.id+',\'name\',this.value)" class="flex-1 text-sm outline-none font-crimson min-w-0">'+
+      '<input type="number" placeholder="0" value="'+(x.price||'')+'" oninput="setShopItem('+x.id+',\'price\',this.value)" class="w-12 border-b border-gray-300 text-center text-sm outline-none">'+
+      '<select onchange="setShopItem('+x.id+',\'currency\',this.value)" class="text-xs outline-none bg-white border border-gray-200 rounded px-1 py-0.5">'+
+        '<option value="gp"'+(x.currency==='gp'?' selected':'')+'>GP</option>'+
+        '<option value="sp"'+(x.currency==='sp'?' selected':'')+'>SP</option>'+
+        '<option value="cp"'+(x.currency==='cp'?' selected':'')+'>CP</option>'+
+      '</select>'+
+      '<button onclick="sellItem('+x.id+')" class="bg-black text-white font-cinzel text-xs px-2 py-0.5 rounded hover:bg-gray-700 whitespace-nowrap">Sell</button>'+
+      '<button onclick="removeShopItem('+x.id+')" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>'+
+    '</div>';
+  }).join('');
+}
+
+function sellItem(id){
+  var x=sItems.find(function(x){return x.id===id;});
+  if(!x||!x.name){toast('Item has no name');return;}
+  var pid=document.getElementById('shop-target').value;
+  if(!pid){toast('Select a player first');return;}
+  if(!connections[pid]){toast('Player not connected');return;}
+  send(pid,{type:'sell_item',item:x.name,price:x.price,currency:x.currency});
+  toast('Sold "'+x.name+'" to '+(players[pid]?players[pid].name:'player'));
+}
+
+// ── NOTES ─────────────────────────────────────────────────────────────
+var DM_SAVE='dm_dashboard';
+function saveNotes(){
+  var s=JSON.parse(localStorage.getItem(DM_SAVE)||'{}');
+  s.notes=document.getElementById('dm-notes').value;
+  localStorage.setItem(DM_SAVE,JSON.stringify(s));
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+initPeer();
+renderCombat();
+renderTreasure();
+renderShop();
+
+var saved=JSON.parse(localStorage.getItem(DM_SAVE)||'{}');
+if(saved.notes)document.getElementById('dm-notes').value=saved.notes;
+</script>
