@@ -384,7 +384,15 @@ function joinDmSession() {
 function doConnect(code) {
   if (dmConn) try { dmConn.close(); } catch(e) {}
   dmConn = dmPeer.connect(code);
+  var timeout = setTimeout(function() {
+    if (!dmConnected) {
+      try { dmConn.close(); } catch(e) {}
+      dmConn = null;
+      setSessionStatus('Connection timed out — check the room code');
+    }
+  }, 10000);
   dmConn.on('open', function() {
+    clearTimeout(timeout);
     dmConnected = true;
     document.getElementById('session-form').style.display = 'none';
     document.getElementById('session-connected').style.display = 'block';
@@ -399,7 +407,7 @@ function doConnect(code) {
     setSessionStatus('Disconnected from DM');
     showDmMsg('DM disconnected');
   });
-  dmConn.on('error', function() { setSessionStatus('Connection failed'); });
+  dmConn.on('error', function() { clearTimeout(timeout); setSessionStatus('Connection failed'); });
 }
 
 function disconnectDm() {
@@ -485,8 +493,6 @@ function showDmMsg(msg) {
   el.textContent = msg; el.style.opacity = '1';
   clearTimeout(el._t); el._t = setTimeout(function() { el.style.opacity = '0'; }, 2500);
 }
-
-function escHtml(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
 // Sync HP to DM when HP inputs change
 document.addEventListener('input', function(e) {
