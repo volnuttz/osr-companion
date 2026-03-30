@@ -1,6 +1,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 tailwind.config = {
   theme: { extend: { fontFamily: { cinzel: ['Cinzel','serif'], crimson: ['Crimson Text','Georgia','serif'] } } }
@@ -22,7 +23,29 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
 
 <div class="max-w-2xl mx-auto bg-white p-2 sm:p-3 pb-24 font-crimson">
 
-
+  <!-- DM SESSION PANEL -->
+  <div id="dm-session" class="mb-3">
+    <div id="session-form" class="border border-gray-200 rounded-xl p-3">
+      <div class="flex items-center justify-between mb-2">
+        <span class="font-cinzel text-xs font-bold text-gray-500 tracking-widest">DM SESSION</span>
+        <a href="dm.html" class="font-cinzel text-xs text-gray-400 hover:text-black transition-colors">DM View →</a>
+      </div>
+      <div class="flex gap-2">
+        <input id="dm-room-input" type="text" placeholder="Room code from your DM…" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-cinzel tracking-wider">
+        <button onclick="joinDmSession()" class="bg-black text-white font-cinzel text-xs font-bold px-3 py-1.5 rounded hover:bg-gray-800 whitespace-nowrap">Join</button>
+      </div>
+      <p id="session-status" class="font-cinzel text-xs text-gray-400 mt-1.5"></p>
+    </div>
+    <div id="session-connected" style="display:none" class="border border-green-200 rounded-xl p-3 bg-green-50">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="font-cinzel text-xs font-bold text-green-700 tracking-widest">CONNECTED TO DM</span>
+          <span id="session-code-label" class="font-cinzel text-xs text-green-600 ml-2"></span>
+        </div>
+        <button onclick="disconnectDm()" class="font-cinzel text-xs text-gray-500 border border-gray-300 bg-white px-2 py-0.5 rounded hover:bg-gray-50">Leave</button>
+      </div>
+    </div>
+  </div>
 
   <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
     <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">NAME</p><input type="text" class="w-full text-sm outline-none" placeholder="Character name..."></div>
@@ -130,6 +153,23 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
       <div class="border border-gray-100 rounded-lg p-2">
         <ul id="free-carry-list"></ul>
         <button onclick="addFreeCarryRow()" class="mt-2 border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Item</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DM NOTIFICATION -->
+  <div id="dm-msg" class="fixed top-4 left-1/2 -translate-x-1/2 bg-black text-white font-cinzel text-xs font-bold tracking-widest px-4 py-2 rounded-full shadow-lg transition-opacity duration-500 opacity-0 pointer-events-none z-50"></div>
+
+  <!-- SHOP MODAL -->
+  <div id="shop-modal" style="display:none" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-end sm:items-center justify-center p-3">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+      <div class="bg-black text-white px-4 py-3 flex items-center justify-between">
+        <span id="shop-modal-name" class="font-cinzel font-bold text-sm tracking-widest"></span>
+        <button onclick="closeShopModal()" class="text-gray-400 hover:text-white text-lg leading-none">&#x2715;</button>
+      </div>
+      <div id="shop-modal-items" class="p-4 max-h-72 overflow-y-auto"></div>
+      <div class="px-4 pb-4">
+        <p class="font-cinzel text-xs text-gray-400 text-center">Gold is deducted and items added to your gear automatically</p>
       </div>
     </div>
   </div>
@@ -336,4 +376,165 @@ function addFreeCarryRow() {
   ul.appendChild(li);
   if (!isLoading) li.querySelector('input').focus();
 }
+
+// ── DM SESSION (PeerJS) ───────────────────────────────────────────────
+var dmPeer = null;
+var dmConn = null;
+var dmConnected = false;
+
+function joinDmSession() {
+  var code = document.getElementById('dm-room-input').value.trim();
+  if (!code) { setSessionStatus('Enter a room code first'); return; }
+  setSessionStatus('Connecting…');
+  if (dmPeer && !dmPeer.destroyed) {
+    doConnect(code);
+  } else {
+    dmPeer = new Peer();
+    dmPeer.on('open', function() { doConnect(code); });
+    dmPeer.on('error', function(err) { setSessionStatus('Error: ' + err.type); });
+  }
+}
+
+function doConnect(code) {
+  if (dmConn) try { dmConn.close(); } catch(e) {}
+  dmConn = dmPeer.connect(code);
+  dmConn.on('open', function() {
+    dmConnected = true;
+    document.getElementById('session-form').style.display = 'none';
+    document.getElementById('session-connected').style.display = 'block';
+    document.getElementById('session-code-label').textContent = code.slice(0,12) + '…';
+    sendJoin();
+  });
+  dmConn.on('data', function(data) { handleDmMsg(data); });
+  dmConn.on('close', function() {
+    dmConnected = false; dmConn = null;
+    document.getElementById('session-form').style.display = 'block';
+    document.getElementById('session-connected').style.display = 'none';
+    setSessionStatus('Disconnected from DM');
+    showDmMsg('DM disconnected');
+  });
+  dmConn.on('error', function() { setSessionStatus('Connection failed'); });
+}
+
+function disconnectDm() {
+  if (dmConn) try { dmConn.close(); } catch(e) {}
+  if (dmPeer) try { dmPeer.destroy(); } catch(e) {}
+  dmConn = null; dmPeer = null; dmConnected = false;
+  document.getElementById('session-form').style.display = 'block';
+  document.getElementById('session-connected').style.display = 'none';
+  setSessionStatus('');
+}
+
+function sendJoin() {
+  if (!dmConn || !dmConnected) return;
+  var nameEl = document.querySelector('input[placeholder="Character name..."]');
+  var clsEl = document.querySelector('input[placeholder="Fighter..."]');
+  dmConn.send({
+    type: 'join',
+    name: nameEl ? nameEl.value : '',
+    cls: clsEl ? clsEl.value : '',
+    hp: parseInt(document.getElementById('hp').value) || 0,
+    hpMax: parseInt(document.getElementById('hp-max').value) || 0,
+    ac: parseInt(document.getElementById('ac').value) || 0
+  });
+}
+
+function syncHpToDm() {
+  if (!dmConn || !dmConnected) return;
+  dmConn.send({
+    type: 'hp_sync',
+    hp: parseInt(document.getElementById('hp').value) || 0,
+    hpMax: parseInt(document.getElementById('hp-max').value) || 0
+  });
+}
+
+function handleDmMsg(data) {
+  if (data.type === 'set_hp') {
+    document.getElementById('hp').value = data.hp;
+    scheduleSave();
+    showDmMsg('HP set to ' + data.hp + ' by DM');
+  }
+  if (data.type === 'set_hp_max') {
+    document.getElementById('hp-max').value = data.hpMax;
+    scheduleSave();
+  }
+  if (data.type === 'treasure') {
+    var items = data.items || [];
+    items.forEach(function(item) {
+      addGearRow();
+      var inputs = document.querySelectorAll('#gear-list input');
+      inputs[inputs.length - 1].value = item;
+    });
+    if (data.gp) { var gp = document.getElementById('gp'); gp.value = (parseInt(gp.value) || 0) + data.gp; }
+    if (data.sp) { var sp = document.getElementById('sp'); sp.value = (parseInt(sp.value) || 0) + data.sp; }
+    if (data.cp) { var cp = document.getElementById('cp'); cp.value = (parseInt(cp.value) || 0) + data.cp; }
+    scheduleSave();
+    var parts = [];
+    if (items.length) parts.push(items.length + ' item' + (items.length > 1 ? 's' : ''));
+    if (data.gp) parts.push(data.gp + ' GP');
+    if (data.sp) parts.push(data.sp + ' SP');
+    if (data.cp) parts.push(data.cp + ' CP');
+    showDmMsg('Received: ' + parts.join(', '));
+  }
+  if (data.type === 'shop_open') openShopModal(data.shop);
+  if (data.type === 'shop_close') { closeShopModal(); showDmMsg('The shop is now closed'); }
+}
+
+function openShopModal(shop) {
+  document.getElementById('shop-modal-name').textContent = shop.name || 'Shop';
+  var div = document.getElementById('shop-modal-items');
+  div._items = shop.items || [];
+  div.innerHTML = (shop.items || []).map(function(item, i) {
+    return '<div class="flex items-center justify-between border-b border-gray-100 py-2.5">' +
+      '<span class="text-sm font-crimson">' + escHtml(item.name) + '</span>' +
+      '<div class="flex items-center gap-2">' +
+        '<span class="font-cinzel text-xs font-bold">' + item.price + ' ' + (item.currency || 'gp').toUpperCase() + '</span>' +
+        '<button onclick="buyItem(' + i + ')" class="bg-black text-white font-cinzel text-xs px-2.5 py-1 rounded hover:bg-gray-800">Buy</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('shop-modal').style.display = 'flex';
+}
+
+function buyItem(idx) {
+  var div = document.getElementById('shop-modal-items');
+  var item = (div._items || [])[idx];
+  if (!item) return;
+  var cur = (item.currency || 'gp').toLowerCase();
+  var curEl = document.getElementById(cur);
+  if (curEl) {
+    var balance = parseInt(curEl.value) || 0;
+    if (balance < item.price) { showDmMsg('Not enough ' + cur.toUpperCase()); return; }
+    curEl.value = balance - item.price;
+  }
+  addGearRow();
+  var inputs = document.querySelectorAll('#gear-list input');
+  inputs[inputs.length - 1].value = item.name;
+  scheduleSave();
+  if (dmConn && dmConnected) dmConn.send({ type: 'bought', item: item.name, price: item.price, currency: item.currency });
+  showDmMsg('Bought: ' + item.name);
+}
+
+function closeShopModal() {
+  document.getElementById('shop-modal').style.display = 'none';
+}
+
+function setSessionStatus(msg) {
+  var el = document.getElementById('session-status');
+  if (el) el.textContent = msg;
+}
+
+function showDmMsg(msg) {
+  var el = document.getElementById('dm-msg');
+  if (!el) return;
+  el.textContent = msg; el.style.opacity = '1';
+  clearTimeout(el._t); el._t = setTimeout(function() { el.style.opacity = '0'; }, 2500);
+}
+
+function escHtml(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+// Sync HP to DM when HP inputs change
+document.addEventListener('input', function(e) {
+  if ((e.target.id === 'hp' || e.target.id === 'hp-max') && dmConnected) syncHpToDm();
+});
 </script>
