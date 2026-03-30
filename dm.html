@@ -136,18 +136,14 @@ input[type=number]{-moz-appearance:textfield;}
             <p class="font-cinzel text-xs text-gray-400 mb-1">SHOP NAME</p>
             <input id="shop-name" type="text" placeholder="The Iron Anvil…" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson">
           </div>
+          <div class="flex gap-2 items-center mb-3">
+            <p class="font-cinzel text-xs font-bold text-gray-500 shrink-0">SELL TO</p>
+            <select id="shop-target" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none bg-white font-crimson">
+              <option value="">— select player —</option>
+            </select>
+          </div>
           <div id="shop-items" class="mb-2"></div>
           <button onclick="addShopItem()" class="border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Item</button>
-        </div>
-        <div class="flex gap-2 items-center mb-3">
-          <p class="font-cinzel text-xs font-bold text-gray-500 shrink-0">SEND TO</p>
-          <select id="shop-target" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none bg-white font-crimson">
-            <option value="all">All Players</option>
-          </select>
-        </div>
-        <div class="flex gap-2">
-          <button onclick="openShop()" class="flex-1 bg-black text-white font-cinzel text-xs font-bold py-2.5 rounded-lg hover:bg-gray-800 tracking-widest">OPEN SHOP</button>
-          <button onclick="closeShop()" class="flex-1 border border-gray-200 font-cinzel text-xs font-bold py-2.5 rounded-lg hover:bg-gray-50 text-gray-500">CLOSE SHOP</button>
         </div>
       </div>
     </div>
@@ -248,16 +244,26 @@ function updateConnCount(){
 }
 
 function updateTargetSelects(){
-  ['treasure-target','shop-target'].forEach(function(selId){
-    var sel=document.getElementById(selId); if(!sel)return;
-    var prev=sel.value;
-    sel.innerHTML='<option value="all">All Players</option>';
+  var tSel=document.getElementById('treasure-target');
+  if(tSel){
+    var prev=tSel.value;
+    tSel.innerHTML='<option value="all">All Players</option>';
     Object.keys(players).forEach(function(pid){
       var o=document.createElement('option');
-      o.value=pid; o.textContent=players[pid].name; sel.appendChild(o);
+      o.value=pid; o.textContent=players[pid].name; tSel.appendChild(o);
     });
-    if(prev)sel.value=prev;
-  });
+    if(prev)tSel.value=prev;
+  }
+  var sSel=document.getElementById('shop-target');
+  if(sSel){
+    var prev=sSel.value;
+    sSel.innerHTML='<option value="">— select player —</option>';
+    Object.keys(players).forEach(function(pid){
+      var o=document.createElement('option');
+      o.value=pid; o.textContent=players[pid].name; sSel.appendChild(o);
+    });
+    if(prev)sSel.value=prev;
+  }
 }
 
 // ── PLAYERS TAB ───────────────────────────────────────────────────────
@@ -480,26 +486,20 @@ function renderShop(){
         '<option value="sp"'+(x.currency==='sp'?' selected':'')+'>SP</option>'+
         '<option value="cp"'+(x.currency==='cp'?' selected':'')+'>CP</option>'+
       '</select>'+
+      '<button onclick="sellItem('+x.id+')" class="bg-black text-white font-cinzel text-xs px-2 py-0.5 rounded hover:bg-gray-700 whitespace-nowrap">Sell</button>'+
       '<button onclick="removeShopItem('+x.id+')" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>'+
     '</div>';
   }).join('');
 }
 
-function openShop(){
-  var name=document.getElementById('shop-name').value.trim()||'Shop';
-  var items=sItems.filter(function(x){return x.name;}).map(function(x){return{name:x.name,price:x.price,currency:x.currency};});
-  if(!items.length){toast('Add items to the shop first');return;}
-  var target=document.getElementById('shop-target').value;
-  var msg={type:'shop_open',shop:{name:name,items:items}};
-  if(target==='all')broadcast(msg); else send(target,msg);
-  toast('Shop opened for '+(target==='all'?'all players':players[target]?players[target].name:'player'));
-}
-
-function closeShop(){
-  var target=document.getElementById('shop-target').value;
-  var msg={type:'shop_close'};
-  if(target==='all')broadcast(msg); else send(target,msg);
-  toast('Shop closed');
+function sellItem(id){
+  var x=sItems.find(function(x){return x.id===id;});
+  if(!x||!x.name){toast('Item has no name');return;}
+  var pid=document.getElementById('shop-target').value;
+  if(!pid){toast('Select a player first');return;}
+  if(!connections[pid]){toast('Player not connected');return;}
+  send(pid,{type:'sell_item',item:x.name,price:x.price,currency:x.currency});
+  toast('Sold "'+x.name+'" to '+(players[pid]?players[pid].name:'player'));
 }
 
 // ── NOTES ─────────────────────────────────────────────────────────────

@@ -160,20 +160,6 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
   <!-- DM NOTIFICATION -->
   <div id="dm-msg" class="fixed top-4 left-1/2 -translate-x-1/2 bg-black text-white font-cinzel text-xs font-bold tracking-widest px-4 py-2 rounded-full shadow-lg transition-opacity duration-500 opacity-0 pointer-events-none z-50"></div>
 
-  <!-- SHOP MODAL -->
-  <div id="shop-modal" style="display:none" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-end sm:items-center justify-center p-3">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
-      <div class="bg-black text-white px-4 py-3 flex items-center justify-between">
-        <span id="shop-modal-name" class="font-cinzel font-bold text-sm tracking-widest"></span>
-        <button onclick="closeShopModal()" class="text-gray-400 hover:text-white text-lg leading-none">&#x2715;</button>
-      </div>
-      <div id="shop-modal-items" class="p-4 max-h-72 overflow-y-auto"></div>
-      <div class="px-4 pb-4">
-        <p class="font-cinzel text-xs text-gray-400 text-center">Gold is deducted and items added to your gear automatically</p>
-      </div>
-    </div>
-  </div>
-
   <div id="roll-msg" class="fixed top-4 left-1/2 -translate-x-1/2 bg-black text-white font-cinzel text-xs font-bold tracking-widest px-4 py-2 rounded-full shadow-lg transition-opacity duration-500 opacity-0 pointer-events-none z-50">Scores rolled!</div>
 
 
@@ -476,47 +462,16 @@ function handleDmMsg(data) {
     if (data.cp) parts.push(data.cp + ' CP');
     showDmMsg('Received: ' + parts.join(', '));
   }
-  if (data.type === 'shop_open') openShopModal(data.shop);
-  if (data.type === 'shop_close') { closeShopModal(); showDmMsg('The shop is now closed'); }
-}
-
-function openShopModal(shop) {
-  document.getElementById('shop-modal-name').textContent = shop.name || 'Shop';
-  var div = document.getElementById('shop-modal-items');
-  div._items = shop.items || [];
-  div.innerHTML = (shop.items || []).map(function(item, i) {
-    return '<div class="flex items-center justify-between border-b border-gray-100 py-2.5">' +
-      '<span class="text-sm font-crimson">' + escHtml(item.name) + '</span>' +
-      '<div class="flex items-center gap-2">' +
-        '<span class="font-cinzel text-xs font-bold">' + item.price + ' ' + (item.currency || 'gp').toUpperCase() + '</span>' +
-        '<button onclick="buyItem(' + i + ')" class="bg-black text-white font-cinzel text-xs px-2.5 py-1 rounded hover:bg-gray-800">Buy</button>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-  document.getElementById('shop-modal').style.display = 'flex';
-}
-
-function buyItem(idx) {
-  var div = document.getElementById('shop-modal-items');
-  var item = (div._items || [])[idx];
-  if (!item) return;
-  var cur = (item.currency || 'gp').toLowerCase();
-  var curEl = document.getElementById(cur);
-  if (curEl) {
-    var balance = parseInt(curEl.value) || 0;
-    if (balance < item.price) { showDmMsg('Not enough ' + cur.toUpperCase()); return; }
-    curEl.value = balance - item.price;
+  if (data.type === 'sell_item') {
+    var cur = (data.currency || 'gp').toLowerCase();
+    var curEl = document.getElementById(cur);
+    if (curEl) curEl.value = Math.max(0, (parseInt(curEl.value) || 0) - (data.price || 0));
+    addGearRow();
+    var inputs = document.querySelectorAll('#gear-list input');
+    inputs[inputs.length - 1].value = data.item;
+    scheduleSave();
+    showDmMsg('Purchased: ' + data.item + ' (-' + data.price + ' ' + (data.currency || 'gp').toUpperCase() + ')');
   }
-  addGearRow();
-  var inputs = document.querySelectorAll('#gear-list input');
-  inputs[inputs.length - 1].value = item.name;
-  scheduleSave();
-  if (dmConn && dmConnected) dmConn.send({ type: 'bought', item: item.name, price: item.price, currency: item.currency });
-  showDmMsg('Bought: ' + item.name);
-}
-
-function closeShopModal() {
-  document.getElementById('shop-modal').style.display = 'none';
 }
 
 function setSessionStatus(msg) {
