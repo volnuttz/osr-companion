@@ -16,23 +16,23 @@ input[type=number]{-moz-appearance:textfield;}
 </style>
 
 <!-- SIDEBAR -->
-<div id="dm-sidebar" class="sidebar-closed fixed top-0 left-0 bottom-0 z-50 w-72 bg-white border-r border-gray-200 shadow-xl flex flex-col font-crimson">
-  <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-900">
+<div id="dm-sidebar" class="sidebar-closed fixed top-0 left-0 bottom-0 z-50 w-72 bg-black border-r border-gray-800 shadow-xl flex flex-col font-crimson">
+  <div class="flex items-center justify-between px-4 py-3 border-b border-gray-800">
     <span class="font-cinzel text-xs font-bold text-gray-400 tracking-widest">MENU</span>
     <button onclick="closeDmHamburger()" aria-label="Close menu" class="w-8 h-8 flex items-center justify-center hover:bg-gray-800 rounded-lg text-gray-400 text-lg leading-none">&times;</button>
   </div>
   <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
     <div>
       <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-2">SESSION</p>
-      <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
-        <span class="font-cinzel text-xs text-gray-500">ROOM</span>
-        <span id="room-code" class="font-cinzel text-sm font-bold tracking-widest text-black flex-1 select-all">—</span>
-        <button onclick="copyCode()" class="font-cinzel text-xs border border-gray-300 px-2 py-0.5 rounded hover:bg-gray-100 text-gray-600">Copy</button>
+      <div class="flex items-center gap-2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2">
+        <span class="font-cinzel text-xs text-gray-400">ROOM</span>
+        <span id="room-code" class="font-cinzel text-sm font-bold tracking-widest text-white flex-1 select-all">—</span>
+        <button onclick="copyCode()" class="font-cinzel text-xs border border-gray-600 px-2 py-0.5 rounded hover:bg-gray-800 text-gray-300">Copy</button>
       </div>
       <p id="peer-status" class="font-cinzel text-xs text-yellow-600 mt-1.5">Connecting…</p>
     </div>
-    <div class="border-t border-gray-100 pt-3">
-      <a href="index.html" class="font-cinzel text-xs text-gray-500 hover:text-black transition-colors">← Player Sheet</a>
+    <div class="border-t border-gray-800 pt-3">
+      <a href="index.html" class="font-cinzel text-xs text-gray-400 hover:text-white transition-colors">← Player Sheet</a>
     </div>
   </div>
 </div>
@@ -83,10 +83,8 @@ input[type=number]{-moz-appearance:textfield;}
     <div id="tab-combat" style="display:none">
       <div class="mt-1">
         <div class="flex items-center justify-between mb-3">
-          <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded">INITIATIVE</span>
+          <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded">COMBAT</span>
           <div class="flex gap-1.5">
-            <button onclick="prevTurn()" class="font-cinzel text-xs border border-gray-200 px-2 py-1 rounded hover:bg-gray-50">← Prev</button>
-            <button onclick="nextTurn()" class="font-cinzel text-xs border border-gray-200 px-2 py-1 rounded hover:bg-gray-50">Next →</button>
             <button onclick="clearCombat()" class="font-cinzel text-xs border border-red-200 text-red-400 px-2 py-1 rounded hover:bg-red-50">Clear</button>
           </div>
         </div>
@@ -94,18 +92,14 @@ input[type=number]{-moz-appearance:textfield;}
         <!-- Add combatant -->
         <div class="border border-dashed border-gray-200 rounded-xl p-3 mt-2">
           <p class="font-cinzel text-xs font-bold text-gray-400 mb-2 tracking-widest">ADD COMBATANT</p>
-          <div class="grid grid-cols-2 gap-2 mb-2">
-            <input id="npc-name" type="text" placeholder="Name…" class="border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson">
-            <select id="npc-type" class="border border-gray-200 rounded px-2 py-1.5 text-sm outline-none bg-white font-crimson">
-              <option value="npc">NPC / Monster</option>
-              <option value="player">Player (manual)</option>
-            </select>
+          <div class="mb-2">
+            <input id="npc-name" type="text" placeholder="Name…" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson">
           </div>
           <div class="mb-2">
             <p class="font-cinzel text-xs text-gray-400 mb-1">DESCRIPTION</p>
             <textarea id="npc-desc" placeholder="Rotting skeleton, hollow eye sockets…" rows="2" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none font-crimson resize-none"></textarea>
           </div>
-          <div class="grid grid-cols-3 gap-2 mb-2">
+          <div class="grid grid-cols-2 gap-2 mb-2">
             <div>
               <p class="font-cinzel text-xs text-gray-400 mb-1">MAX HP</p>
               <input id="npc-hp" type="number" placeholder="10" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
@@ -113,10 +107,6 @@ input[type=number]{-moz-appearance:textfield;}
             <div>
               <p class="font-cinzel text-xs text-gray-400 mb-1">AC</p>
               <input id="npc-ac" type="number" placeholder="12" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
-            </div>
-            <div>
-              <p class="font-cinzel text-xs text-gray-400 mb-1">INITIATIVE</p>
-              <input id="npc-init" type="number" placeholder="0" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
             </div>
           </div>
           <div class="mb-2">
@@ -163,21 +153,8 @@ input[type=number]{-moz-appearance:textfield;}
     <!-- ── SHOP ── -->
     <div id="tab-shop" style="display:none">
       <div class="mt-1">
-        <div class="border border-gray-200 rounded-xl p-3 mb-3">
-          <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block mb-3">SHOP</span>
-          <div class="mb-3">
-            <p class="font-cinzel text-xs text-gray-400 mb-1">SHOP NAME</p>
-            <input id="shop-name" type="text" placeholder="The Iron Anvil…" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson">
-          </div>
-          <div class="flex gap-2 items-center mb-3">
-            <p class="font-cinzel text-xs font-bold text-gray-500 shrink-0">SELL TO</p>
-            <select id="shop-target" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none bg-white font-crimson">
-              <option value="">— select player —</option>
-            </select>
-          </div>
-          <div id="shop-items" class="mb-2"></div>
-          <button onclick="addShopItem()" class="border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Item</button>
-        </div>
+        <div id="shops-container"></div>
+        <button onclick="addShop()" class="w-full border border-dashed border-gray-300 rounded-xl font-cinzel text-xs text-gray-400 font-bold py-3 hover:bg-gray-50 mt-2">+ Add Shop</button>
       </div>
     </div>
 
@@ -299,16 +276,7 @@ function updateTargetSelects(){
     });
     if(prev)tSel.value=prev;
   }
-  var sSel=document.getElementById('shop-target');
-  if(sSel){
-    var sPrev=sSel.value;
-    sSel.innerHTML='<option value="">— select player —</option>';
-    Object.keys(players).forEach(function(pid){
-      var o=document.createElement('option');
-      o.value=pid; o.textContent=players[pid].name; sSel.appendChild(o);
-    });
-    if(sPrev)sSel.value=sPrev;
-  }
+  renderAllShops();
 }
 
 // ── PLAYERS TAB ───────────────────────────────────────────────────────
@@ -362,26 +330,21 @@ function adjHp(pid,delta){if(players[pid])setHp(pid,players[pid].hp+delta);}
 
 // ── COMBAT TAB ────────────────────────────────────────────────────────
 var combatants=[];
-var activeCombatantId=null;
 var nextId=1;
+var dragSrcIdx=null;
 
 function addCombatant(){
   var name=document.getElementById('npc-name').value.trim();
   if(!name){toast('Enter a name');return;}
-  var type=document.getElementById('npc-type').value;
   var desc=document.getElementById('npc-desc').value.trim();
   var hp=parseInt(document.getElementById('npc-hp').value)||10;
   var ac=parseInt(document.getElementById('npc-ac').value)||10;
-  var init=parseInt(document.getElementById('npc-init').value)||0;
   var attacks=document.getElementById('npc-attacks').value.trim();
-  combatants.push({id:nextId++,name:name,type:type,desc:desc,hp:hp,hpMax:hp,ac:ac,init:init,attacks:attacks,peerId:null});
-  combatants.sort(function(a,b){return b.init-a.init;});
-  if(!activeCombatantId)activeCombatantId=combatants[0].id;
+  combatants.push({id:nextId++,name:name,desc:desc,hp:hp,hpMax:hp,ac:ac,attacks:attacks,peerId:null});
   document.getElementById('npc-name').value='';
   document.getElementById('npc-desc').value='';
   document.getElementById('npc-hp').value='';
   document.getElementById('npc-ac').value='';
-  document.getElementById('npc-init').value='';
   document.getElementById('npc-attacks').value='';
   renderCombat();
 }
@@ -390,10 +353,9 @@ function addPlayersToCombat(){
   Object.keys(players).forEach(function(pid){
     if(!combatants.find(function(c){return c.peerId===pid;})){
       var p=players[pid];
-      combatants.push({id:nextId++,name:p.name,type:'player',desc:'',hp:p.hp,hpMax:p.hpMax,ac:p.ac,init:0,attacks:'',peerId:pid});
+      combatants.push({id:nextId++,name:p.name,desc:'',hp:p.hp,hpMax:p.hpMax,ac:p.ac,attacks:'',peerId:pid});
     }
   });
-  if(!activeCombatantId&&combatants.length)activeCombatantId=combatants[0].id;
   renderCombat();
 }
 
@@ -418,31 +380,84 @@ function setCombatHp(id,val){
   renderCombat();
 }
 
-function setCombatInit(id,val){
-  var c=combatants.find(function(c){return c.id===id;});
-  if(c){c.init=parseInt(val)||0;combatants.sort(function(a,b){return b.init-a.init;});renderCombat();}
-}
-
 function removeCombatant(id){
-  var wasActive=activeCombatantId===id;
   combatants=combatants.filter(function(c){return c.id!==id;});
-  if(wasActive)activeCombatantId=combatants.length?combatants[0].id:null;
   renderCombat();
 }
 
-function nextTurn(){
-  if(!combatants.length)return;
-  var idx=combatants.findIndex(function(c){return c.id===activeCombatantId;});
-  activeCombatantId=combatants[(idx+1)%combatants.length].id;
-  renderCombat();
+function clearCombat(){if(confirm('Clear all combatants?')){combatants=[];renderCombat();}}
+
+// Drag-and-drop reordering
+function onDragStart(e){
+  dragSrcIdx=+e.currentTarget.dataset.idx;
+  e.currentTarget.style.opacity='0.4';
+  e.dataTransfer.effectAllowed='move';
 }
-function prevTurn(){
-  if(!combatants.length)return;
-  var idx=combatants.findIndex(function(c){return c.id===activeCombatantId;});
-  activeCombatantId=combatants[(idx-1+combatants.length)%combatants.length].id;
-  renderCombat();
+function onDragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  var card=e.currentTarget;
+  card.classList.add('border-black','border-2');
 }
-function clearCombat(){if(confirm('Clear all combatants?')){combatants=[];activeCombatantId=null;renderCombat();}}
+function onDragLeave(e){
+  e.currentTarget.classList.remove('border-black','border-2');
+}
+function onDrop(e){
+  e.preventDefault();
+  e.currentTarget.classList.remove('border-black','border-2');
+  var destIdx=+e.currentTarget.dataset.idx;
+  if(dragSrcIdx!==null&&dragSrcIdx!==destIdx){
+    var moved=combatants.splice(dragSrcIdx,1)[0];
+    combatants.splice(destIdx,0,moved);
+    renderCombat();
+  }
+  dragSrcIdx=null;
+}
+function onDragEnd(e){e.currentTarget.style.opacity='1';dragSrcIdx=null;}
+
+// Touch drag-and-drop
+var touchDragEl=null,touchClone=null,touchSrcIdx=null,touchStartY=0,touchMoved=false;
+function onTouchStart(e){
+  touchSrcIdx=+e.currentTarget.dataset.idx;
+  touchStartY=e.touches[0].clientY;
+  touchMoved=false;
+  touchDragEl=e.currentTarget;
+}
+function onTouchMove(e){
+  if(touchDragEl===null)return;
+  var dy=Math.abs(e.touches[0].clientY-touchStartY);
+  if(!touchMoved&&dy>10){
+    touchMoved=true;
+    touchClone=touchDragEl.cloneNode(true);
+    touchClone.style.cssText='position:fixed;z-index:999;pointer-events:none;opacity:0.8;width:'+touchDragEl.offsetWidth+'px;';
+    document.body.appendChild(touchClone);
+    touchDragEl.style.opacity='0.3';
+  }
+  if(touchMoved&&touchClone){
+    e.preventDefault();
+    touchClone.style.top=(e.touches[0].clientY-30)+'px';
+    touchClone.style.left=touchDragEl.getBoundingClientRect().left+'px';
+  }
+}
+function onTouchEnd(e){
+  if(touchMoved&&touchDragEl!==null){
+    var endY=e.changedTouches[0].clientY;
+    var cards=document.querySelectorAll('[data-idx]');
+    var destIdx=touchSrcIdx;
+    cards.forEach(function(card){
+      var r=card.getBoundingClientRect();
+      if(endY>=r.top&&endY<=r.bottom) destIdx=+card.dataset.idx;
+    });
+    if(touchSrcIdx!==destIdx){
+      var moved=combatants.splice(touchSrcIdx,1)[0];
+      combatants.splice(destIdx,0,moved);
+      renderCombat();
+    }
+    touchDragEl.style.opacity='1';
+  }
+  if(touchClone){touchClone.remove();touchClone=null;}
+  touchDragEl=null;touchSrcIdx=null;touchMoved=false;
+}
 
 function renderCombat(){
   var div=document.getElementById('initiative-list');
@@ -455,21 +470,18 @@ function renderCombat(){
   }
   var html=syncBtn;
   combatants.forEach(function(c,i){
-    var active=c.id===activeCombatantId;
     var pct=c.hpMax>0?Math.min(100,Math.max(0,Math.round(c.hp/c.hpMax*100))):0;
     var bar=pct>50?'bg-green-400':pct>25?'bg-yellow-400':'bg-red-400';
-    var border=active?'border-2 border-black':'border border-'+(c.type==='player'?'blue-200':'gray-200');
-    var bg=active?'bg-gray-50':'';
-    html+='<div class="'+border+' rounded-xl p-2.5 mb-2 '+bg+'">'+
+    var isPlayer=!!c.peerId;
+    var border='border border-'+(isPlayer?'blue-200':'gray-200');
+    html+='<div class="'+border+' rounded-xl p-2.5 mb-2 cursor-grab active:cursor-grabbing" draggable="true" data-idx="'+i+'" ondragstart="onDragStart(event)" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)" ondragend="onDragEnd(event)" ontouchstart="onTouchStart(event)" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event)">'+
       '<div class="flex items-center gap-1.5 mb-1">'+
-        '<span class="font-cinzel text-xs text-gray-400 w-5 text-right shrink-0">'+(active?'▶':i+1)+'</span>'+
+        '<span class="text-gray-300 text-xs select-none shrink-0">⠿</span>'+
         '<span class="font-cinzel text-sm font-bold flex-1 truncate">'+esc(c.name)+'</span>'+
         '<span class="text-xs text-gray-400">AC '+c.ac+'</span>'+
-        '<span class="font-cinzel text-xs text-gray-400 ml-2">Init</span>'+
-        '<input type="number" value="'+c.init+'" onchange="setCombatInit('+c.id+',this.value)" class="w-8 border-b border-gray-300 text-center text-xs outline-none ml-0.5">'+
         '<button onclick="removeCombatant('+c.id+')" class="text-gray-300 hover:text-gray-500 text-xs px-1 ml-1">&#x2715;</button>'+
       '</div>'+
-      (c.desc?'<p class="text-xs text-gray-500 font-crimson italic ml-6 mb-1.5 leading-snug">'+esc(c.desc)+'</p>':'')+
+      (c.desc?'<p class="text-xs text-gray-500 font-crimson italic ml-5 mb-1.5 leading-snug">'+esc(c.desc)+'</p>':'')+
       '<div class="h-1 bg-gray-100 rounded-full mb-2 overflow-hidden"><div class="h-full '+bar+' rounded-full" style="width:'+pct+'%"></div></div>'+
       '<div class="flex items-center gap-1.5 flex-wrap">'+
         '<span class="font-cinzel text-xs font-bold text-gray-400">HP</span>'+
@@ -480,7 +492,7 @@ function renderCombat(){
         '<button onclick="adjCombatHp('+c.id+',1)" class="w-6 h-6 rounded-full bg-green-50 text-green-700 text-xs font-bold hover:bg-green-100">+1</button>'+
         '<button onclick="adjCombatHp('+c.id+',5)" class="w-6 h-6 rounded-full bg-green-100 text-green-800 text-xs font-bold hover:bg-green-200">+5</button>'+
       '</div>'+
-      (c.attacks?'<div class="mt-1.5 ml-6 flex gap-1.5 items-baseline"><span class="font-cinzel text-xs font-bold text-gray-400 shrink-0">ATK</span><span class="text-xs font-crimson text-gray-600">'+esc(c.attacks)+'</span></div>':'')+
+      (c.attacks?'<div class="mt-1.5 ml-5 flex gap-1.5 items-baseline"><span class="font-cinzel text-xs font-bold text-gray-400 shrink-0">ATK</span><span class="text-xs font-crimson text-gray-600">'+esc(c.attacks)+'</span></div>':'')+
     '</div>';
   });
   div.innerHTML=html;
@@ -525,45 +537,92 @@ function sendTreasure(){
 }
 
 // ── SHOP TAB ─────────────────────────────────────────────────────────
-var sItems=[];
-var sNextId=1;
+var shops=[];
+var shopNextId=1;
+var sItemNextId=1;
 
-function addShopItem(){
-  sItems.push({id:sNextId++,name:'',price:0,currency:'gp'});
-  renderShop();
+function addShop(){
+  shops.push({id:shopNextId++,name:'',items:[],target:''});
+  renderAllShops();
 }
-function removeShopItem(id){
-  sItems=sItems.filter(function(x){return x.id!==id;});
-  renderShop();
+function removeShop(shopId){
+  shops=shops.filter(function(s){return s.id!==shopId;});
+  renderAllShops();
 }
-function setShopItem(id,field,val){
-  var x=sItems.find(function(x){return x.id===id;});
+function setShopName(shopId,val){
+  var s=shops.find(function(s){return s.id===shopId;});
+  if(s)s.name=val;
+}
+function setShopTarget(shopId,val){
+  var s=shops.find(function(s){return s.id===shopId;});
+  if(s)s.target=val;
+}
+function addShopItem(shopId){
+  var s=shops.find(function(s){return s.id===shopId;});
+  if(s){s.items.push({id:sItemNextId++,name:'',price:0,currency:'gp'});renderAllShops();}
+}
+function removeShopItem(shopId,itemId){
+  var s=shops.find(function(s){return s.id===shopId;});
+  if(s){s.items=s.items.filter(function(x){return x.id!==itemId;});renderAllShops();}
+}
+function setShopItem(shopId,itemId,field,val){
+  var s=shops.find(function(s){return s.id===shopId;});
+  if(!s)return;
+  var x=s.items.find(function(x){return x.id===itemId;});
   if(x)x[field]=(field==='price'?(parseInt(val)||0):val);
 }
-function renderShop(){
-  document.getElementById('shop-items').innerHTML=sItems.map(function(x){
-    return '<div class="flex items-center gap-1.5 border-b border-gray-100 py-1.5">'+
-      '<input type="text" placeholder="Item…" value="'+esc(x.name)+'" oninput="setShopItem('+x.id+',\'name\',this.value)" class="flex-1 text-sm outline-none font-crimson min-w-0">'+
-      '<input type="number" placeholder="0" value="'+(x.price||'')+'" oninput="setShopItem('+x.id+',\'price\',this.value)" class="w-12 border-b border-gray-300 text-center text-sm outline-none">'+
-      '<select onchange="setShopItem('+x.id+',\'currency\',this.value)" class="text-xs outline-none bg-white border border-gray-200 rounded px-1 py-0.5">'+
-        '<option value="gp"'+(x.currency==='gp'?' selected':'')+'>GP</option>'+
-        '<option value="sp"'+(x.currency==='sp'?' selected':'')+'>SP</option>'+
-        '<option value="cp"'+(x.currency==='cp'?' selected':'')+'>CP</option>'+
-      '</select>'+
-      '<button onclick="sellItem('+x.id+')" class="bg-black text-white font-cinzel text-xs px-2 py-0.5 rounded hover:bg-gray-700 whitespace-nowrap">Sell</button>'+
-      '<button onclick="removeShopItem('+x.id+')" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>'+
-    '</div>';
-  }).join('');
-}
-
-function sellItem(id){
-  var x=sItems.find(function(x){return x.id===id;});
+function sellItem(shopId,itemId){
+  var s=shops.find(function(s){return s.id===shopId;});
+  if(!s)return;
+  var x=s.items.find(function(x){return x.id===itemId;});
   if(!x||!x.name){toast('Item has no name');return;}
-  var pid=document.getElementById('shop-target').value;
+  var pid=s.target;
   if(!pid){toast('Select a player first');return;}
   if(!connections[pid]){toast('Player not connected');return;}
   send(pid,{type:'sell_item',item:x.name,price:x.price,currency:x.currency});
   toast('Sold "'+x.name+'" to '+(players[pid]?players[pid].name:'player'));
+}
+function renderAllShops(){
+  var container=document.getElementById('shops-container');
+  if(!shops.length){
+    container.innerHTML='<p class="text-center text-xs text-gray-400 font-cinzel py-8">No shops yet. Add one below.</p>';
+    return;
+  }
+  container.innerHTML=shops.map(function(s){
+    var playerOpts='<option value="">— select player —</option>';
+    Object.keys(players).forEach(function(pid){
+      playerOpts+='<option value="'+pid+'"'+(s.target===pid?' selected':'')+'>'+esc(players[pid].name)+'</option>';
+    });
+    var itemsHtml=s.items.map(function(x){
+      return '<div class="flex items-center gap-1.5 border-b border-gray-100 py-1.5">'+
+        '<input type="text" placeholder="Item…" value="'+esc(x.name)+'" oninput="setShopItem('+s.id+','+x.id+',\'name\',this.value)" class="flex-1 text-sm outline-none font-crimson min-w-0">'+
+        '<input type="number" placeholder="0" value="'+(x.price||'')+'" oninput="setShopItem('+s.id+','+x.id+',\'price\',this.value)" class="w-12 border-b border-gray-300 text-center text-sm outline-none">'+
+        '<select onchange="setShopItem('+s.id+','+x.id+',\'currency\',this.value)" class="text-xs outline-none bg-white border border-gray-200 rounded px-1 py-0.5">'+
+          '<option value="gp"'+(x.currency==='gp'?' selected':'')+'>GP</option>'+
+          '<option value="sp"'+(x.currency==='sp'?' selected':'')+'>SP</option>'+
+          '<option value="cp"'+(x.currency==='cp'?' selected':'')+'>CP</option>'+
+        '</select>'+
+        '<button onclick="sellItem('+s.id+','+x.id+')" class="bg-black text-white font-cinzel text-xs px-2 py-0.5 rounded hover:bg-gray-700 whitespace-nowrap">Sell</button>'+
+        '<button onclick="removeShopItem('+s.id+','+x.id+')" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>'+
+      '</div>';
+    }).join('');
+    return '<div class="border border-gray-200 rounded-xl p-3 mb-3">'+
+      '<div class="flex items-center justify-between mb-3">'+
+        '<span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded">SHOP</span>'+
+        '<button onclick="removeShop('+s.id+')" class="font-cinzel text-xs border border-red-200 text-red-400 px-2 py-0.5 rounded hover:bg-red-50">Remove</button>'+
+      '</div>'+
+      '<div class="mb-3">'+
+        '<p class="font-cinzel text-xs text-gray-400 mb-1">SHOP NAME</p>'+
+        '<input type="text" placeholder="The Iron Anvil…" value="'+esc(s.name)+'" oninput="setShopName('+s.id+',this.value)" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson">'+
+      '</div>'+
+      '<div class="flex gap-2 items-center mb-3">'+
+        '<p class="font-cinzel text-xs font-bold text-gray-500 shrink-0">SELL TO</p>'+
+        '<select onchange="setShopTarget('+s.id+',this.value)" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none bg-white font-crimson">'+playerOpts+'</select>'+
+      '</div>'+
+      '<div>'+itemsHtml+'</div>'+
+      '<button onclick="addShopItem('+s.id+')" class="border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50 mt-2">+ Add Item</button>'+
+    '</div>';
+  }).join('');
 }
 
 // ── NOTES ─────────────────────────────────────────────────────────────
@@ -578,7 +637,7 @@ function saveNotes(){
 initPeer();
 renderCombat();
 renderTreasure();
-renderShop();
+renderAllShops();
 
 var saved=JSON.parse(localStorage.getItem(DM_SAVE)||'{}');
 if(saved.notes)document.getElementById('dm-notes').value=saved.notes;
