@@ -86,36 +86,40 @@ input[type=number]{-moz-appearance:textfield;}
           <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded">COMBAT</span>
         </div>
         <div id="initiative-list" class="mb-3"></div>
-        <button id="add-combatant-btn" onclick="toggleCombatantForm()" class="w-full border border-dashed border-gray-300 rounded-xl font-cinzel text-xs text-gray-400 font-bold py-3 hover:bg-gray-50 mt-2">+ Add Combatant</button>
-        <!-- Add combatant (hidden by default) -->
-        <div id="add-combatant-form" style="display:none" class="border border-dashed border-gray-200 rounded-xl p-3 mt-2">
-          <div class="flex items-center justify-between mb-2">
-            <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest">ADD COMBATANT</p>
-            <button onclick="toggleCombatantForm()" class="text-gray-400 hover:text-gray-600 text-xs px-1">&times;</button>
-          </div>
-          <div class="mb-2">
-            <input id="npc-name" type="text" placeholder="Name…" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson">
-          </div>
-          <div class="mb-2">
-            <p class="font-cinzel text-xs text-gray-400 mb-1">DESCRIPTION</p>
-            <textarea id="npc-desc" placeholder="Rotting skeleton, hollow eye sockets…" rows="2" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none font-crimson resize-none"></textarea>
-          </div>
-          <div class="grid grid-cols-2 gap-2 mb-2">
-            <div>
-              <p class="font-cinzel text-xs text-gray-400 mb-1">MAX HP</p>
-              <input id="npc-hp" type="number" placeholder="10" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
-            </div>
-            <div>
-              <p class="font-cinzel text-xs text-gray-400 mb-1">AC</p>
-              <input id="npc-ac" type="number" placeholder="12" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
-            </div>
-          </div>
-          <div class="mb-2">
-            <p class="font-cinzel text-xs text-gray-400 mb-1">ATTACKS</p>
-            <input id="npc-attacks" type="text" placeholder="Claw +2 (1d6), Bite +1 (1d4)…" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none font-crimson">
-          </div>
-          <button onclick="addCombatant()" class="w-full border border-gray-200 rounded font-cinzel text-xs text-gray-500 font-bold py-1.5 hover:bg-gray-50">+ Add to Combat</button>
+        <button onclick="openCombatantModal()" class="w-full border border-dashed border-gray-300 rounded-xl font-cinzel text-xs text-gray-400 font-bold py-3 hover:bg-gray-50 mt-2">+ Add Combatant</button>
+      </div>
+    </div>
+
+    <!-- Add Combatant Modal -->
+    <div id="combatant-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+      <div onclick="closeCombatantModal()" class="absolute inset-0 bg-black/40"></div>
+      <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-3 p-4">
+        <div class="flex items-center justify-between mb-3">
+          <p class="font-cinzel text-xs font-bold text-gray-500 tracking-widest">ADD COMBATANT</p>
+          <button onclick="closeCombatantModal()" class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-lg text-gray-400 text-lg leading-none">&times;</button>
         </div>
+        <div class="mb-2">
+          <input id="npc-name" type="text" placeholder="Name…" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson">
+        </div>
+        <div class="mb-2">
+          <p class="font-cinzel text-xs text-gray-400 mb-1">DESCRIPTION</p>
+          <textarea id="npc-desc" placeholder="Rotting skeleton, hollow eye sockets…" rows="2" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none font-crimson resize-none"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-2 mb-2">
+          <div>
+            <p class="font-cinzel text-xs text-gray-400 mb-1">MAX HP</p>
+            <input id="npc-hp" type="number" placeholder="10" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
+          </div>
+          <div>
+            <p class="font-cinzel text-xs text-gray-400 mb-1">AC</p>
+            <input id="npc-ac" type="number" placeholder="12" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none text-center">
+          </div>
+        </div>
+        <div class="mb-3">
+          <p class="font-cinzel text-xs text-gray-400 mb-1">ATTACKS</p>
+          <input id="npc-attacks" type="text" placeholder="Claw +2 (1d6), Bite +1 (1d4)…" class="w-full border border-gray-200 rounded px-2 py-1 text-sm outline-none font-crimson">
+        </div>
+        <button onclick="addCombatant()" class="w-full bg-black text-white font-cinzel text-xs font-bold py-2.5 rounded-lg hover:bg-gray-800 tracking-widest">ADD TO COMBAT</button>
       </div>
     </div>
 
@@ -307,15 +311,12 @@ var combatants=[];
 var nextId=1;
 var dragSrcIdx=null;
 
-function toggleCombatantForm(){
-  var form=document.getElementById('add-combatant-form');
-  var btn=document.getElementById('add-combatant-btn');
-  if(form.style.display==='none'){
-    form.style.display='block'; btn.style.display='none';
-    document.getElementById('npc-name').focus();
-  } else {
-    form.style.display='none'; btn.style.display='block';
-  }
+function openCombatantModal(){
+  document.getElementById('combatant-modal').classList.remove('hidden');
+  setTimeout(function(){document.getElementById('npc-name').focus();},50);
+}
+function closeCombatantModal(){
+  document.getElementById('combatant-modal').classList.add('hidden');
 }
 
 function addCombatant(){
@@ -331,6 +332,7 @@ function addCombatant(){
   document.getElementById('npc-hp').value='';
   document.getElementById('npc-ac').value='';
   document.getElementById('npc-attacks').value='';
+  closeCombatantModal();
   renderCombat();
 }
 
