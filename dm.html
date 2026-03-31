@@ -33,8 +33,11 @@ input[type=number]{-moz-appearance:textfield;}
       <p id="peer-status" class="font-cinzel text-xs text-yellow-600 mt-1.5">Connecting…</p>
     </div>
     <div class="border-t border-gray-800 pt-3">
-      <a href="index.html" class="font-cinzel text-xs text-gray-400 hover:text-white transition-colors">← Player Sheet</a>
+      <a href="index.html" class="font-cinzel text-xs text-gray-400 hover:text-white transition-colors">Player Page</a>
     </div>
+  </div>
+  <div class="p-5 border-t border-gray-800">
+    <img src="logo-white.png" alt="ShadowDark RPG" class="mx-auto max-h-20 opacity-40">
   </div>
 </div>
 <!-- Sidebar backdrop -->
@@ -243,6 +246,9 @@ function handleMsg(pid,data){
     players[pid].hp=parseInt(data.hp)||0;
     players[pid].hpMax=parseInt(data.hpMax)||0;
     syncCombatantFromPlayer(pid,players[pid].hp,players[pid].hpMax);
+  }
+  if(data.type==='sell_rejected'){
+    toast((players[pid]?players[pid].name:'Player')+': '+data.reason+' for "'+data.item+'"');
   }
 }
 

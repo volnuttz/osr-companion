@@ -45,7 +45,6 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
     <button onclick="closeHamburger()" aria-label="Close menu" class="w-9 h-9 flex items-center justify-center hover:bg-gray-100 rounded-lg text-gray-500 text-lg leading-none">&times;</button>
   </div>
   <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-5">
-    <a href="dm.html" class="font-cinzel text-xs text-gray-500 hover:text-black transition-colors">GM View →</a>
     <!-- GM SESSION -->
     <div id="session-form">
       <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-2">GM SESSION</p>
@@ -64,6 +63,10 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
         <button onclick="disconnectDm()" class="font-cinzel text-xs text-gray-500 border border-gray-300 bg-white px-2 py-0.5 rounded hover:bg-gray-50">Leave</button>
       </div>
     </div>
+    <a href="dm.html" class="font-cinzel text-xs text-gray-500 hover:text-black transition-colors">GM Page</a>
+  </div>
+  <div class="p-5 border-t border-gray-100">
+    <img id="sidebar-logo" src="logo-black.png" alt="ShadowDark RPG" class="mx-auto max-h-20 opacity-60">
   </div>
 </div>
 <!-- Sidebar backdrop -->
@@ -516,12 +519,19 @@ function handleDmMsg(data) {
   if (data.type === 'sell_item') {
     var cur = (data.currency || 'gp').toLowerCase();
     var curEl = document.getElementById(cur);
-    if (curEl) curEl.value = Math.max(0, (parseInt(curEl.value) || 0) - (data.price || 0));
+    var have = curEl ? (parseInt(curEl.value) || 0) : 0;
+    var price = data.price || 0;
+    if (price > have) {
+      showDmMsg('Not enough ' + cur.toUpperCase() + ' for ' + data.item);
+      if (dmConn && dmConnected) dmConn.send({type:'sell_rejected',item:data.item,reason:'Not enough ' + cur.toUpperCase()});
+      return;
+    }
+    if (curEl) curEl.value = have - price;
     addGearRow();
     var inputs = document.querySelectorAll('#gear-list input');
     inputs[inputs.length - 1].value = data.item;
     scheduleSave();
-    showDmMsg('Purchased: ' + data.item + ' (-' + data.price + ' ' + (data.currency || 'gp').toUpperCase() + ')');
+    showDmMsg('Purchased: ' + data.item + ' (-' + price + ' ' + cur.toUpperCase() + ')');
   }
 }
 
