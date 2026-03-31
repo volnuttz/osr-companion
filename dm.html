@@ -306,7 +306,7 @@ function addCombatant(){
   document.getElementById('npc-ac').value='';
   document.getElementById('npc-attacks').value='';
   closeCombatantModal();
-  renderCombat();
+  renderCombat();saveDashboard();
 }
 
 
@@ -319,24 +319,24 @@ function adjCombatHp(id,delta){
   var c=combatants.find(function(c){return c.id===id;});
   if(!c)return;
   c.hp=Math.max(0,c.hp+delta);
-  if(c.peerId&&players[c.peerId]){players[c.peerId].hp=c.hp;send(c.peerId,{type:'set_hp',hp:c.hp});renderPlayers();}
-  renderCombat();
+  if(c.peerId&&players[c.peerId]){players[c.peerId].hp=c.hp;send(c.peerId,{type:'set_hp',hp:c.hp});}
+  renderCombat();saveDashboard();
 }
 
 function setCombatHp(id,val){
   var c=combatants.find(function(c){return c.id===id;});
   if(!c)return;
   c.hp=Math.max(0,parseInt(val)||0);
-  if(c.peerId&&players[c.peerId]){players[c.peerId].hp=c.hp;send(c.peerId,{type:'set_hp',hp:c.hp});renderPlayers();}
-  renderCombat();
+  if(c.peerId&&players[c.peerId]){players[c.peerId].hp=c.hp;send(c.peerId,{type:'set_hp',hp:c.hp});}
+  renderCombat();saveDashboard();
 }
 
 function removeCombatant(id){
   combatants=combatants.filter(function(c){return c.id!==id;});
-  renderCombat();
+  renderCombat();saveDashboard();
 }
 
-function clearCombat(){if(confirm('Clear all combatants?')){combatants=[];renderCombat();}}
+function clearCombat(){if(confirm('Clear all combatants?')){combatants=[];renderCombat();saveDashboard();}}
 
 // Drag-and-drop reordering
 function onDragStart(e){
@@ -360,7 +360,7 @@ function onDrop(e){
   if(dragSrcIdx!==null&&dragSrcIdx!==destIdx){
     var moved=combatants.splice(dragSrcIdx,1)[0];
     combatants.splice(destIdx,0,moved);
-    renderCombat();
+    renderCombat();saveDashboard();
   }
   dragSrcIdx=null;
 }
@@ -402,7 +402,7 @@ function onTouchEnd(e){
     if(touchSrcIdx!==destIdx){
       var moved=combatants.splice(touchSrcIdx,1)[0];
       combatants.splice(destIdx,0,moved);
-      renderCombat();
+      renderCombat();saveDashboard();
     }
     touchDragEl.style.opacity='1';
   }
@@ -453,15 +453,16 @@ var tNextId=1;
 function addTreasureItem(kind){
   if(kind==='currency') tItems.push({id:tNextId++,kind:'currency',amount:0,currency:'gp',target:'all'});
   else tItems.push({id:tNextId++,kind:'item',val:'',target:'all'});
-  renderTreasure();
+  renderTreasure();saveDashboard();
 }
 function removeTreasureItem(id){
   tItems=tItems.filter(function(x){return x.id!==id;});
-  renderTreasure();
+  renderTreasure();saveDashboard();
 }
 function setTreasureItem(id,field,val){
   var x=tItems.find(function(x){return x.id===id;});
   if(x)x[field]=(field==='amount'?(parseInt(val)||0):val);
+  saveDashboard();
 }
 function sendTreasureItem(id){
   var x=tItems.find(function(x){return x.id===id;});
@@ -480,7 +481,7 @@ function sendTreasureItem(id){
   if(x.target==='all')broadcast(msg); else send(x.target,msg);
   toast('Sent '+label+'!');
   tItems=tItems.filter(function(t){return t.id!==id;});
-  renderTreasure();
+  renderTreasure();saveDashboard();
 }
 function renderTreasure(){
   var playerOpts='<option value="all">All</option>';
@@ -529,33 +530,36 @@ function confirmAddShop(){
   if(!name){toast('Enter a shop name');return;}
   shops.push({id:shopNextId++,name:name,items:[],target:''});
   closeShopModal();
-  renderAllShops();
+  renderAllShops();saveDashboard();
 }
 function removeShop(shopId){
   shops=shops.filter(function(s){return s.id!==shopId;});
-  renderAllShops();
+  renderAllShops();saveDashboard();
 }
 function setShopName(shopId,val){
   var s=shops.find(function(s){return s.id===shopId;});
   if(s)s.name=val;
+  saveDashboard();
 }
 function setShopTarget(shopId,val){
   var s=shops.find(function(s){return s.id===shopId;});
   if(s)s.target=val;
+  saveDashboard();
 }
 function addShopItem(shopId){
   var s=shops.find(function(s){return s.id===shopId;});
-  if(s){s.items.push({id:sItemNextId++,name:'',price:0,currency:'gp'});renderAllShops();}
+  if(s){s.items.push({id:sItemNextId++,name:'',price:0,currency:'gp'});renderAllShops();saveDashboard();}
 }
 function removeShopItem(shopId,itemId){
   var s=shops.find(function(s){return s.id===shopId;});
-  if(s){s.items=s.items.filter(function(x){return x.id!==itemId;});renderAllShops();}
+  if(s){s.items=s.items.filter(function(x){return x.id!==itemId;});renderAllShops();saveDashboard();}
 }
 function setShopItem(shopId,itemId,field,val){
   var s=shops.find(function(s){return s.id===shopId;});
   if(!s)return;
   var x=s.items.find(function(x){return x.id===itemId;});
   if(x)x[field]=(field==='price'?(parseInt(val)||0):val);
+  saveDashboard();
 }
 function sellItem(shopId,itemId){
   var s=shops.find(function(s){return s.id===shopId;});
@@ -607,20 +611,42 @@ function renderAllShops(){
   }).join('');
 }
 
-// ── NOTES ─────────────────────────────────────────────────────────────
+// ── SAVE / LOAD ──────────────────────────────────────────────────────
 var DM_SAVE='dm_dashboard';
-function saveNotes(){
-  var s=JSON.parse(localStorage.getItem(DM_SAVE)||'{}');
-  s.notes=document.getElementById('dm-notes').value;
-  localStorage.setItem(DM_SAVE,JSON.stringify(s));
+
+function saveDashboard(){
+  var npcCombatants=combatants.filter(function(c){return !c.peerId;}).map(function(c){
+    return {id:c.id,name:c.name,desc:c.desc,hp:c.hp,hpMax:c.hpMax,ac:c.ac,attacks:c.attacks};
+  });
+  var data={
+    notes:document.getElementById('dm-notes').value,
+    combatants:npcCombatants,
+    nextId:nextId,
+    treasures:tItems,
+    tNextId:tNextId,
+    shops:shops,
+    shopNextId:shopNextId,
+    sItemNextId:sItemNextId
+  };
+  localStorage.setItem(DM_SAVE,JSON.stringify(data));
 }
+
+function loadDashboard(){
+  var data=JSON.parse(localStorage.getItem(DM_SAVE)||'{}');
+  if(data.notes)document.getElementById('dm-notes').value=data.notes;
+  if(data.combatants){combatants=data.combatants.map(function(c){c.peerId=null;return c;});}
+  if(data.nextId)nextId=data.nextId;
+  if(data.treasures){tItems=data.treasures;}
+  if(data.tNextId)tNextId=data.tNextId;
+  if(data.shops){shops=data.shops;}
+  if(data.shopNextId)shopNextId=data.shopNextId;
+  if(data.sItemNextId)sItemNextId=data.sItemNextId;
+  renderCombat();renderTreasure();renderAllShops();
+}
+
+function saveNotes(){saveDashboard();}
 
 // ── INIT ──────────────────────────────────────────────────────────────
 initPeer();
-renderCombat();
-renderTreasure();
-renderAllShops();
-
-var saved=JSON.parse(localStorage.getItem(DM_SAVE)||'{}');
-if(saved.notes)document.getElementById('dm-notes').value=saved.notes;
+loadDashboard();
 </script>
