@@ -10,12 +10,13 @@ A self-contained OSR TTRPG character sheet and GM dashboard designed for use wit
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Player character sheet |
-| `dm.html` | GM dashboard |
+| `index.html` | Landing hub with links to player and GM pages |
+| `player.html` | Player character sheet |
+| `gm.html` | GM dashboard |
 
 ---
 
-## Player Sheet (`index.html`)
+## Player Sheet (`player.html`)
 
 - Ability scores (STR, INT, DEX, WIS, CON, CHA) with automatic modifier calculation
 - HP / AC tracking
@@ -40,7 +41,7 @@ While connected:
 
 ---
 
-## GM Dashboard (`dm.html`)
+## GM Dashboard (`gm.html`)
 
 Peer-to-peer session management for the GM. No server or account required — PeerJS generates a room code that players enter on their sheet.
 
