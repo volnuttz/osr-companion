@@ -59,8 +59,7 @@ input[type=number]{-moz-appearance:textfield;}
   <!-- TABS -->
   <div class="bg-white border-b border-gray-200 sticky top-[44px] z-20 overflow-x-auto">
     <div class="max-w-2xl mx-auto flex gap-0">
-      <button onclick="showTab('players')" id="tbtn-players" class="tab-btn font-cinzel text-xs py-2.5 px-4 whitespace-nowrap border-b-2 border-black text-black tab-active">PLAYERS</button>
-      <button onclick="showTab('combat')" id="tbtn-combat" class="tab-btn font-cinzel text-xs py-2.5 px-4 whitespace-nowrap border-b-2 border-transparent text-gray-400 hover:text-gray-600">BATTLEFIELD</button>
+      <button onclick="showTab('combat')" id="tbtn-combat" class="tab-btn font-cinzel text-xs py-2.5 px-4 whitespace-nowrap border-b-2 border-black text-black tab-active">BATTLEFIELD</button>
       <button onclick="showTab('treasure')" id="tbtn-treasure" class="tab-btn font-cinzel text-xs py-2.5 px-4 whitespace-nowrap border-b-2 border-transparent text-gray-400 hover:text-gray-600">TREASURES</button>
       <button onclick="showTab('shop')" id="tbtn-shop" class="tab-btn font-cinzel text-xs py-2.5 px-4 whitespace-nowrap border-b-2 border-transparent text-gray-400 hover:text-gray-600">SHOPS</button>
       <button onclick="showTab('notes')" id="tbtn-notes" class="tab-btn font-cinzel text-xs py-2.5 px-4 whitespace-nowrap border-b-2 border-transparent text-gray-400 hover:text-gray-600">NOTES</button>
@@ -70,18 +69,8 @@ input[type=number]{-moz-appearance:textfield;}
   <!-- TAB CONTENT -->
   <div class="max-w-2xl mx-auto p-3 pb-12">
 
-    <!-- ── PLAYERS ── -->
-    <div id="tab-players">
-      <div id="players-list" class="mt-1">
-        <div class="text-center py-14">
-          <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-1">NO PLAYERS CONNECTED</p>
-          <p class="text-sm text-gray-400">Share the room code with your players</p>
-        </div>
-      </div>
-    </div>
-
     <!-- ── BATTLEFIELD ── -->
-    <div id="tab-combat" style="display:none">
+    <div id="tab-combat">
       <div class="mt-1">
         <div id="initiative-list" class="mb-3"></div>
         <button onclick="openCombatantModal()" class="w-full border border-dashed border-gray-300 rounded-xl font-cinzel text-xs text-gray-400 font-bold py-3 hover:bg-gray-50 mt-2">+ Add Combatant</button>
@@ -196,7 +185,7 @@ function toast(msg){
 }
 
 // ── TABS ──────────────────────────────────────────────────────────────
-var TABS=['players','combat','treasure','shop','notes'];
+var TABS=['combat','treasure','shop','notes'];
 function showTab(name){
   TABS.forEach(function(t){
     document.getElementById('tab-'+t).style.display=t===name?'block':'none';
@@ -225,7 +214,7 @@ function initPeer(){
       conn.on('close',function(){
         var name=players[conn.peer]?players[conn.peer].name:'A player';
         delete players[conn.peer]; delete connections[conn.peer];
-        renderPlayers(); updateConnCount(); updateTargetSelects();
+        updateConnCount(); updateTargetSelects();
         toast(name+' disconnected');
       });
     });
@@ -241,13 +230,19 @@ function initPeer(){
 function handleMsg(pid,data){
   if(data.type==='join'){
     players[pid]={name:data.name||'Unknown',cls:data.cls||'',hp:parseInt(data.hp)||0,hpMax:parseInt(data.hpMax)||0,ac:parseInt(data.ac)||0};
-    renderPlayers(); updateConnCount(); updateTargetSelects();
+    updateConnCount(); updateTargetSelects();
+    // Auto-add to battlefield
+    if(!combatants.find(function(c){return c.peerId===pid;})){
+      var p=players[pid];
+      combatants.push({id:nextId++,name:p.name,desc:'',hp:p.hp,hpMax:p.hpMax,ac:p.ac,attacks:'',peerId:pid});
+      renderCombat();
+    }
     toast((players[pid].name||'A player')+' joined the session');
   }
   if(data.type==='hp_sync'&&players[pid]){
     players[pid].hp=parseInt(data.hp)||0;
     players[pid].hpMax=parseInt(data.hpMax)||0;
-    renderPlayers(); syncCombatantFromPlayer(pid,players[pid].hp,players[pid].hpMax);
+    syncCombatantFromPlayer(pid,players[pid].hp,players[pid].hpMax);
   }
 }
 
@@ -270,52 +265,17 @@ function updateTargetSelects(){
   renderAllShops();
 }
 
-// ── PLAYERS TAB ───────────────────────────────────────────────────────
-function renderPlayers(){
-  var div=document.getElementById('players-list');
-  var pids=Object.keys(players);
-  if(!pids.length){
-    div.innerHTML='<div class="text-center py-14"><p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-1">NO PLAYERS CONNECTED</p><p class="text-sm text-gray-400">Share the room code above</p></div>';
-    return;
-  }
-  div.innerHTML=pids.map(function(pid){
-    var p=players[pid];
-    var pct=p.hpMax>0?Math.min(100,Math.max(0,Math.round(p.hp/p.hpMax*100))):0;
-    var bar=pct>50?'bg-green-500':pct>25?'bg-yellow-400':'bg-red-500';
-    var dead=p.hp<=0;
-    return '<div class="border border-gray-200 rounded-xl shadow-sm p-3 mb-3'+(dead?' opacity-60':'')+'">'+
-      '<div class="flex items-center justify-between mb-2">'+
-        '<div><span class="font-cinzel font-bold text-sm">'+esc(p.name)+'</span>'+(p.cls?'<span class="text-xs text-gray-400 ml-2 font-crimson">'+esc(p.cls)+'</span>':'')+
-        (dead?'<span class="ml-2 font-cinzel text-xs text-red-500">DEAD</span>':'')+
-        '</div>'+
-        '<span class="font-cinzel text-xs text-gray-500 border border-gray-200 rounded px-1.5 py-0.5">AC '+esc(p.ac||'—')+'</span>'+
-      '</div>'+
-      '<div class="h-1.5 bg-gray-100 rounded-full mb-2.5 overflow-hidden"><div class="h-full '+bar+' rounded-full transition-all" style="width:'+pct+'%"></div></div>'+
-      '<div class="flex items-center gap-2 flex-wrap">'+
-        '<span class="font-cinzel text-xs font-bold text-gray-400">HP</span>'+
-        '<input type="number" value="'+p.hp+'" onchange="setHp(\''+pid+'\',+this.value)" class="w-10 border-b border-gray-300 text-center text-sm outline-none">'+
-        '<span class="text-gray-300">/</span>'+
-        '<input type="number" value="'+p.hpMax+'" onchange="setHpMax(\''+pid+'\',+this.value)" class="w-10 border-b border-gray-300 text-center text-sm outline-none text-gray-400">'+
-        '<button onclick="adjHp(\''+pid+'\',-1)" class="w-7 h-7 rounded-full bg-red-50 text-red-600 text-xs font-bold font-cinzel hover:bg-red-100">-1</button>'+
-        '<button onclick="adjHp(\''+pid+'\',-5)" class="w-7 h-7 rounded-full bg-red-100 text-red-700 text-xs font-bold font-cinzel hover:bg-red-200">-5</button>'+
-        '<button onclick="adjHp(\''+pid+'\',1)" class="w-7 h-7 rounded-full bg-green-50 text-green-700 text-xs font-bold font-cinzel hover:bg-green-100">+1</button>'+
-        '<button onclick="adjHp(\''+pid+'\',5)" class="w-7 h-7 rounded-full bg-green-100 text-green-800 text-xs font-bold font-cinzel hover:bg-green-200">+5</button>'+
-      '</div>'+
-    '</div>';
-  }).join('');
-}
-
+// ── PLAYER HP SYNC ───────────────────────────────────────────────────
 function setHp(pid,val){
   if(!players[pid])return;
   players[pid].hp=Math.max(0,val);
   send(pid,{type:'set_hp',hp:players[pid].hp});
-  renderPlayers(); syncCombatantFromPlayer(pid,players[pid].hp,players[pid].hpMax);
+  syncCombatantFromPlayer(pid,players[pid].hp,players[pid].hpMax);
 }
 function setHpMax(pid,val){
   if(!players[pid])return;
   players[pid].hpMax=Math.max(0,val);
   send(pid,{type:'set_hp_max',hpMax:players[pid].hpMax});
-  renderPlayers();
 }
 function adjHp(pid,delta){if(players[pid])setHp(pid,players[pid].hp+delta);}
 
@@ -349,15 +309,6 @@ function addCombatant(){
   renderCombat();
 }
 
-function addPlayersToCombat(){
-  Object.keys(players).forEach(function(pid){
-    if(!combatants.find(function(c){return c.peerId===pid;})){
-      var p=players[pid];
-      combatants.push({id:nextId++,name:p.name,desc:'',hp:p.hp,hpMax:p.hpMax,ac:p.ac,attacks:'',peerId:pid});
-    }
-  });
-  renderCombat();
-}
 
 function syncCombatantFromPlayer(pid,hp,hpMax){
   var c=combatants.find(function(c){return c.peerId===pid;});
@@ -461,14 +412,11 @@ function onTouchEnd(e){
 
 function renderCombat(){
   var div=document.getElementById('initiative-list');
-  var syncBtn=Object.keys(players).length
-    ?'<button onclick="addPlayersToCombat()" class="w-full border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold py-1.5 hover:bg-gray-50 mb-2">+ Sync Connected Players</button>'
-    :'';
   if(!combatants.length){
-    div.innerHTML=syncBtn+'<p class="text-center text-xs text-gray-400 font-cinzel py-4">No combatants yet. Add below.</p>';
+    div.innerHTML='<p class="text-center text-xs text-gray-400 font-cinzel py-4">No combatants yet. Add below.</p>';
     return;
   }
-  var html=syncBtn;
+  var html='';
   combatants.forEach(function(c,i){
     var pct=c.hpMax>0?Math.min(100,Math.max(0,Math.round(c.hp/c.hpMax*100))):0;
     var bar=pct>50?'bg-green-400':pct>25?'bg-yellow-400':'bg-red-400';
