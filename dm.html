@@ -10,18 +10,19 @@ input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 input[type=number]{-moz-appearance:textfield;}
 @media(max-width:640px){input,select,textarea{font-size:16px!important;}}
-#dm-sidebar{transition:transform 0.25s ease;}
+#dm-sidebar{transition:transform 0.3s cubic-bezier(.4,0,.2,1);}
 #dm-sidebar.sidebar-closed{transform:translateX(-100%);}
-#dm-hamburger-backdrop{transition:opacity 0.25s ease;}
+#dm-hamburger-backdrop{transition:opacity 0.3s cubic-bezier(.4,0,.2,1);}
+.tab-active{color:#000;border-bottom:2px solid #000;}
 </style>
 
 <!-- SIDEBAR -->
-<div id="dm-sidebar" class="sidebar-closed fixed top-0 left-0 bottom-0 z-50 w-72 bg-black border-r border-gray-800 shadow-xl flex flex-col font-crimson">
-  <div class="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+<div id="dm-sidebar" class="sidebar-closed fixed top-0 left-0 bottom-0 z-50 w-full sm:w-80 bg-black shadow-xl flex flex-col font-crimson">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-800">
     <span class="font-cinzel text-xs font-bold text-gray-400 tracking-widest">MENU</span>
-    <button onclick="closeDmHamburger()" aria-label="Close menu" class="w-8 h-8 flex items-center justify-center hover:bg-gray-800 rounded-lg text-gray-400 text-lg leading-none">&times;</button>
+    <button onclick="closeDmHamburger()" aria-label="Close menu" class="w-9 h-9 flex items-center justify-center hover:bg-gray-800 rounded-lg text-gray-400 text-lg leading-none">&times;</button>
   </div>
-  <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+  <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-5">
     <div>
       <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-2">SESSION</p>
       <div class="flex items-center gap-2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2">
@@ -56,13 +57,13 @@ input[type=number]{-moz-appearance:textfield;}
   </div>
 
   <!-- TABS -->
-  <div class="bg-white border-b border-gray-200 sticky top-[44px] z-20">
-    <div class="max-w-2xl mx-auto flex">
-      <button onclick="showTab('players')" id="tbtn-players" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 bg-black text-white">PLAYERS</button>
-      <button onclick="showTab('combat')" id="tbtn-combat" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">BATTLEFIELD</button>
-      <button onclick="showTab('treasure')" id="tbtn-treasure" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">TREASURES</button>
-      <button onclick="showTab('shop')" id="tbtn-shop" class="tab-btn flex-1 font-cinzel text-xs py-2.5 border-r border-gray-100 text-gray-500 hover:bg-gray-50">SHOPS</button>
-      <button onclick="showTab('notes')" id="tbtn-notes" class="tab-btn flex-1 font-cinzel text-xs py-2.5 text-gray-500 hover:bg-gray-50">NOTES</button>
+  <div class="bg-white border-b border-gray-200 sticky top-[44px] z-20 overflow-x-auto">
+    <div class="max-w-2xl mx-auto flex gap-0">
+      <button onclick="showTab('players')" id="tbtn-players" class="tab-btn font-cinzel text-xs py-2.5 px-4 whitespace-nowrap border-b-2 border-black text-black tab-active">PLAYERS</button>
+      <button onclick="showTab('combat')" id="tbtn-combat" class="tab-btn font-cinzel text-xs py-2.5 px-4 whitespace-nowrap border-b-2 border-transparent text-gray-400 hover:text-gray-600">BATTLEFIELD</button>
+      <button onclick="showTab('treasure')" id="tbtn-treasure" class="tab-btn font-cinzel text-xs py-2.5 px-4 whitespace-nowrap border-b-2 border-transparent text-gray-400 hover:text-gray-600">TREASURES</button>
+      <button onclick="showTab('shop')" id="tbtn-shop" class="tab-btn font-cinzel text-xs py-2.5 px-4 whitespace-nowrap border-b-2 border-transparent text-gray-400 hover:text-gray-600">SHOPS</button>
+      <button onclick="showTab('notes')" id="tbtn-notes" class="tab-btn font-cinzel text-xs py-2.5 px-4 whitespace-nowrap border-b-2 border-transparent text-gray-400 hover:text-gray-600">NOTES</button>
     </div>
   </div>
 
@@ -200,8 +201,8 @@ function showTab(name){
   TABS.forEach(function(t){
     document.getElementById('tab-'+t).style.display=t===name?'block':'none';
     var btn=document.getElementById('tbtn-'+t);
-    if(t===name){btn.classList.add('bg-black','text-white');btn.classList.remove('text-gray-500','hover:bg-gray-50');}
-    else{btn.classList.remove('bg-black','text-white');btn.classList.add('text-gray-500','hover:bg-gray-50');}
+    if(t===name){btn.classList.add('border-black','text-black');btn.classList.remove('border-transparent','text-gray-400','hover:text-gray-600');}
+    else{btn.classList.remove('border-black','text-black');btn.classList.add('border-transparent','text-gray-400','hover:text-gray-600');}
   });
 }
 
