@@ -13,7 +13,6 @@ input[type=number]{-moz-appearance:textfield;}
 #dm-sidebar{transition:transform 0.3s cubic-bezier(.4,0,.2,1);}
 #dm-sidebar.sidebar-closed{transform:translateX(-100%);}
 #dm-hamburger-backdrop{transition:opacity 0.3s cubic-bezier(.4,0,.2,1);}
-.tab-active{color:#000;border-bottom:2px solid #000;}
 </style>
 
 <!-- SIDEBAR -->
@@ -164,6 +163,18 @@ input[type=number]{-moz-appearance:textfield;}
       </div>
     </div>
 
+    <!-- Timer Finished Modal -->
+    <div id="timer-finished-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+      <div onclick="closeTimerFinishedModal()" class="absolute inset-0 bg-black/40"></div>
+      <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-3 p-6 text-center">
+        <div class="mb-4">
+          <p class="font-cinzel text-lg font-bold text-gray-800 tracking-widest">TORCH FINISHED</p>
+          <p class="font-cinzel text-sm text-gray-600 mt-2">Your 1-hour timer has completed!</p>
+        </div>
+        <button onclick="closeTimerFinishedModal()" class="w-full bg-black text-white font-cinzel text-sm font-bold py-3 rounded-lg hover:bg-gray-800 tracking-widest">OK</button>
+      </div>
+    </div>
+
     <!-- ── NOTES ── -->
     <div id="tab-notes" style="display:none">
       <div class="mt-1">
@@ -176,6 +187,27 @@ input[type=number]{-moz-appearance:textfield;}
 
 <!-- TOAST -->
 <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-black text-white font-cinzel text-xs font-bold tracking-widest px-4 py-2 rounded-full shadow-lg transition-opacity duration-500 opacity-0 pointer-events-none z-50"></div>
+
+<!-- DICE MSG -->
+<div id="dice-msg" class="fixed top-4 left-1/2 -translate-x-1/2 bg-black text-white font-cinzel text-sm font-bold tracking-widest px-5 py-2 rounded-full shadow-lg transition-opacity duration-500 opacity-0 pointer-events-none z-50"></div>
+
+<!-- FAB SPEED DIAL -->
+<div id="fab-container" class="fixed bottom-6 right-4 sm:bottom-6 sm:right-5 flex flex-col items-end gap-2 z-40" style="bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem))">
+  <div id="fab-items" class="flex flex-col items-end gap-2 mb-1" style="display:none!important;">
+    <button onclick="quickRoll('1d4');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800">d4</button>
+    <button onclick="quickRoll('1d6');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800">d6</button>
+    <button onclick="quickRoll('1d8');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800">d8</button>
+    <button onclick="quickRoll('1d10');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800">d10</button>
+    <button onclick="quickRoll('1d12');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800">d12</button>
+    <button onclick="quickRoll('1d20');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800">d20</button>
+  </div>
+  <!-- Persistent Timer Button -->
+  <button onclick="startTimer()" class="h-10 px-3 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800 whitespace-nowrap">
+    <span id="timer-display">Torch</span>
+  </button>
+  <!-- Main FAB -->
+  <button id="fab-main" onclick="toggleFab()" class="w-14 h-14 bg-black text-white rounded-full shadow-xl flex items-center justify-center text-xl hover:bg-gray-800 transition-transform duration-200">&#9858;</button>
+</div>
 
 <script>
 // ── HAMBURGER MENU ────────────────────────────────────────────────────
@@ -825,6 +857,69 @@ function showCharacterSheet(peerId){
 
 function closeCharacterModal(){
   document.getElementById('character-modal').classList.add('hidden');
+}
+
+function closeTimerFinishedModal(){
+  document.getElementById('timer-finished-modal').classList.add('hidden');
+}
+
+// ── FAB AND TIMER ────────────────────────────────────────────────────
+var fabOpen = false;
+function toggleFab() {
+  fabOpen = !fabOpen;
+  var items = document.getElementById('fab-items');
+  var btn = document.getElementById('fab-main');
+  items.style.cssText = fabOpen ? 'display:flex;flex-direction:column;align-items:flex-end;gap:8px;margin-bottom:4px;' : 'display:none!important;';
+}
+
+function d(sides) { return Math.floor(Math.random() * sides) + 1; }
+
+function quickRoll(expr) {
+  var parts = expr.match(/(\d+)d(\d+)/i);
+  if (!parts) return;
+  var n = parseInt(parts[1]), s = parseInt(parts[2]);
+  var rolls = [], total = 0;
+  for (var i = 0; i < n; i++) { var r = d(s); rolls.push(r); total += r; }
+  var label = 'd' + s + ' = ' + total;
+  var msg = document.getElementById('dice-msg');
+  msg.textContent = label;
+  msg.style.opacity = '1';
+  clearTimeout(msg._t);
+  msg._t = setTimeout(function() { msg.style.opacity = '0'; }, 1800);
+}
+
+var timerInterval = null;
+var timerSeconds = 0;
+
+function startTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    document.getElementById('timer-display').textContent = 'Torch';
+    return;
+  }
+  timerSeconds = 3600; // 1 hour
+  updateTimerDisplay();
+  timerInterval = setInterval(function() {
+    timerSeconds--;
+    if (timerSeconds <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      document.getElementById('timer-display').textContent = 'Done!';
+      document.getElementById('timer-finished-modal').classList.remove('hidden');
+      setTimeout(function() {
+        document.getElementById('timer-display').textContent = 'Torch';
+      }, 3000);
+    } else {
+      updateTimerDisplay();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  var mins = Math.floor(timerSeconds / 60);
+  var secs = timerSeconds % 60;
+  document.getElementById('timer-display').textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────
