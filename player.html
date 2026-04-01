@@ -467,12 +467,85 @@ function disconnectDm() {
 
 function sendJoin() {
   if (!dmConn || !dmConnected) return;
+  
+  // Get basic info
   var nameEl = document.querySelector('input[placeholder="Character name..."]');
+  var ancestryEl = document.querySelector('input[placeholder="Human, Elf..."]');
   var clsEl = document.querySelector('input[placeholder="Fighter..."]');
+  var levelEl = document.querySelector('input[placeholder="1"]');
+  var titleEl = document.querySelector('input[placeholder="Wanderer..."]');
+  var alignmentEl = document.querySelector('input[placeholder="Lawful..."]');
+  var backgroundEl = document.querySelector('input[placeholder="Soldier..."]');
+  var deityEl = document.querySelector('input[placeholder="God or none..."]');
+  
+  // Get ability scores
+  var abilities = {};
+  ['str','int','dex','wis','con','cha'].forEach(function(stat) {
+    var val = parseInt(document.getElementById(stat).value) || 0;
+    var mod = document.getElementById(stat + '-mod').textContent;
+    abilities[stat.toUpperCase()] = { score: val, modifier: mod };
+  });
+  
+  // Get talents
+  var talents = Array.from(document.querySelectorAll('#talents-list input')).map(function(el) { 
+    return el.value.trim(); 
+  }).filter(function(val) { return val; });
+  
+  // Get attacks
+  var attacks = Array.from(document.querySelectorAll('#attacks-body tr')).map(function(tr) {
+    var inputs = Array.from(tr.querySelectorAll('input'));
+    return {
+      weapon: inputs[0] ? inputs[0].value.trim() : '',
+      modifier: inputs[1] ? inputs[1].value.trim() : '',
+      damage: inputs[2] ? inputs[2].value.trim() : ''
+    };
+  }).filter(function(attack) { return attack.weapon; });
+  
+  // Get spells
+  var spells = Array.from(document.querySelectorAll('#spells-body tr')).map(function(tr) {
+    var inputs = Array.from(tr.querySelectorAll('input'));
+    var selects = Array.from(tr.querySelectorAll('select'));
+    return {
+      tier: selects[0] ? selects[0].value : '',
+      name: inputs[0] ? inputs[0].value.trim() : '',
+      duration: inputs[1] ? inputs[1].value.trim() : '',
+      range: selects[1] ? selects[1].value : '',
+      description: inputs[2] ? inputs[2].value.trim() : ''
+    };
+  }).filter(function(spell) { return spell.name; });
+  
+  // Get gear and currency
+  var gear = Array.from(document.querySelectorAll('#gear-list input')).map(function(el) { 
+    return el.value.trim(); 
+  }).filter(function(val) { return val; });
+  
+  var freeCarry = Array.from(document.querySelectorAll('#free-carry-list input')).map(function(el) { 
+    return el.value.trim(); 
+  }).filter(function(val) { return val; });
+  
+  var gp = parseInt(document.getElementById('gp').value) || 0;
+  var sp = parseInt(document.getElementById('sp').value) || 0;
+  var cp = parseInt(document.getElementById('cp').value) || 0;
+  
   dmConn.send({
     type: 'join',
-    name: nameEl ? nameEl.value : '',
-    cls: clsEl ? clsEl.value : '',
+    name: nameEl ? nameEl.value.trim() : '',
+    ancestry: ancestryEl ? ancestryEl.value.trim() : '',
+    cls: clsEl ? clsEl.value.trim() : '',
+    level: levelEl ? levelEl.value.trim() : '',
+    title: titleEl ? titleEl.value.trim() : '',
+    alignment: alignmentEl ? alignmentEl.value.trim() : '',
+    background: backgroundEl ? backgroundEl.value.trim() : '',
+    deity: deityEl ? deityEl.value.trim() : '',
+    abilities: abilities,
+    talents: talents,
+    attacks: attacks,
+    spells: spells,
+    gear: gear,
+    freeCarry: freeCarry,
+    gp: gp,
+    sp: sp,
+    cp: cp,
     hp: parseInt(document.getElementById('hp').value) || 0,
     hpMax: parseInt(document.getElementById('hp-max').value) || 0,
     ac: parseInt(document.getElementById('ac').value) || 0

@@ -150,6 +150,20 @@ input[type=number]{-moz-appearance:textfield;}
       </div>
     </div>
 
+    <!-- Character Sheet Modal -->
+    <div id="character-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+      <div onclick="closeCharacterModal()" class="absolute inset-0 bg-black/40"></div>
+      <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-3 p-4 max-h-[80vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <p class="font-cinzel text-sm font-bold text-gray-700 tracking-widest">CHARACTER SHEET</p>
+          <button onclick="closeCharacterModal()" class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-lg text-gray-400 text-lg leading-none">&times;</button>
+        </div>
+        <div id="character-content">
+          <!-- Content will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+
     <!-- ── NOTES ── -->
     <div id="tab-notes" style="display:none">
       <div class="mt-1">
@@ -232,7 +246,28 @@ function initPeer(){
 
 function handleMsg(pid,data){
   if(data.type==='join'){
-    players[pid]={name:data.name||'Unknown',cls:data.cls||'',hp:parseInt(data.hp)||0,hpMax:parseInt(data.hpMax)||0,ac:parseInt(data.ac)||0};
+    players[pid]={
+      name:data.name||'Unknown',
+      ancestry:data.ancestry||'',
+      cls:data.cls||'',
+      level:data.level||'',
+      title:data.title||'',
+      alignment:data.alignment||'',
+      background:data.background||'',
+      deity:data.deity||'',
+      abilities:data.abilities||{},
+      talents:data.talents||[],
+      attacks:data.attacks||[],
+      spells:data.spells||[],
+      gear:data.gear||[],
+      freeCarry:data.freeCarry||[],
+      gp:data.gp||0,
+      sp:data.sp||0,
+      cp:data.cp||0,
+      hp:parseInt(data.hp)||0,
+      hpMax:parseInt(data.hpMax)||0,
+      ac:parseInt(data.ac)||0
+    };
     updateConnCount(); updateTargetSelects();
     // Auto-add to battlefield
     if(!combatants.find(function(c){return c.peerId===pid;})){
@@ -428,10 +463,11 @@ function renderCombat(){
     var bar=pct>50?'bg-green-400':pct>25?'bg-yellow-400':'bg-red-400';
     var isPlayer=!!c.peerId;
     var border='border border-'+(isPlayer?'blue-200':'gray-200');
+    var nameHtml = isPlayer ? '<span class="font-cinzel text-sm font-bold flex-1 truncate cursor-pointer hover:text-blue-600" onclick="showCharacterSheet(\''+c.peerId+'\')">'+esc(c.name)+'</span>' : '<span class="font-cinzel text-sm font-bold flex-1 truncate">'+esc(c.name)+'</span>';
     html+='<div class="'+border+' rounded-xl p-2.5 mb-2 cursor-grab active:cursor-grabbing" draggable="true" data-idx="'+i+'" ondragstart="onDragStart(event)" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)" ondragend="onDragEnd(event)" ontouchstart="onTouchStart(event)" ontouchmove="onTouchMove(event)" ontouchend="onTouchEnd(event)">'+
       '<div class="flex items-center gap-1.5 mb-1">'+
         '<span class="text-gray-300 text-xs select-none shrink-0">⠿</span>'+
-        '<span class="font-cinzel text-sm font-bold flex-1 truncate">'+esc(c.name)+'</span>'+
+        nameHtml+
         '<span class="text-xs text-gray-400">AC '+c.ac+'</span>'+
         '<button onclick="removeCombatant('+c.id+')" class="text-gray-300 hover:text-gray-500 text-xs px-1 ml-1">&#x2715;</button>'+
       '</div>'+
@@ -651,6 +687,145 @@ function loadDashboard(){
 }
 
 function saveNotes(){saveDashboard();}
+
+// ── CHARACTER SHEET MODAL ────────────────────────────────────────────
+function showCharacterSheet(peerId){
+  var player = players[peerId];
+  if(!player) return;
+  
+  var content = '<div class="space-y-4">';
+  
+  // Header
+  content += '<div class="text-center pb-3 border-b border-gray-200">' +
+    '<h3 class="font-cinzel text-xl font-bold">' + esc(player.name) + '</h3>' +
+    '<p class="font-cinzel text-sm text-gray-600">' + (player.title ? esc(player.title) + ' ' : '') + (player.cls || 'No class') + (player.level ? ' ' + player.level : '') + '</p>' +
+    (player.ancestry ? '<p class="font-cinzel text-xs text-gray-500">' + esc(player.ancestry) + '</p>' : '') +
+  '</div>';
+  
+  // Basic stats
+  content += '<div class="grid grid-cols-2 gap-3">' +
+    '<div class="text-center">' +
+      '<div class="font-cinzel text-xs text-gray-500 mb-1">HP</div>' +
+      '<div class="font-cinzel text-xl font-bold">' + player.hp + ' / ' + player.hpMax + '</div>' +
+    '</div>' +
+    '<div class="text-center">' +
+      '<div class="font-cinzel text-xs text-gray-500 mb-1">AC</div>' +
+      '<div class="font-cinzel text-xl font-bold">' + player.ac + '</div>' +
+    '</div>' +
+  '</div>';
+  
+  // Ability scores
+  if(Object.keys(player.abilities).length > 0){
+    content += '<div>' +
+      '<div class="font-cinzel text-xs font-bold text-gray-500 mb-2">ABILITIES</div>' +
+      '<div class="grid grid-cols-3 gap-2">';
+    ['STR','INT','DEX','WIS','CON','CHA'].forEach(function(stat){
+      var ability = player.abilities[stat];
+      if(ability){
+        content += '<div class="text-center border border-gray-200 rounded p-2">' +
+          '<div class="font-cinzel text-xs font-bold mb-1">' + stat + '</div>' +
+          '<div class="font-cinzel text-sm">' + ability.score + ' (' + ability.modifier + ')</div>' +
+        '</div>';
+      }
+    });
+    content += '</div></div>';
+  }
+  
+  // Background info
+  var backgroundInfo = [];
+  if(player.alignment) backgroundInfo.push('<span class="font-cinzel text-xs text-gray-500">Alignment:</span> ' + esc(player.alignment));
+  if(player.background) backgroundInfo.push('<span class="font-cinzel text-xs text-gray-500">Background:</span> ' + esc(player.background));
+  if(player.deity) backgroundInfo.push('<span class="font-cinzel text-xs text-gray-500">Deity:</span> ' + esc(player.deity));
+  
+  if(backgroundInfo.length > 0){
+    content += '<div>' +
+      '<div class="font-cinzel text-xs font-bold text-gray-500 mb-2">BACKGROUND</div>' +
+      '<div class="space-y-1">' + backgroundInfo.join('<br>') + '</div>' +
+    '</div>';
+  }
+  
+  // Talents
+  if(player.talents && player.talents.length > 0){
+    content += '<div>' +
+      '<div class="font-cinzel text-xs font-bold text-gray-500 mb-2">TALENTS</div>' +
+      '<ul class="space-y-1">';
+    player.talents.forEach(function(talent){
+      content += '<li class="flex items-center gap-2"><span class="text-gray-300">•</span><span class="text-sm font-crimson">' + esc(talent) + '</span></li>';
+    });
+    content += '</ul></div>';
+  }
+  
+  // Attacks
+  if(player.attacks && player.attacks.length > 0){
+    content += '<div>' +
+      '<div class="font-cinzel text-xs font-bold text-gray-500 mb-2">ATTACKS</div>' +
+      '<div class="space-y-2">';
+    player.attacks.forEach(function(attack){
+      content += '<div class="border border-gray-200 rounded p-2">' +
+        '<div class="font-cinzel text-sm font-bold">' + esc(attack.weapon) + '</div>' +
+        '<div class="text-xs text-gray-600 font-crimson">' + esc(attack.modifier) + ' / ' + esc(attack.damage) + '</div>' +
+      '</div>';
+    });
+    content += '</div></div>';
+  }
+  
+  // Spells
+  if(player.spells && player.spells.length > 0){
+    content += '<div>' +
+      '<div class="font-cinzel text-xs font-bold text-gray-500 mb-2">SPELLS</div>' +
+      '<div class="space-y-2">';
+    player.spells.forEach(function(spell){
+      content += '<div class="border border-gray-200 rounded p-2">' +
+        '<div class="font-cinzel text-sm font-bold">' + esc(spell.name) + '</div>' +
+        '<div class="text-xs text-gray-600 font-crimson">' + 'Tier ' + spell.tier + ' • ' + esc(spell.range) + ' • ' + esc(spell.duration) + '</div>' +
+        (spell.description ? '<div class="text-xs text-gray-500 font-crimson mt-1">' + esc(spell.description) + '</div>' : '') +
+      '</div>';
+    });
+    content += '</div></div>';
+  }
+  
+  // Gear and currency
+  var gearSection = '';
+  if((player.gp || player.sp || player.cp) > 0){
+    gearSection += '<div class="font-cinzel text-xs font-bold text-gray-500 mb-2">CURRENCY</div>' +
+      '<div class="flex gap-4 mb-3">' +
+        (player.gp ? '<span class="font-cinzel text-sm">' + player.gp + ' GP</span>' : '') +
+        (player.sp ? '<span class="font-cinzel text-sm">' + player.sp + ' SP</span>' : '') +
+        (player.cp ? '<span class="font-cinzel text-sm">' + player.cp + ' CP</span>' : '') +
+      '</div>';
+  }
+  
+  if(player.gear && player.gear.length > 0){
+    gearSection += '<div class="font-cinzel text-xs font-bold text-gray-500 mb-2">GEAR</div>' +
+      '<ul class="space-y-1 mb-3">';
+    player.gear.forEach(function(item, i){
+      gearSection += '<li class="flex items-center gap-2"><span class="font-cinzel text-xs text-gray-400 w-4">' + (i+1) + '.</span><span class="text-sm font-crimson">' + esc(item) + '</span></li>';
+    });
+    gearSection += '</ul>';
+  }
+  
+  if(player.freeCarry && player.freeCarry.length > 0){
+    gearSection += '<div class="font-cinzel text-xs font-bold text-gray-500 mb-2">FREE TO CARRY</div>' +
+      '<ul class="space-y-1">';
+    player.freeCarry.forEach(function(item){
+      gearSection += '<li class="flex items-center gap-2"><span class="text-gray-300">•</span><span class="text-sm font-crimson">' + esc(item) + '</span></li>';
+    });
+    gearSection += '</ul>';
+  }
+  
+  if(gearSection){
+    content += '<div>' + gearSection + '</div>';
+  }
+  
+  content += '</div>';
+  
+  document.getElementById('character-content').innerHTML = content;
+  document.getElementById('character-modal').classList.remove('hidden');
+}
+
+function closeCharacterModal(){
+  document.getElementById('character-modal').classList.add('hidden');
+}
 
 // ── INIT ──────────────────────────────────────────────────────────────
 initPeer();
