@@ -31,6 +31,14 @@ input[type=number]{-moz-appearance:textfield;}
       </div>
       <p id="peer-status" class="font-cinzel text-xs text-yellow-600 mt-1.5">Connecting…</p>
     </div>
+    <!-- GM DASHBOARD SAVE/LOAD -->
+    <div class="border-t border-gray-800 pt-3">
+      <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-2">DASHBOARD</p>
+      <div class="flex flex-col gap-2">
+        <button onclick="downloadGmDashboard()" class="w-full border border-gray-600 bg-gray-900 font-cinzel text-xs text-gray-300 font-bold px-3 py-1.5 rounded hover:bg-gray-800">Download</button>
+        <button onclick="uploadGmDashboard()" class="w-full bg-gray-100 text-black font-cinzel text-xs font-bold px-3 py-1.5 rounded hover:bg-gray-200">Upload</button>
+      </div>
+    </div>
     <div class="border-t border-gray-800 pt-3">
       <a href="player.html" class="font-cinzel text-xs text-gray-400 hover:text-white transition-colors">Player Page</a>
     </div>
@@ -925,4 +933,76 @@ function updateTimerDisplay() {
 // ── INIT ──────────────────────────────────────────────────────────────
 initPeer();
 loadDashboard();
+
+// ── GM DASHBOARD EXPORT/IMPORT ──────────────────────────────────────
+function downloadGmDashboard() {
+  var npcCombatants = combatants.filter(function(c) { return !c.peerId; }).map(function(c) {
+    return { id: c.id, name: c.name, desc: c.desc, hp: c.hp, hpMax: c.hpMax, ac: c.ac, attacks: c.attacks };
+  });
+  var data = {
+    notes: document.getElementById('dm-notes').value,
+    combatants: npcCombatants,
+    nextId: nextId,
+    treasures: tItems,
+    tNextId: tNextId,
+    shops: shops,
+    shopNextId: shopNextId,
+    sItemNextId: sItemNextId
+  };
+  var timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+  var filename = 'gm_dashboard_' + timestamp + '.json';
+  var json = JSON.stringify(data, null, 2);
+  var blob = new Blob([json], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  closeDmHamburger();
+  toast('Dashboard saved: ' + filename);
+}
+
+function uploadGmDashboard() {
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(event) {
+      try {
+        var data = JSON.parse(event.target.result);
+        
+        // Restore all data
+        if (data.notes) document.getElementById('dm-notes').value = data.notes;
+        if (data.combatants) {
+          combatants = data.combatants.map(function(c) { c.peerId = null; return c; });
+        }
+        if (data.nextId) nextId = data.nextId;
+        if (data.treasures) tItems = data.treasures;
+        if (data.tNextId) tNextId = data.tNextId;
+        if (data.shops) shops = data.shops;
+        if (data.shopNextId) shopNextId = data.shopNextId;
+        if (data.sItemNextId) sItemNextId = data.sItemNextId;
+        
+        // Re-render all sections
+        renderCombat();
+        renderTreasure();
+        renderAllShops();
+        
+        closeDmHamburger();
+        toast('Dashboard loaded: ' + file.name);
+      } catch(err) {
+        toast('Invalid dashboard file');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
 </script>

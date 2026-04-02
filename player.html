@@ -63,7 +63,15 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
         <button onclick="disconnectDm()" class="font-cinzel text-xs text-gray-500 border border-gray-300 bg-white px-2 py-0.5 rounded hover:bg-gray-50">Leave</button>
       </div>
     </div>
-    <a href="gm.html" class="font-cinzel text-xs text-gray-500 hover:text-black transition-colors">GM Page</a>
+    <!-- CHARACTER SHEET SAVE/LOAD -->
+    <div class="border-t border-gray-100 pt-3">
+      <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-2">CHARACTER SHEET</p>
+      <div class="flex flex-col gap-2">
+        <button onclick="downloadCharacterSheet()" class="w-full border border-gray-300 bg-white font-cinzel text-xs text-gray-700 font-bold px-3 py-1.5 rounded hover:bg-gray-50">Download</button>
+        <button onclick="uploadCharacterSheet()" class="w-full bg-black text-white font-cinzel text-xs font-bold px-3 py-1.5 rounded hover:bg-gray-800">Upload</button>
+      </div>
+    </div>
+    <a href="gm.html" class="font-cinzel text-xs text-gray-500 hover:text-black transition-colors block pt-3 border-t border-gray-100">GM Page</a>
   </div>
   <div class="p-5 border-t border-gray-100">
     <img id="sidebar-logo" src="Third Party Shadowdark Logo Black.png" alt="ShadowDark RPG" class="mx-auto max-h-20 opacity-60">
@@ -624,4 +632,50 @@ function showDmMsg(msg) {
 document.addEventListener('input', function(e) {
   if ((e.target.id === 'hp' || e.target.id === 'hp-max') && dmConnected) syncHpToDm();
 });
+
+// ── CHARACTER SHEET EXPORT/IMPORT ────────────────────────────────────
+function downloadCharacterSheet() {
+  var data = getSheetData();
+  var charName = document.querySelector('input[placeholder="Character name..."]').value.trim() || 'character';
+  var filename = charName.replace(/[^a-z0-9_-]/gi, '_').toLowerCase() + '.json';
+  var json = JSON.stringify(data, null, 2);
+  var blob = new Blob([json], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  closeHamburger();
+  showDmMsg('Character sheet saved: ' + filename);
+}
+
+function uploadCharacterSheet() {
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(event) {
+      try {
+        var data = JSON.parse(event.target.result);
+        loadSheetData(data);
+        try {
+          localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+        } catch(err) {}
+        closeHamburger();
+        showDmMsg('Character sheet loaded: ' + file.name);
+      } catch(err) {
+        showDmMsg('Invalid character sheet file');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
 </script>
