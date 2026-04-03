@@ -275,7 +275,9 @@ function initPeer(){
       conn.on('close',function(){
         var name=players[conn.peer]?players[conn.peer].name:'A player';
         delete players[conn.peer]; delete connections[conn.peer];
-        updateConnCount(); updateTargetSelects();
+        // Remove character from battlefield
+        combatants=combatants.filter(function(c){return c.peerId!==conn.peer;});
+        updateConnCount(); updateTargetSelects(); renderCombat(); saveDashboard();
         toast(name+' disconnected');
       });
     });
