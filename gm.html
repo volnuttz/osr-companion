@@ -127,14 +127,51 @@ input[type=number]{-moz-appearance:textfield;}
     <!-- ── TREASURES ── -->
     <div id="tab-treasure" style="display:none">
       <div class="mt-1">
-        <div class="border border-gray-200 rounded-xl p-3 mb-3">
-          <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block mb-3">LOOT</span>
-          <div id="treasure-items"></div>
-          <div class="flex gap-1.5 mt-2">
-            <button onclick="addTreasureItem('item')" class="border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Item</button>
-            <button onclick="addTreasureItem('currency')" class="border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Currency</button>
+        <div id="treasure-items"></div>
+        <button onclick="openTreasureModal()" class="w-full border border-dashed border-gray-300 rounded-xl font-cinzel text-xs text-gray-400 font-bold py-3 hover:bg-gray-50 mt-2">+ Add Treasure Item</button>
+      </div>
+    </div>
+
+    <!-- Add Treasure Item Modal -->
+    <div id="treasure-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+      <div onclick="closeTreasureModal()" class="absolute inset-0 bg-black/40"></div>
+      <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-3 p-4">
+        <div class="flex items-center justify-between mb-3">
+          <p class="font-cinzel text-xs font-bold text-gray-500 tracking-widest">ADD TREASURE ITEM</p>
+          <button onclick="closeTreasureModal()" class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-lg text-gray-400 text-lg leading-none">&times;</button>
+        </div>
+        <div class="mb-4">
+          <p class="font-cinzel text-xs font-bold text-gray-500 mb-2">TYPE</p>
+          <div class="flex gap-2">
+            <label class="flex-1 flex items-center gap-2 border border-gray-200 rounded px-3 py-2 cursor-pointer hover:bg-gray-50">
+              <input type="radio" name="treasure-type" value="item" checked class="cursor-pointer" onchange="updateTreasureTypeFields()">
+              <span class="font-cinzel text-xs text-gray-700 font-bold">Item</span>
+            </label>
+            <label class="flex-1 flex items-center gap-2 border border-gray-200 rounded px-3 py-2 cursor-pointer hover:bg-gray-50">
+              <input type="radio" name="treasure-type" value="currency" class="cursor-pointer" onchange="updateTreasureTypeFields()">
+              <span class="font-cinzel text-xs text-gray-700 font-bold">Currency</span>
+            </label>
           </div>
         </div>
+        <div id="treasure-item-fields">
+          <p class="font-cinzel text-xs text-gray-400 mb-1">ITEM NAME</p>
+          <input id="treasure-item-name" type="text" placeholder="Sword, Amulet, Map…" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson mb-3">
+        </div>
+        <div id="treasure-currency-fields" style="display:none">
+          <div class="mb-3">
+            <p class="font-cinzel text-xs text-gray-400 mb-1">AMOUNT</p>
+            <input id="treasure-amount" type="number" placeholder="0" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none text-center">
+          </div>
+          <div class="mb-3">
+            <p class="font-cinzel text-xs text-gray-400 mb-1">CURRENCY</p>
+            <select id="treasure-currency" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none bg-white">
+              <option value="gp">Gold Pieces (GP)</option>
+              <option value="sp">Silver Pieces (SP)</option>
+              <option value="cp">Copper Pieces (CP)</option>
+            </select>
+          </div>
+        </div>
+        <button onclick="confirmAddTreasure()" class="w-full bg-black text-white font-cinzel text-xs font-bold py-2.5 rounded-lg hover:bg-gray-800 tracking-widest">ADD TO TREASURES</button>
       </div>
     </div>
 
@@ -538,9 +575,35 @@ function renderCombat(){
 var tItems=[];
 var tNextId=1;
 
-function addTreasureItem(kind){
-  if(kind==='currency') tItems.push({id:tNextId++,kind:'currency',amount:0,currency:'gp',target:'all'});
-  else tItems.push({id:tNextId++,kind:'item',val:'',target:'all'});
+function openTreasureModal(){
+  document.getElementById('treasure-modal').classList.remove('hidden');
+  document.getElementById('treasure-item-name').value='';
+  document.getElementById('treasure-amount').value='';
+  document.querySelectorAll('input[name="treasure-type"]')[0].checked=true;
+  updateTreasureTypeFields();
+  setTimeout(function(){document.getElementById('treasure-item-name').focus();},50);
+}
+function closeTreasureModal(){
+  document.getElementById('treasure-modal').classList.add('hidden');
+}
+function updateTreasureTypeFields(){
+  var type=document.querySelector('input[name="treasure-type"]:checked').value;
+  document.getElementById('treasure-item-fields').style.display=type==='item'?'block':'none';
+  document.getElementById('treasure-currency-fields').style.display=type==='currency'?'block':'none';
+}
+function confirmAddTreasure(){
+  var type=document.querySelector('input[name="treasure-type"]:checked').value;
+  if(type==='currency'){
+    var amount=parseInt(document.getElementById('treasure-amount').value)||0;
+    if(!amount){toast('Enter an amount');return;}
+    var currency=document.getElementById('treasure-currency').value;
+    tItems.push({id:tNextId++,kind:'currency',amount:amount,currency:currency,target:''});
+  } else {
+    var name=document.getElementById('treasure-item-name').value.trim();
+    if(!name){toast('Enter an item name');return;}
+    tItems.push({id:tNextId++,kind:'item',val:name,target:''});
+  }
+  closeTreasureModal();
   renderTreasure();saveDashboard();
 }
 function removeTreasureItem(id){
@@ -555,6 +618,8 @@ function setTreasureItem(id,field,val){
 function sendTreasureItem(id){
   var x=tItems.find(function(x){return x.id===id;});
   if(!x)return;
+  if(!x.target){toast('Select a player first');return;}
+  if(!connections[x.target]){toast('Player not connected');return;}
   var msg;
   if(x.kind==='currency'){
     if(!x.amount){toast('Enter an amount');return;}
@@ -566,36 +631,44 @@ function sendTreasureItem(id){
     msg={type:'treasure',items:[x.val],gp:0,sp:0,cp:0};
     var label='"'+x.val+'"';
   }
-  if(x.target==='all')broadcast(msg); else send(x.target,msg);
+  send(x.target,msg);
   toast('Sent '+label+'!');
   tItems=tItems.filter(function(t){return t.id!==id;});
   renderTreasure();saveDashboard();
 }
 function renderTreasure(){
-  var playerOpts='<option value="all">All</option>';
+  var container=document.getElementById('treasure-items');
+  if(!tItems.length){
+    container.innerHTML='<p class="text-center text-xs text-gray-400 font-cinzel py-8">No treasures yet. Add one below.</p>';
+    return;
+  }
+  var playerOpts='<option value="">— select player —</option>';
   Object.keys(players).forEach(function(pid){
     playerOpts+='<option value="'+pid+'">'+esc(players[pid].name)+'</option>';
   });
-  document.getElementById('treasure-items').innerHTML=tItems.map(function(x){
+  container.innerHTML=tItems.map(function(x){
     var opts=playerOpts.replace('value="'+x.target+'"','value="'+x.target+'" selected');
     if(x.kind==='currency'){
-      return '<div class="flex items-center gap-1.5 border-b border-gray-100 py-1.5">'+
-        '<input type="number" placeholder="0" value="'+(x.amount||'')+'" oninput="setTreasureItem('+x.id+',\'amount\',this.value)" class="w-14 border-b border-gray-300 text-center text-sm outline-none">'+
-        '<select onchange="setTreasureItem('+x.id+',\'currency\',this.value)" class="text-xs outline-none bg-white border border-gray-200 rounded px-1 py-0.5">'+
-          '<option value="gp"'+(x.currency==='gp'?' selected':'')+'>GP</option>'+
-          '<option value="sp"'+(x.currency==='sp'?' selected':'')+'>SP</option>'+
-          '<option value="cp"'+(x.currency==='cp'?' selected':'')+'>CP</option>'+
-        '</select>'+
-        '<select onchange="setTreasureItem('+x.id+',\'target\',this.value)" class="text-xs outline-none bg-white border border-gray-200 rounded px-1 py-0.5 font-crimson ml-auto">'+opts+'</select>'+
-        '<button onclick="sendTreasureItem('+x.id+')" class="bg-black text-white font-cinzel text-xs px-2 py-0.5 rounded hover:bg-gray-700 whitespace-nowrap">Send</button>'+
-        '<button onclick="removeTreasureItem('+x.id+')" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>'+
+      return '<div class="border border-gray-200 rounded-xl p-3 mb-3">'+
+        '<div class="flex items-center justify-between mb-2">'+
+          '<span class="font-cinzel text-sm font-bold tracking-wide">'+x.amount+' '+x.currency.toUpperCase()+'</span>'+
+          '<button onclick="removeTreasureItem('+x.id+')" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>'+
+        '</div>'+
+        '<div class="flex gap-2">'+
+          '<select onchange="setTreasureItem('+x.id+',\'target\',this.value)" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none bg-white font-crimson">'+opts+'</select>'+
+          '<button onclick="sendTreasureItem('+x.id+')" class="bg-black text-white font-cinzel text-xs px-3 rounded hover:bg-gray-800 whitespace-nowrap">Send</button>'+
+        '</div>'+
       '</div>';
     }
-    return '<div class="flex items-center gap-1.5 border-b border-gray-100 py-1.5">'+
-      '<input type="text" placeholder="Item name…" value="'+esc(x.val)+'" oninput="setTreasureItem('+x.id+',\'val\',this.value)" class="flex-1 text-sm outline-none font-crimson min-w-0">'+
-      '<select onchange="setTreasureItem('+x.id+',\'target\',this.value)" class="text-xs outline-none bg-white border border-gray-200 rounded px-1 py-0.5 font-crimson">'+opts+'</select>'+
-      '<button onclick="sendTreasureItem('+x.id+')" class="bg-black text-white font-cinzel text-xs px-2 py-0.5 rounded hover:bg-gray-700 whitespace-nowrap">Send</button>'+
-      '<button onclick="removeTreasureItem('+x.id+')" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>'+
+    return '<div class="border border-gray-200 rounded-xl p-3 mb-3">'+
+      '<div class="flex items-center justify-between mb-2">'+
+        '<span class="font-cinzel text-sm font-bold tracking-wide">'+esc(x.val)+'</span>'+
+        '<button onclick="removeTreasureItem('+x.id+')" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>'+
+      '</div>'+
+      '<div class="flex gap-2">'+
+        '<select onchange="setTreasureItem('+x.id+',\'target\',this.value)" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none bg-white font-crimson">'+opts+'</select>'+
+        '<button onclick="sendTreasureItem('+x.id+')" class="bg-black text-white font-cinzel text-xs px-3 rounded hover:bg-gray-800 whitespace-nowrap">Send</button>'+
+      '</div>'+
     '</div>';
   }).join('');
 }
