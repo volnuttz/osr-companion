@@ -86,7 +86,7 @@ input[type=number]{-moz-appearance:textfield;}
     <!-- ── BATTLEFIELD ── -->
     <div id="tab-combat">
       <div class="mt-1">
-        <div id="initiative-list" class="mb-3"></div>
+        <div id="initiative-list"></div>
         <button onclick="openCombatantModal()" class="w-full border border-dashed border-gray-300 rounded-xl font-cinzel text-xs text-gray-400 font-bold py-3 hover:bg-gray-50 mt-2">+ Add Combatant</button>
       </div>
     </div>
@@ -537,7 +537,7 @@ function onTouchEnd(e){
 function renderCombat(){
   var div=document.getElementById('initiative-list');
   if(!combatants.length){
-    div.innerHTML='<p class="text-center text-xs text-gray-400 font-cinzel py-4">No combatants yet. Add below.</p>';
+    div.innerHTML='<p class="text-center text-xs text-gray-400 font-cinzel py-8">No combatants yet. Add below.</p>';
     return;
   }
   var html='';
