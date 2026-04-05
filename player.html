@@ -259,6 +259,8 @@ function getSheetData() {
   data.spells = Array.from(document.querySelectorAll('#spells-body .spell-row')).map(function(row) {
     var inputs = Array.from(row.querySelectorAll('input')).map(function(el) { return el.value; });
     var selects = Array.from(row.querySelectorAll('select')).map(function(el) { return el.value; });
+    var textarea = row.querySelector('textarea');
+    if (textarea) inputs.push(textarea.value);
     return { inputs: inputs, selects: selects };
   });
   data.gear = Array.from(document.querySelectorAll('#gear-list input')).map(function(el) { return el.value; });
@@ -279,7 +281,7 @@ function loadSheetData(data) {
   });
   if (data.talents) data.talents.forEach(function(val) { addTalentRow(); var inputs = document.querySelectorAll('#talents-list input'); inputs[inputs.length-1].value = val; });
   if (data.attacks) data.attacks.forEach(function(row) { addAttackRow(); var tr = document.querySelector('#attacks-body tr:last-child'); row.forEach(function(val, i) { var inp = tr.querySelectorAll('input')[i]; if (inp) inp.value = val; }); });
-  if (data.spells) data.spells.forEach(function(row) { addSpellRow(); var spellRow = document.querySelector('#spells-body .spell-row:last-child'); row.inputs.forEach(function(val, i) { var inp = spellRow.querySelectorAll('input')[i]; if (inp) inp.value = val; }); row.selects.forEach(function(val, i) { var sel = spellRow.querySelectorAll('select')[i]; if (sel) sel.value = val; }); });
+  if (data.spells) data.spells.forEach(function(row) { addSpellRow(); var spellRow = document.querySelector('#spells-body .spell-row:last-child'); row.inputs.forEach(function(val, i) { var inp = spellRow.querySelectorAll('input')[i]; if (inp) { inp.value = val; } else { var ta = spellRow.querySelector('textarea'); if (ta) { ta.value = val; ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; } } }); row.selects.forEach(function(val, i) { var sel = spellRow.querySelectorAll('select')[i]; if (sel) sel.value = val; }); });
   if (data.gear) data.gear.forEach(function(val) { addGearRow(); var inputs = document.querySelectorAll('#gear-list input'); inputs[inputs.length-1].value = val; });
   if (data.freeCarry) data.freeCarry.forEach(function(val) { addFreeCarryRow(); var inputs = document.querySelectorAll('#free-carry-list input'); inputs[inputs.length-1].value = val; });
   isLoading = false;
@@ -380,7 +382,7 @@ function addSpellRow() {
       '</select>' +
       '<button onclick="this.closest(\'.spell-row\').remove()" class="ml-auto text-gray-300 hover:text-gray-500 text-sm">&#x2715;</button>' +
     '</div>' +
-    '<input type="text" placeholder="Effect..." class="w-full text-xs outline-none font-crimson text-gray-500 mt-1">';
+    '<textarea placeholder="Effect..." rows="2" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\'" class="w-full text-xs outline-none font-crimson text-gray-500 mt-1 resize-none overflow-hidden"></textarea>';
   container.appendChild(div);
 }
 
@@ -510,12 +512,13 @@ function sendJoin() {
   var spells = Array.from(document.querySelectorAll('#spells-body .spell-row')).map(function(row) {
     var inputs = Array.from(row.querySelectorAll('input'));
     var selects = Array.from(row.querySelectorAll('select'));
+    var textarea = row.querySelector('textarea');
     return {
       tier: selects[0] ? selects[0].value : '',
       name: inputs[0] ? inputs[0].value.trim() : '',
       duration: inputs[1] ? inputs[1].value.trim() : '',
       range: selects[1] ? selects[1].value : '',
-      description: inputs[2] ? inputs[2].value.trim() : ''
+      description: textarea ? textarea.value.trim() : ''
     };
   }).filter(function(spell) { return spell.name; });
   
