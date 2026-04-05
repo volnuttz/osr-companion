@@ -155,19 +155,7 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
   <!-- SPELLS -->
   <div class="border border-gray-200 rounded-xl shadow-sm p-3 sm:p-4 mb-4">
     <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block mb-3">SPELLS</span>
-    <div class="overflow-x-auto">
-      <table class="w-full" style="table-layout:fixed;border-collapse:collapse;min-width:340px;">
-        <thead><tr class="border-b-2 border-gray-100">
-          <th class="font-cinzel text-xs font-bold text-left py-1 px-1 w-10">TIER</th>
-          <th class="font-cinzel text-xs font-bold text-left py-1 px-1">NAME</th>
-          <th class="font-cinzel text-xs font-bold text-left py-1 px-1 w-14">DUR.</th>
-          <th class="font-cinzel text-xs font-bold text-left py-1 px-1 w-14">RANGE</th>
-          <th class="font-cinzel text-xs font-bold text-left py-1 px-1">DESC</th>
-          <th class="w-6"></th>
-        </tr></thead>
-        <tbody id="spells-body"></tbody>
-      </table>
-    </div>
+    <div id="spells-body"></div>
     <button onclick="addSpellRow()" class="mt-3 border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Spell</button>
   </div>
 
@@ -268,9 +256,9 @@ function getSheetData() {
   data.attacks = Array.from(document.querySelectorAll('#attacks-body tr')).map(function(tr) {
     return Array.from(tr.querySelectorAll('input')).map(function(el) { return el.value; });
   });
-  data.spells = Array.from(document.querySelectorAll('#spells-body tr')).map(function(tr) {
-    var inputs = Array.from(tr.querySelectorAll('input')).map(function(el) { return el.value; });
-    var selects = Array.from(tr.querySelectorAll('select')).map(function(el) { return el.value; });
+  data.spells = Array.from(document.querySelectorAll('#spells-body .spell-row')).map(function(row) {
+    var inputs = Array.from(row.querySelectorAll('input')).map(function(el) { return el.value; });
+    var selects = Array.from(row.querySelectorAll('select')).map(function(el) { return el.value; });
     return { inputs: inputs, selects: selects };
   });
   data.gear = Array.from(document.querySelectorAll('#gear-list input')).map(function(el) { return el.value; });
@@ -291,7 +279,7 @@ function loadSheetData(data) {
   });
   if (data.talents) data.talents.forEach(function(val) { addTalentRow(); var inputs = document.querySelectorAll('#talents-list input'); inputs[inputs.length-1].value = val; });
   if (data.attacks) data.attacks.forEach(function(row) { addAttackRow(); var tr = document.querySelector('#attacks-body tr:last-child'); row.forEach(function(val, i) { var inp = tr.querySelectorAll('input')[i]; if (inp) inp.value = val; }); });
-  if (data.spells) data.spells.forEach(function(row) { addSpellRow(); var tr = document.querySelector('#spells-body tr:last-child'); row.inputs.forEach(function(val, i) { var inp = tr.querySelectorAll('input')[i]; if (inp) inp.value = val; }); row.selects.forEach(function(val, i) { var sel = tr.querySelectorAll('select')[i]; if (sel) sel.value = val; }); });
+  if (data.spells) data.spells.forEach(function(row) { addSpellRow(); var spellRow = document.querySelector('#spells-body .spell-row:last-child'); row.inputs.forEach(function(val, i) { var inp = spellRow.querySelectorAll('input')[i]; if (inp) inp.value = val; }); row.selects.forEach(function(val, i) { var sel = spellRow.querySelectorAll('select')[i]; if (sel) sel.value = val; }); });
   if (data.gear) data.gear.forEach(function(val) { addGearRow(); var inputs = document.querySelectorAll('#gear-list input'); inputs[inputs.length-1].value = val; });
   if (data.freeCarry) data.freeCarry.forEach(function(val) { addFreeCarryRow(); var inputs = document.querySelectorAll('#free-carry-list input'); inputs[inputs.length-1].value = val; });
   isLoading = false;
@@ -374,17 +362,26 @@ function addAttackRow() {
 }
 
 function addSpellRow() {
-  var tbody = document.getElementById('spells-body');
-  var tr = document.createElement('tr');
-  tr.className = 'border-b border-gray-100';
-  tr.innerHTML =
-    '<td class="py-2 px-1"><select class="text-sm outline-none font-crimson w-10" style="background:white;"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>' +
-    '<td class="py-2 px-1"><input type="text" placeholder="Name..." class="w-full text-sm outline-none font-crimson"></td>' +
-    '<td class="py-2 px-1"><input type="text" placeholder="1 min..." class="w-full text-sm outline-none font-crimson"></td>' +
-    '<td class="py-2 px-1"><select class="text-sm outline-none font-crimson w-14" style="background:white;"><option>Self</option><option>Close</option><option>Near</option><option>Far</option></select></td>' +
-    '<td class="py-2 px-1"><input type="text" placeholder="Effect..." class="w-full text-sm outline-none font-crimson"></td>' +
-    '<td class="py-2 px-1 text-center"><button onclick="this.closest(\'tr\').remove()" class="text-gray-300 hover:text-gray-500 text-sm">&#x2715;</button></td>';
-  tbody.appendChild(tr);
+  var container = document.getElementById('spells-body');
+  var div = document.createElement('div');
+  div.className = 'spell-row border-b border-gray-100 py-2';
+  div.innerHTML =
+    '<input type="text" placeholder="Name..." class="w-full text-sm outline-none font-crimson font-bold mb-1">' +
+    '<div class="flex items-center gap-1 flex-wrap">' +
+      '<span class="font-cinzel text-xs text-gray-400">Tier</span>' +
+      '<select class="text-sm outline-none font-crimson" style="background:white;">' +
+        '<option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>' +
+      '</select>' +
+      '<span class="text-gray-300 text-xs">·</span>' +
+      '<input type="text" placeholder="Duration..." class="text-sm outline-none font-crimson w-20">' +
+      '<span class="text-gray-300 text-xs">·</span>' +
+      '<select class="text-sm outline-none font-crimson" style="background:white;">' +
+        '<option>Self</option><option>Close</option><option>Near</option><option>Far</option>' +
+      '</select>' +
+      '<button onclick="this.closest(\'.spell-row\').remove()" class="ml-auto text-gray-300 hover:text-gray-500 text-sm">&#x2715;</button>' +
+    '</div>' +
+    '<input type="text" placeholder="Effect..." class="w-full text-xs outline-none font-crimson text-gray-500 mt-1">';
+  container.appendChild(div);
 }
 
 function addGearRow() {
@@ -510,9 +507,9 @@ function sendJoin() {
   }).filter(function(attack) { return attack.weapon; });
   
   // Get spells
-  var spells = Array.from(document.querySelectorAll('#spells-body tr')).map(function(tr) {
-    var inputs = Array.from(tr.querySelectorAll('input'));
-    var selects = Array.from(tr.querySelectorAll('select'));
+  var spells = Array.from(document.querySelectorAll('#spells-body .spell-row')).map(function(row) {
+    var inputs = Array.from(row.querySelectorAll('input'));
+    var selects = Array.from(row.querySelectorAll('select'));
     return {
       tier: selects[0] ? selects[0].value : '',
       name: inputs[0] ? inputs[0].value.trim() : '',
