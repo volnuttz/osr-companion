@@ -67,8 +67,9 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
     <div class="border-t border-gray-100 pt-3">
       <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-2">CHARACTER SHEET</p>
       <div class="flex flex-col gap-2">
+        <button onclick="openCharGen()" class="w-full bg-black text-white font-cinzel text-xs font-bold px-3 py-1.5 rounded hover:bg-gray-800">Create Character</button>
         <button onclick="downloadCharacterSheet()" class="w-full border border-gray-300 bg-white font-cinzel text-xs text-gray-700 font-bold px-3 py-1.5 rounded hover:bg-gray-50">Download</button>
-        <button onclick="uploadCharacterSheet()" class="w-full bg-black text-white font-cinzel text-xs font-bold px-3 py-1.5 rounded hover:bg-gray-800">Upload</button>
+        <button onclick="uploadCharacterSheet()" class="w-full border border-gray-300 bg-white font-cinzel text-xs text-gray-700 font-bold px-3 py-1.5 rounded hover:bg-gray-50">Upload</button>
       </div>
     </div>
     <a href="gm.html" class="font-cinzel text-xs text-gray-500 hover:text-black transition-colors block pt-3 border-t border-gray-100">GM Page</a>
@@ -176,6 +177,118 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
       <div class="border border-gray-100 rounded-lg p-2">
         <ul id="free-carry-list"></ul>
         <button onclick="addFreeCarryRow()" class="mt-2 border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Item</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARACTER CREATION MODAL -->
+  <div id="chargen-backdrop" class="hidden fixed inset-0 z-50 bg-black/40" onclick="if(event.target===this)closeCharGen()">
+    <div class="absolute inset-x-2 top-4 bottom-4 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:top-8 sm:bottom-8 sm:w-[640px] bg-white rounded-xl shadow-2xl flex flex-col overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100 shrink-0">
+        <div>
+          <h2 class="font-cinzel text-sm font-bold tracking-widest">CREATE CHARACTER</h2>
+          <p class="font-crimson text-xs text-gray-400 italic">Shadowdark Quickstart — free rules</p>
+        </div>
+        <button onclick="closeCharGen()" aria-label="Close" class="w-9 h-9 flex items-center justify-center hover:bg-gray-100 rounded-lg text-gray-500 text-lg leading-none">&times;</button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-5 space-y-5">
+
+        <!-- ABILITY SCORES -->
+        <section>
+          <div class="flex items-center justify-between mb-2">
+            <p class="font-cinzel text-xs font-bold tracking-widest">1 · ABILITY SCORES</p>
+            <button onclick="cgRollAbilities()" class="font-cinzel text-xs font-bold bg-black text-white px-3 py-1 rounded hover:bg-gray-800">Roll 3d6</button>
+          </div>
+          <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            <div class="border border-gray-200 rounded p-2 text-center"><p class="font-cinzel text-[10px] font-bold text-gray-400">STR</p><input id="cg-str" type="number" min="3" max="18" class="w-full text-center text-base outline-none" placeholder="—"></div>
+            <div class="border border-gray-200 rounded p-2 text-center"><p class="font-cinzel text-[10px] font-bold text-gray-400">INT</p><input id="cg-int" type="number" min="3" max="18" class="w-full text-center text-base outline-none" placeholder="—"></div>
+            <div class="border border-gray-200 rounded p-2 text-center"><p class="font-cinzel text-[10px] font-bold text-gray-400">DEX</p><input id="cg-dex" type="number" min="3" max="18" class="w-full text-center text-base outline-none" placeholder="—"></div>
+            <div class="border border-gray-200 rounded p-2 text-center"><p class="font-cinzel text-[10px] font-bold text-gray-400">WIS</p><input id="cg-wis" type="number" min="3" max="18" class="w-full text-center text-base outline-none" placeholder="—"></div>
+            <div class="border border-gray-200 rounded p-2 text-center"><p class="font-cinzel text-[10px] font-bold text-gray-400">CON</p><input id="cg-con" type="number" min="3" max="18" class="w-full text-center text-base outline-none" placeholder="—"></div>
+            <div class="border border-gray-200 rounded p-2 text-center"><p class="font-cinzel text-[10px] font-bold text-gray-400">CHA</p><input id="cg-cha" type="number" min="3" max="18" class="w-full text-center text-base outline-none" placeholder="—"></div>
+          </div>
+          <p class="font-crimson text-xs text-gray-500 italic mt-1">3d6 in order. Edit if your table allows.</p>
+        </section>
+
+        <!-- ANCESTRY -->
+        <section>
+          <p class="font-cinzel text-xs font-bold tracking-widest mb-2">2 · ANCESTRY</p>
+          <select id="cg-ancestry" onchange="cgUpdateAncestry()" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson bg-white">
+            <option value="">— choose —</option>
+          </select>
+          <p id="cg-ancestry-talent" class="font-crimson text-xs text-gray-600 mt-1.5 min-h-[1em]"></p>
+        </section>
+
+        <!-- CLASS -->
+        <section>
+          <p class="font-cinzel text-xs font-bold tracking-widest mb-2">3 · CLASS</p>
+          <select id="cg-class" onchange="cgUpdateClass()" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson bg-white">
+            <option value="">— choose —</option>
+          </select>
+          <ul id="cg-class-features" class="font-crimson text-xs text-gray-600 mt-1.5 list-disc list-inside space-y-0.5"></ul>
+        </section>
+
+        <!-- BACKGROUND -->
+        <section>
+          <div class="flex items-center justify-between mb-2">
+            <p class="font-cinzel text-xs font-bold tracking-widest">4 · BACKGROUND</p>
+            <button onclick="cgRollBackground()" class="font-cinzel text-xs font-bold border border-gray-300 px-3 py-1 rounded hover:bg-gray-50">Roll d20</button>
+          </div>
+          <select id="cg-background" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson bg-white">
+            <option value="">— choose —</option>
+          </select>
+        </section>
+
+        <!-- ALIGNMENT -->
+        <section>
+          <p class="font-cinzel text-xs font-bold tracking-widest mb-2">5 · ALIGNMENT</p>
+          <div id="cg-alignment-group" class="grid grid-cols-3 gap-2">
+            <button data-align="Lawful" onclick="cgPickAlignment('Lawful')" class="cg-align font-cinzel text-xs font-bold border border-gray-300 px-2 py-2 rounded hover:bg-gray-50">Lawful</button>
+            <button data-align="Neutral" onclick="cgPickAlignment('Neutral')" class="cg-align font-cinzel text-xs font-bold border border-gray-300 px-2 py-2 rounded hover:bg-gray-50">Neutral</button>
+            <button data-align="Chaotic" onclick="cgPickAlignment('Chaotic')" class="cg-align font-cinzel text-xs font-bold border border-gray-300 px-2 py-2 rounded hover:bg-gray-50">Chaotic</button>
+          </div>
+        </section>
+
+        <!-- DEITY -->
+        <section>
+          <div class="flex items-center justify-between mb-2">
+            <p class="font-cinzel text-xs font-bold tracking-widest">6 · DEITY</p>
+            <button onclick="cgRollDeity()" class="font-cinzel text-xs font-bold border border-gray-300 px-3 py-1 rounded hover:bg-gray-50">Roll</button>
+          </div>
+          <select id="cg-deity" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson bg-white">
+            <option value="">— choose alignment first —</option>
+          </select>
+        </section>
+
+        <!-- NAME -->
+        <section>
+          <div class="flex items-center justify-between mb-2">
+            <p class="font-cinzel text-xs font-bold tracking-widest">7 · NAME</p>
+            <button onclick="cgRollName()" class="font-cinzel text-xs font-bold border border-gray-300 px-3 py-1 rounded hover:bg-gray-50">Roll</button>
+          </div>
+          <input id="cg-name" type="text" placeholder="Character name…" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson">
+        </section>
+
+        <!-- HP & GOLD -->
+        <section>
+          <p class="font-cinzel text-xs font-bold tracking-widest mb-2">8 · HIT POINTS &amp; GOLD</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="cgRollHp()" class="border border-gray-300 rounded p-2 text-left hover:bg-gray-50">
+              <p class="font-cinzel text-[10px] font-bold text-gray-400">HP — 1d? + CON</p>
+              <p id="cg-hp-display" class="font-cinzel text-lg font-bold">—</p>
+            </button>
+            <button onclick="cgRollGold()" class="border border-gray-300 rounded p-2 text-left hover:bg-gray-50">
+              <p class="font-cinzel text-[10px] font-bold text-gray-400">GOLD — 2d6 × 5</p>
+              <p id="cg-gold-display" class="font-cinzel text-lg font-bold">—</p>
+            </button>
+          </div>
+          <p class="font-crimson text-xs text-gray-500 italic mt-1">Pick a class to enable HP. Dwarves roll HP with advantage.</p>
+        </section>
+
+      </div>
+      <div class="border-t border-gray-100 p-4 flex flex-col sm:flex-row gap-2 shrink-0">
+        <button onclick="closeCharGen()" class="flex-1 border border-gray-300 bg-white font-cinzel text-xs font-bold px-3 py-2 rounded hover:bg-gray-50">Cancel</button>
+        <button onclick="applyCharGen()" class="flex-1 bg-black text-white font-cinzel text-xs font-bold px-3 py-2 rounded hover:bg-gray-800">Apply to Sheet</button>
       </div>
     </div>
   </div>
@@ -650,6 +763,256 @@ function downloadCharacterSheet() {
   URL.revokeObjectURL(url);
   closeHamburger();
   showDmMsg('Character sheet saved: ' + filename);
+}
+
+// ── CHARACTER CREATION (Shadowdark Quickstart, free rules) ───────────
+var CHARGEN = {
+  ancestries: {
+    Human: { talent: 'Ambitious — You gain one additional talent roll at 1st level.' },
+    Elf: { talent: 'Farsight — +1 bonus to ranged weapon attack rolls or +1 to spellcasting checks.' },
+    Dwarf: { talent: 'Stout — Roll hit points with advantage at 1st level. Permanently gain the higher value at later levels.' },
+    Halfling: { talent: 'Stealthy — Once per day, become invisible for 3 rounds.' },
+    Goblin: { talent: "Keen Senses — You can't be surprised." },
+    'Half-Orc': { talent: 'Mighty — +1 bonus to attack and damage rolls with melee weapons.' }
+  },
+  classes: {
+    Fighter: {
+      hd: 8, title: 'Squire',
+      features: [
+        'Weapon Mastery — Choose two weapons; +1 attack and damage; +1 damage per Fighter level.',
+        'Hauler — Add CON modifier (if positive) to total gear slots.',
+        'Grit — Choose STR or DEX. Advantage on checks of that type to overcome an opposing force.'
+      ]
+    },
+    Priest: {
+      hd: 6, title: 'Acolyte',
+      features: [
+        'Languages — Common, plus one of Celestial, Diabolic, or Primordial.',
+        'Turn Undead — WIS check vs. DC 9 + undead level; success makes them flee.',
+        'Spellcasting — Cast priest spells using WIS.'
+      ]
+    },
+    Thief: {
+      hd: 4, title: 'Footpad',
+      features: [
+        'Backstab — +1 damage die per Thief level against unaware foes.',
+        'Thievery — Proficient with tools, climbing, sneaking, hiding, disguises, traps, delicate tasks.'
+      ]
+    },
+    Wizard: {
+      hd: 4, title: 'Apprentice',
+      features: [
+        'Languages — Common, plus 2 random extra languages.',
+        'Learning Spells — INT check to learn new spells.',
+        'Spellcasting — Cast wizard spells using INT.'
+      ]
+    }
+  },
+  backgrounds: ['Urchin','Wanted','Cult Initiate',"Thieves' Guild",'Banished','Orphaned',"Wizard's Apprentice",'Jeweler','Herbalist','Barbarian','Mercenary','Sailor','Acolyte','Soldier','Ranger','Scout','Minstrel','Scholar','Noble','Chirurgeon'],
+  alignments: ['Lawful','Neutral','Chaotic'],
+  deities: {
+    Lawful: ['Saint Terragnis','Madeera the Covenant','Gede'],
+    Neutral: ['Ord','Cthonia','Achra'],
+    Chaotic: ['Shune the Vile','Memnon','Ramlaat']
+  },
+  names: {
+    Human: ['Aldo','Anya','Brom','Astrid','Curtis','Bree','Drake','Carmen','Hank','Diana','Lazlo','Fiona','Mavros','Heidi','Rook','Ingrid','Sigmund','Inga','Wulf','Lotta'],
+    Elf: ['Eliara','Eldon','Galadiel','Aelar','Hadar','Beiro','Iyathandra','Erevan','Lealla','Filarion','Heian','Naïlo','Selathra','Riardon','Soveliss','Tharivol','Valanthe','Variel'],
+    Dwarf: ['Adric','Aleena','Brottor','Aviska','Eberk','Bardryn','Einkil','Daewynn','Fargrim','Diesa','Gardain','Gilda','Orsik','Ricca','Rurik','Roiha','Taklinn','Sannl','Travok','Tomma'],
+    Halfling: ['Astaria','Cassiope','Birch','Daphne','Cole','Elise','Errich','Hannah','Finnan','Lily','Hadwin','Maddie','Lyle','Marigold','Magnus','Maud','Nibs','Olia','Quinn','Rosie','Roscoe','Wendel'],
+    Goblin: ['Hix','Iggs','Klick','Bibi','Krunch','Daisy','Lonk','Mibb','Niblet','Lucy','Riggle','Skitter','Olive','Snork','Pip','Squick','Twitch','Yark','Tessy'],
+    'Half-Orc': ['Brakka','Greta','Drog','Henka','Gorvik','Magga','Lothar','Mazena','Mirana','Mort','Pranka','Murzol','Rok','Vorgaza','Sarkon','Yelena','Stranj','Zasha','Tarska']
+  },
+  freeGear: ['Backpack','Flint and steel','Torch','Torch','Iron spikes (10)','Rope, 60ft','Rations (3 days)']
+};
+
+var cgState = { hp: null, gold: null, alignment: '' };
+
+function cgPopulateSelect(el, items, current) {
+  el.innerHTML = '<option value="">— choose —</option>' + items.map(function(v){
+    var sel = v === current ? ' selected' : '';
+    return '<option value="' + v + '"' + sel + '>' + v + '</option>';
+  }).join('');
+}
+
+function openCharGen() {
+  // Populate selects (only once would be fine, but idempotent is cheaper than a flag)
+  cgPopulateSelect(document.getElementById('cg-ancestry'), Object.keys(CHARGEN.ancestries));
+  cgPopulateSelect(document.getElementById('cg-class'), Object.keys(CHARGEN.classes));
+  cgPopulateSelect(document.getElementById('cg-background'), CHARGEN.backgrounds);
+  // Reset state
+  cgState = { hp: null, gold: null, alignment: '' };
+  document.getElementById('cg-hp-display').textContent = '—';
+  document.getElementById('cg-gold-display').textContent = '—';
+  document.getElementById('cg-ancestry-talent').textContent = '';
+  document.getElementById('cg-class-features').innerHTML = '';
+  document.getElementById('cg-name').value = '';
+  document.getElementById('cg-deity').innerHTML = '<option value="">— choose alignment first —</option>';
+  Array.from(document.querySelectorAll('.cg-align')).forEach(function(b){ b.classList.remove('bg-black','text-white'); b.classList.add('border-gray-300'); });
+  ['cg-str','cg-int','cg-dex','cg-wis','cg-con','cg-cha'].forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('chargen-backdrop').classList.remove('hidden');
+  closeHamburger();
+}
+
+function closeCharGen() {
+  document.getElementById('chargen-backdrop').classList.add('hidden');
+}
+
+function cgRollAbilities() {
+  ['cg-str','cg-int','cg-dex','cg-wis','cg-con','cg-cha'].forEach(function(id){
+    document.getElementById(id).value = d(6) + d(6) + d(6);
+  });
+}
+
+function cgUpdateAncestry() {
+  var v = document.getElementById('cg-ancestry').value;
+  document.getElementById('cg-ancestry-talent').textContent = v ? CHARGEN.ancestries[v].talent : '';
+  if (cgState.hp !== null) cgRefreshHpLabel();
+}
+
+function cgUpdateClass() {
+  var v = document.getElementById('cg-class').value;
+  var ul = document.getElementById('cg-class-features');
+  if (!v) { ul.innerHTML = ''; cgRefreshHpLabel(); return; }
+  var c = CHARGEN.classes[v];
+  ul.innerHTML = '<li>Hit Die: d' + c.hd + ' &middot; Starting title: ' + c.title + '</li>' +
+    c.features.map(function(f){ return '<li>' + f + '</li>'; }).join('');
+  cgRefreshHpLabel();
+}
+
+function cgRefreshHpLabel() {
+  var cls = document.getElementById('cg-class').value;
+  var btn = document.querySelector('#cg-hp-display').previousElementSibling;
+  btn.textContent = 'HP — 1d' + (cls ? CHARGEN.classes[cls].hd : '?') + ' + CON';
+}
+
+function cgRollBackground() {
+  var i = d(20) - 1;
+  document.getElementById('cg-background').value = CHARGEN.backgrounds[i];
+}
+
+function cgPickAlignment(a) {
+  cgState.alignment = a;
+  Array.from(document.querySelectorAll('.cg-align')).forEach(function(b){
+    if (b.getAttribute('data-align') === a) { b.classList.add('bg-black','text-white'); b.classList.remove('border-gray-300'); }
+    else { b.classList.remove('bg-black','text-white'); b.classList.add('border-gray-300'); }
+  });
+  cgPopulateSelect(document.getElementById('cg-deity'), CHARGEN.deities[a]);
+}
+
+function cgRollDeity() {
+  if (!cgState.alignment) { showDmMsg('Pick an alignment first'); return; }
+  var list = CHARGEN.deities[cgState.alignment];
+  document.getElementById('cg-deity').value = list[Math.floor(Math.random() * list.length)];
+}
+
+function cgRollName() {
+  var a = document.getElementById('cg-ancestry').value;
+  if (!a) { showDmMsg('Pick an ancestry first'); return; }
+  var list = CHARGEN.names[a];
+  document.getElementById('cg-name').value = list[Math.floor(Math.random() * list.length)];
+}
+
+function cgRollHp() {
+  var cls = document.getElementById('cg-class').value;
+  if (!cls) { showDmMsg('Pick a class first'); return; }
+  var hd = CHARGEN.classes[cls].hd;
+  var conVal = parseInt(document.getElementById('cg-con').value);
+  var conMod = isNaN(conVal) ? 0 : Math.floor((conVal - 10) / 2);
+  var roll = d(hd);
+  if (document.getElementById('cg-ancestry').value === 'Dwarf') {
+    var r2 = d(hd);
+    roll = Math.max(roll, r2);
+  }
+  var total = Math.max(1, roll + conMod);
+  cgState.hp = total;
+  document.getElementById('cg-hp-display').textContent = total + ' HP';
+}
+
+function cgRollGold() {
+  var gp = (d(6) + d(6)) * 5;
+  cgState.gold = gp;
+  document.getElementById('cg-gold-display').textContent = gp + ' GP';
+}
+
+function applyCharGen() {
+  // Validation
+  var ancestry = document.getElementById('cg-ancestry').value;
+  var cls = document.getElementById('cg-class').value;
+  var bg = document.getElementById('cg-background').value;
+  var deity = document.getElementById('cg-deity').value;
+  var name = document.getElementById('cg-name').value.trim();
+  var missing = [];
+  if (!name) missing.push('name');
+  if (!ancestry) missing.push('ancestry');
+  if (!cls) missing.push('class');
+  if (!cgState.alignment) missing.push('alignment');
+  if (cgState.hp === null) missing.push('HP');
+  if (missing.length) { showDmMsg('Missing: ' + missing.join(', ')); return; }
+  if (!confirm('This will overwrite the current character sheet. Continue?')) return;
+
+  // Wipe dynamic lists
+  document.getElementById('talents-list').innerHTML = '';
+  document.getElementById('attacks-body').innerHTML = '';
+  document.getElementById('spells-body').innerHTML = '';
+  document.getElementById('gear-list').innerHTML = '';
+  document.getElementById('free-carry-list').innerHTML = '';
+
+  // Header fields by placeholder
+  function setByPlaceholder(ph, val) {
+    var el = document.querySelector('input[placeholder="' + ph + '"]');
+    if (el) el.value = val;
+  }
+  setByPlaceholder('Character name...', name);
+  setByPlaceholder('Human, Elf...', ancestry);
+  setByPlaceholder('Fighter...', cls);
+  setByPlaceholder('1', '1');
+  setByPlaceholder('Wanderer...', CHARGEN.classes[cls].title);
+  setByPlaceholder('Lawful...', cgState.alignment);
+  setByPlaceholder('Soldier...', bg);
+  setByPlaceholder('God or none...', deity || '');
+
+  // Abilities
+  ['str','int','dex','wis','con','cha'].forEach(function(s) {
+    var v = parseInt(document.getElementById('cg-' + s).value);
+    var el = document.getElementById(s);
+    el.value = isNaN(v) ? '' : v;
+    calcMod(s);
+  });
+
+  // HP
+  document.getElementById('hp').value = cgState.hp;
+  document.getElementById('hp-max').value = cgState.hp;
+
+  // AC = 10 + DEX mod (no armor yet)
+  var dexVal = parseInt(document.getElementById('dex').value);
+  var dexMod = isNaN(dexVal) ? 0 : Math.floor((dexVal - 10) / 2);
+  document.getElementById('ac').value = 10 + dexMod;
+
+  // Talents: ancestry talent + class features
+  function addTalent(text) {
+    addTalentRow();
+    var inputs = document.querySelectorAll('#talents-list input');
+    inputs[inputs.length - 1].value = text;
+  }
+  addTalent(ancestry + ': ' + CHARGEN.ancestries[ancestry].talent);
+  CHARGEN.classes[cls].features.forEach(function(f) { addTalent(cls + ': ' + f); });
+
+  // Free carry essentials
+  CHARGEN.freeGear.forEach(function(item) {
+    addFreeCarryRow();
+    var inputs = document.querySelectorAll('#free-carry-list input');
+    inputs[inputs.length - 1].value = item;
+  });
+
+  // Gold
+  document.getElementById('gp').value = cgState.gold || 0;
+  document.getElementById('sp').value = 0;
+  document.getElementById('cp').value = 0;
+
+  scheduleSave();
+  closeCharGen();
+  showDmMsg('Character created: ' + name);
 }
 
 function uploadCharacterSheet() {
