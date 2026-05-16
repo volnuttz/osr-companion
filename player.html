@@ -228,6 +228,16 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
           <ul id="cg-class-features" class="font-crimson text-xs text-gray-600 mt-1.5 list-disc list-inside space-y-0.5"></ul>
         </section>
 
+        <!-- STARTING SPELLS (Wizard / Priest only) -->
+        <section id="cg-spells-section" style="display:none">
+          <div class="flex items-center justify-between mb-2">
+            <p class="font-cinzel text-xs font-bold tracking-widest">3b · STARTING SPELLS</p>
+            <button onclick="cgRollSpells()" class="font-cinzel text-xs font-bold border border-gray-300 px-3 py-1 rounded hover:bg-gray-50">Roll random</button>
+          </div>
+          <p id="cg-spells-info" class="font-crimson text-xs text-gray-500 italic mb-1.5">—</p>
+          <div id="cg-spells-list" class="grid grid-cols-1 sm:grid-cols-2 gap-1"></div>
+        </section>
+
         <!-- BACKGROUND -->
         <section>
           <div class="flex items-center justify-between mb-2">
@@ -823,7 +833,37 @@ var CHARGEN = {
     Goblin: ['Hix','Iggs','Klick','Bibi','Krunch','Daisy','Lonk','Mibb','Niblet','Lucy','Riggle','Skitter','Olive','Snork','Pip','Squick','Twitch','Yark','Tessy'],
     'Half-Orc': ['Brakka','Greta','Drog','Henka','Gorvik','Magga','Lothar','Mazena','Mirana','Mort','Pranka','Murzol','Rok','Vorgaza','Sarkon','Yelena','Stranj','Zasha','Tarska']
   },
-  freeGear: ['Backpack','Flint and steel','Torch','Torch','Iron spikes (10)','Rope, 60ft','Rations (3 days)']
+  freeGear: ['Backpack','Flint and steel','Torch','Torch','Iron spikes (10)','Rope, 60ft','Rations (3 days)'],
+  spells: {
+    Wizard: {
+      pick: 3,
+      list: [
+        { name: 'Alarm',                tier: '1', duration: '8 hours',           range: 'Near',  desc: 'Alerts you when a creature enters the warded area.' },
+        { name: 'Burning Hands',        tier: '1', duration: 'Instant',           range: 'Close', desc: 'A fan of flame; targets take damage and may catch fire.' },
+        { name: 'Charm Person',         tier: '1', duration: '1 day',             range: 'Close', desc: 'Target treats you as a trusted friend.' },
+        { name: 'Detect Magic',         tier: '1', duration: '5 rounds (focus)',  range: 'Near',  desc: 'Sense the presence of magic nearby.' },
+        { name: 'Feather Fall',         tier: '1', duration: 'Instant',           range: 'Self',  desc: 'Negate fall damage for yourself.' },
+        { name: 'Floating Disk',        tier: '1', duration: '1 hour',            range: 'Close', desc: 'A disk of force follows you, carrying gear.' },
+        { name: 'Hold Portal',          tier: '1', duration: '10 minutes',        range: 'Near',  desc: 'Seal a door, window, or gate.' },
+        { name: 'Light',                tier: '1', duration: '1 hour',            range: 'Close', desc: 'Object sheds bright light in near radius.' },
+        { name: 'Mage Armor',           tier: '1', duration: '1 hour',            range: 'Self',  desc: 'Your AC becomes 14 + DEX (no shield).' },
+        { name: 'Magic Missile',        tier: '1', duration: 'Instant',           range: 'Far',   desc: 'Unerring bolt of force damages a target.' },
+        { name: 'Protection from Evil', tier: '1', duration: '10 min (focus)',    range: 'Close', desc: 'Target has disadvantage vs. evil attackers.' },
+        { name: 'Sleep',                tier: '1', duration: 'Instant',           range: 'Near',  desc: 'Weak creatures fall into magical slumber.' }
+      ]
+    },
+    Priest: {
+      pick: 2,
+      list: [
+        { name: 'Cure Wounds',          tier: '1', duration: 'Instant',           range: 'Close', desc: 'Restore HP to a touched creature.' },
+        { name: 'Holy Weapon',          tier: '1', duration: '5 rounds',          range: 'Self',  desc: 'A weapon you touch deals +1 damage and shines.' },
+        { name: 'Light',                tier: '1', duration: '1 hour',            range: 'Close', desc: 'Object sheds bright light in near radius.' },
+        { name: 'Protection from Evil', tier: '1', duration: '10 min (focus)',    range: 'Close', desc: 'Target has disadvantage vs. evil attackers.' },
+        { name: 'Shield of Faith',      tier: '1', duration: '5 rounds',          range: 'Self',  desc: '+2 AC, divine aura protects you.' },
+        { name: 'Turn Undead',          tier: '1', duration: 'Instant',           range: 'Near',  desc: 'Drive away undead by sheer faith.' }
+      ]
+    }
+  }
 };
 
 var cgState = { hp: null, gold: null, alignment: '' };
@@ -848,6 +888,8 @@ function openCharGen() {
   document.getElementById('cg-class-features').innerHTML = '';
   document.getElementById('cg-name').value = '';
   document.getElementById('cg-deity').innerHTML = '<option value="">— choose alignment first —</option>';
+  document.getElementById('cg-spells-section').style.display = 'none';
+  document.getElementById('cg-spells-list').innerHTML = '';
   Array.from(document.querySelectorAll('.cg-align')).forEach(function(b){ b.classList.remove('bg-black','text-white'); b.classList.add('border-gray-300'); });
   ['cg-str','cg-int','cg-dex','cg-wis','cg-con','cg-cha'].forEach(function(id){ document.getElementById(id).value = ''; });
   document.getElementById('chargen-backdrop').classList.remove('hidden');
@@ -873,11 +915,69 @@ function cgUpdateAncestry() {
 function cgUpdateClass() {
   var v = document.getElementById('cg-class').value;
   var ul = document.getElementById('cg-class-features');
-  if (!v) { ul.innerHTML = ''; cgRefreshHpLabel(); return; }
+  var spellsSec = document.getElementById('cg-spells-section');
+  var spellsList = document.getElementById('cg-spells-list');
+  if (!v) {
+    ul.innerHTML = '';
+    spellsSec.style.display = 'none';
+    spellsList.innerHTML = '';
+    cgRefreshHpLabel();
+    return;
+  }
   var c = CHARGEN.classes[v];
   ul.innerHTML = '<li>Hit Die: d' + c.hd + ' &middot; Starting title: ' + c.title + '</li>' +
     c.features.map(function(f){ return '<li>' + f + '</li>'; }).join('');
   cgRefreshHpLabel();
+  // Spells panel
+  if (CHARGEN.spells[v]) {
+    spellsSec.style.display = 'block';
+    spellsList.innerHTML = CHARGEN.spells[v].list.map(function(s, i) {
+      return '<label class="flex items-start gap-1.5 text-xs font-crimson py-0.5 cursor-pointer">' +
+        '<input type="checkbox" data-cg-spell="' + i + '" onchange="cgSpellChange()" class="mt-0.5 shrink-0">' +
+        '<span><span class="font-bold">' + s.name + '</span> <span class="text-gray-400">· ' + s.range + ' · ' + s.duration + '</span></span>' +
+        '</label>';
+    }).join('');
+    cgSpellChange();
+  } else {
+    spellsSec.style.display = 'none';
+    spellsList.innerHTML = '';
+  }
+}
+
+function cgSpellChange() {
+  var v = document.getElementById('cg-class').value;
+  if (!CHARGEN.spells[v]) return;
+  var max = CHARGEN.spells[v].pick;
+  var boxes = Array.from(document.querySelectorAll('#cg-spells-list input'));
+  var checked = boxes.filter(function(b) { return b.checked; });
+  if (checked.length > max) {
+    // Uncheck the most recent
+    checked[checked.length - 1].checked = false;
+    checked.pop();
+  }
+  boxes.forEach(function(b) {
+    if (checked.length >= max && !b.checked) b.disabled = true;
+    else b.disabled = false;
+  });
+  document.getElementById('cg-spells-info').textContent =
+    'Pick ' + max + ' tier-1 ' + v.toLowerCase() + ' spell' + (max > 1 ? 's' : '') +
+    ' (' + checked.length + ' / ' + max + ')';
+}
+
+function cgRollSpells() {
+  var v = document.getElementById('cg-class').value;
+  if (!CHARGEN.spells[v]) return;
+  var max = CHARGEN.spells[v].pick;
+  var n = CHARGEN.spells[v].list.length;
+  var picked = [];
+  while (picked.length < max) {
+    var i = Math.floor(Math.random() * n);
+    if (picked.indexOf(i) === -1) picked.push(i);
+  }
+  document.querySelectorAll('#cg-spells-list input').forEach(function(cb, i) {
+    cb.checked = picked.indexOf(i) !== -1;
+  });
+  cgSpellChange();
 }
 
 function cgRefreshHpLabel() {
@@ -948,6 +1048,11 @@ function applyCharGen() {
   if (!cls) missing.push('class');
   if (!cgState.alignment) missing.push('alignment');
   if (cgState.hp === null) missing.push('HP');
+  if (CHARGEN.spells[cls]) {
+    var need = CHARGEN.spells[cls].pick;
+    var got = document.querySelectorAll('#cg-spells-list input:checked').length;
+    if (got !== need) missing.push(need + ' starting spells (have ' + got + ')');
+  }
   if (missing.length) { showDmMsg('Missing: ' + missing.join(', ')); return; }
   if (!confirm('This will overwrite the current character sheet. Continue?')) return;
 
@@ -997,6 +1102,23 @@ function applyCharGen() {
   }
   addTalent(ancestry + ': ' + CHARGEN.ancestries[ancestry].talent);
   CHARGEN.classes[cls].features.forEach(function(f) { addTalent(cls + ': ' + f); });
+
+  // Starting spells (Wizard / Priest)
+  if (CHARGEN.spells[cls]) {
+    Array.from(document.querySelectorAll('#cg-spells-list input:checked')).forEach(function(cb) {
+      var spell = CHARGEN.spells[cls].list[parseInt(cb.getAttribute('data-cg-spell'))];
+      addSpellRow();
+      var row = document.querySelector('#spells-body .spell-row:last-child');
+      var inputs = row.querySelectorAll('input');
+      var selects = row.querySelectorAll('select');
+      var ta = row.querySelector('textarea');
+      if (inputs[0]) inputs[0].value = spell.name;
+      if (inputs[1]) inputs[1].value = spell.duration;
+      if (selects[0]) selects[0].value = spell.tier;
+      if (selects[1]) selects[1].value = spell.range;
+      if (ta) { ta.value = spell.desc; ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+    });
+  }
 
   // Free carry essentials
   CHARGEN.freeGear.forEach(function(item) {
