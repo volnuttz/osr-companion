@@ -87,7 +87,10 @@ input[type=number]{-moz-appearance:textfield;}
     <div id="tab-combat">
       <div class="mt-1">
         <div id="initiative-list"></div>
-        <button onclick="openCombatantModal()" class="w-full border border-dashed border-gray-300 rounded-xl font-cinzel text-xs text-gray-400 font-bold py-3 hover:bg-gray-50 mt-2">+ Add Combatant</button>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+          <button onclick="openCombatantModal()" class="border border-dashed border-gray-300 rounded-xl font-cinzel text-xs text-gray-400 font-bold py-3 hover:bg-gray-50">+ Add Combatant</button>
+          <button onclick="openMonsterCatalog()" class="border border-dashed border-gray-300 rounded-xl font-cinzel text-xs text-gray-400 font-bold py-3 hover:bg-gray-50">+ From Quickstart</button>
+        </div>
       </div>
     </div>
 
@@ -128,7 +131,10 @@ input[type=number]{-moz-appearance:textfield;}
     <div id="tab-treasure" style="display:none">
       <div class="mt-1">
         <div id="treasure-items"></div>
-        <button onclick="openTreasureModal()" class="w-full border border-dashed border-gray-300 rounded-xl font-cinzel text-xs text-gray-400 font-bold py-3 hover:bg-gray-50 mt-2">+ Add Treasure Item</button>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+          <button onclick="openTreasureModal()" class="border border-dashed border-gray-300 rounded-xl font-cinzel text-xs text-gray-400 font-bold py-3 hover:bg-gray-50">+ Add Treasure Item</button>
+          <button onclick="openItemCatalog('treasure')" class="border border-dashed border-gray-300 rounded-xl font-cinzel text-xs text-gray-400 font-bold py-3 hover:bg-gray-50">+ From Quickstart</button>
+        </div>
       </div>
     </div>
 
@@ -231,6 +237,43 @@ input[type=number]{-moz-appearance:textfield;}
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- MONSTER CATALOG MODAL -->
+<div id="monster-catalog" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+  <div onclick="closeMonsterCatalog()" class="absolute inset-0 bg-black/40"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-3 flex flex-col" style="max-height:85vh">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 shrink-0">
+      <div>
+        <p class="font-cinzel text-xs font-bold text-gray-500 tracking-widest">QUICKSTART MONSTERS</p>
+        <p class="font-crimson text-xs text-gray-400 italic">Tap to add to the battlefield</p>
+      </div>
+      <button onclick="closeMonsterCatalog()" class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-lg text-gray-400 text-lg leading-none">&times;</button>
+    </div>
+    <input id="monster-search" type="text" placeholder="Search…" oninput="renderMonsterCatalog()" class="border-b border-gray-100 px-4 py-2 outline-none text-sm font-crimson">
+    <div id="monster-catalog-list" class="flex-1 overflow-y-auto p-2"></div>
+  </div>
+</div>
+
+<!-- ITEM CATALOG MODAL -->
+<div id="item-catalog" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+  <div onclick="closeItemCatalog()" class="absolute inset-0 bg-black/40"></div>
+  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-3 flex flex-col" style="max-height:85vh">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 shrink-0">
+      <div>
+        <p class="font-cinzel text-xs font-bold text-gray-500 tracking-widest">QUICKSTART ITEMS</p>
+        <p id="item-catalog-subtitle" class="font-crimson text-xs text-gray-400 italic">Tap to add</p>
+      </div>
+      <button onclick="closeItemCatalog()" class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-lg text-gray-400 text-lg leading-none">&times;</button>
+    </div>
+    <div class="flex border-b border-gray-100 shrink-0">
+      <button data-cat="weapons" onclick="switchCatalogTab('weapons')" class="cat-tab flex-1 font-cinzel text-xs py-2 border-b-2 border-black text-black">WEAPONS</button>
+      <button data-cat="armor"   onclick="switchCatalogTab('armor')"   class="cat-tab flex-1 font-cinzel text-xs py-2 border-b-2 border-transparent text-gray-400">ARMOR</button>
+      <button data-cat="gear"    onclick="switchCatalogTab('gear')"    class="cat-tab flex-1 font-cinzel text-xs py-2 border-b-2 border-transparent text-gray-400">GEAR</button>
+    </div>
+    <input id="item-search" type="text" placeholder="Search…" oninput="renderItemCatalog()" class="border-b border-gray-100 px-4 py-2 outline-none text-sm font-crimson">
+    <div id="item-catalog-list" class="flex-1 overflow-y-auto p-2"></div>
   </div>
 </div>
 
@@ -767,7 +810,10 @@ function renderAllShops(){
         '<select onchange="setShopTarget('+s.id+',this.value)" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none bg-white font-crimson">'+playerOpts+'</select>'+
       '</div>'+
       '<div>'+itemsHtml+'</div>'+
-      '<button onclick="addShopItem('+s.id+')" class="border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50 mt-2">+ Add Item</button>'+
+      '<div class="flex flex-wrap gap-2 mt-2">'+
+        '<button onclick="addShopItem('+s.id+')" class="border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Item</button>'+
+        '<button onclick="openItemCatalog({shopId:'+s.id+'})" class="border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ From Quickstart</button>'+
+      '</div>'+
     '</div>';
   }).join('');
 }
@@ -1007,6 +1053,192 @@ function updateTimerDisplay() {
   var mins = Math.floor(timerSeconds / 60);
   var secs = timerSeconds % 60;
   document.getElementById('timer-display').textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+}
+
+// ── QUICKSTART CATALOG (monsters and items) ──────────────────────────
+var QUICKSTART = {
+  monsters: [
+    { name:'Bandit',           lvl:1, ac:12, hp:4,  atk:'shortsword or shortbow +1 (1d6)',           desc:'Cutthroat highway robber.' },
+    { name:'Berserker',        lvl:1, ac:13, hp:8,  atk:'greataxe +3 (1d10)',                        desc:'Frenzied warrior; ignores first crit.' },
+    { name:'Bugbear',          lvl:3, ac:13, hp:16, atk:'morningstar +3 (1d10)',                     desc:'Hulking goblinoid; advantage on surprise.' },
+    { name:'Cultist',          lvl:1, ac:11, hp:4,  atk:'dagger +1 (1d4)',                           desc:'Fanatical worshipper of a dark power.' },
+    { name:'Giant Centipede',  lvl:1, ac:13, hp:4,  atk:'bite +1 (1d4 + poison DC 9 CON)',           desc:'Scuttling pest; poison paralyzes.' },
+    { name:'Giant Rat',        lvl:1, ac:11, hp:4,  atk:'bite +1 (1d4)',                             desc:'Dog-sized vermin with foul bite.' },
+    { name:'Giant Spider',     lvl:2, ac:13, hp:9,  atk:'bite +2 (1d6 + poison DC 12 CON)',          desc:'Ambush web hunter.' },
+    { name:'Gnoll',            lvl:2, ac:13, hp:9,  atk:'spear +2 (1d6)',                            desc:'Hyena-headed humanoid raider.' },
+    { name:'Goblin',           lvl:1, ac:12, hp:4,  atk:'scimitar or shortbow +0 (1d6)',             desc:'Small cunning humanoid raider.' },
+    { name:'Hobgoblin',        lvl:1, ac:13, hp:6,  atk:'longsword or bow +2 (1d6+1)',               desc:'Disciplined goblinoid soldier.' },
+    { name:'Kobold',           lvl:1, ac:12, hp:3,  atk:'spear or sling +0 (1d4)',                   desc:'Dragon-blooded sneak.' },
+    { name:'Ogre',             lvl:4, ac:13, hp:22, atk:'greatclub +4 (1d8)',                        desc:'Foul giant brute.' },
+    { name:'Orc',              lvl:2, ac:13, hp:9,  atk:'longsword or shortbow +1 (1d6+1)',          desc:'Brutal humanoid warrior.' },
+    { name:'Owlbear',          lvl:5, ac:14, hp:35, atk:'2 claws +4 (1d8) + bite +4 (1d6)',          desc:'Owl-bear hybrid horror.' },
+    { name:'Skeleton',         lvl:1, ac:12, hp:4,  atk:'sword or bow +0 (1d6)',                     desc:'Animated undead bones.' },
+    { name:'Stirge',           lvl:1, ac:13, hp:4,  atk:'proboscis +2 (1 + blood drain)',            desc:'Mosquito-bat; clings and drains blood.' },
+    { name:'Troll',            lvl:7, ac:14, hp:50, atk:'2 claws +6 (1d6) + bite +6 (1d8)',          desc:'Regenerates 5 HP/round unless burned or acid.' },
+    { name:'Wight',            lvl:4, ac:12, hp:18, atk:'longsword +3 (1d8 + life drain)',           desc:'Touch ages and drains life force.' },
+    { name:'Wolf',             lvl:1, ac:12, hp:6,  atk:'bite +1 (1d4)',                             desc:'Pack hunter; advantage when flanking.' },
+    { name:'Zombie',           lvl:1, ac:9,  hp:5,  atk:'slam +1 (1d4)',                             desc:'Shambling undead; -4 INI.' }
+  ],
+  weapons: [
+    { name:'Club',         price:5,   currency:'sp', desc:'1d4, 1H' },
+    { name:'Dagger',       price:1,   currency:'gp', desc:'1d4, finesse, thrown' },
+    { name:'Staff',        price:5,   currency:'sp', desc:'1d4, 2H' },
+    { name:'Javelin',      price:5,   currency:'sp', desc:'1d4, thrown' },
+    { name:'Spear',        price:5,   currency:'sp', desc:'1d6, thrown/versatile' },
+    { name:'Mace',         price:5,   currency:'gp', desc:'1d6, 1H' },
+    { name:'Shortsword',   price:7,   currency:'gp', desc:'1d6, 1H' },
+    { name:'Shortbow',     price:6,   currency:'gp', desc:'1d4, 2H, far' },
+    { name:'Longsword',    price:9,   currency:'gp', desc:'1d8, 1H' },
+    { name:'Longbow',      price:15,  currency:'gp', desc:'1d8, 2H, far' },
+    { name:'Bastard sword',price:4,   currency:'gp', desc:'1d8 1H / 1d10 2H' },
+    { name:'Greataxe',     price:7,   currency:'gp', desc:'1d8 1H / 1d10 2H' },
+    { name:'Greatsword',   price:12,  currency:'gp', desc:'1d12, 2H' },
+    { name:'Warhammer',    price:5,   currency:'gp', desc:'1d10, 2H' },
+    { name:'Crossbow',     price:8,   currency:'gp', desc:'1d6, 2H, far, loading' }
+  ],
+  armor: [
+    { name:'Leather armor',   price:10,  currency:'gp', desc:'AC 11 + DEX, 1 slot' },
+    { name:'Chainmail',       price:60,  currency:'gp', desc:'AC 13 + DEX, 2 slots; disadv stealth/swim' },
+    { name:'Plate mail',      price:130, currency:'gp', desc:'AC 15 + DEX, 3 slots; disadv stealth/swim/sneak' },
+    { name:'Shield',          price:10,  currency:'gp', desc:'+1 AC, 1 slot, 1H' },
+    { name:'Helmet',          price:10,  currency:'gp', desc:'Advantage to resist crits' },
+    { name:'Mithral upgrade', price:4,   currency:'gp', desc:'×4 base cost; removes armor penalty' }
+  ],
+  gear: [
+    { name:'Arrows (20)',         price:1,   currency:'gp', desc:'Bow ammo' },
+    { name:'Backpack',            price:2,   currency:'gp', desc:'Holds your stuff' },
+    { name:'Bandages (5)',        price:1,   currency:'sp', desc:'Stop bleeding' },
+    { name:'Caltrops (bag)',      price:1,   currency:'sp', desc:'Tactical hazard' },
+    { name:'Crossbow bolts (20)', price:1,   currency:'gp', desc:'Crossbow ammo' },
+    { name:'Crowbar',             price:5,   currency:'sp', desc:'Pry open doors' },
+    { name:'Flask or bottle',     price:3,   currency:'sp', desc:'Carries liquid' },
+    { name:'Flint and steel',     price:5,   currency:'sp', desc:'Start fires' },
+    { name:'Grappling hook',      price:1,   currency:'gp', desc:'Climbing aid' },
+    { name:'Holy symbol',         price:1,   currency:'gp', desc:'Priestly focus' },
+    { name:'Holy water (vial)',   price:25,  currency:'gp', desc:'Damages undead/fiends' },
+    { name:'Iron spikes (10)',    price:1,   currency:'gp', desc:'Wedge doors, secure ropes' },
+    { name:'Lantern',             price:5,   currency:'gp', desc:'Steady light' },
+    { name:'Mirror (steel)',      price:10,  currency:'gp', desc:'Peer around corners' },
+    { name:'Oil, flask',          price:5,   currency:'sp', desc:'Lantern fuel or flammable' },
+    { name:'Pole (10 ft)',        price:5,   currency:'sp', desc:'Prod the unknown' },
+    { name:'Pot, iron',           price:5,   currency:'sp', desc:'Cookware' },
+    { name:'Rations (3 days)',    price:5,   currency:'sp', desc:'Travel food' },
+    { name:'Rope, 60ft',          price:1,   currency:'gp', desc:'Hempen rope' },
+    { name:'Sack',                price:5,   currency:'cp', desc:'Generic carrier' },
+    { name:'Spellbook',           price:100, currency:'gp', desc:'Wizard’s tome' },
+    { name:"Thieves' tools",      price:25,  currency:'gp', desc:'Lockpicks and probes' },
+    { name:'Torch',               price:1,   currency:'sp', desc:'1 hour of light' },
+    { name:'Wolfsbane (sprig)',   price:10,  currency:'gp', desc:'Wards lycanthropes' }
+  ]
+};
+
+var catalogTab = 'weapons';
+var itemCatalogTarget = null;
+
+function openMonsterCatalog(){
+  document.getElementById('monster-search').value = '';
+  renderMonsterCatalog();
+  document.getElementById('monster-catalog').classList.remove('hidden');
+}
+function closeMonsterCatalog(){
+  document.getElementById('monster-catalog').classList.add('hidden');
+}
+function renderMonsterCatalog(){
+  var q = (document.getElementById('monster-search').value || '').toLowerCase();
+  var list = QUICKSTART.monsters.filter(function(m){
+    return !q || m.name.toLowerCase().indexOf(q) !== -1 || (m.desc && m.desc.toLowerCase().indexOf(q) !== -1);
+  });
+  var container = document.getElementById('monster-catalog-list');
+  if (!list.length) { container.innerHTML = '<p class="text-center text-xs text-gray-400 font-cinzel py-6">No matches.</p>'; return; }
+  container.innerHTML = list.map(function(m, i){
+    var idx = QUICKSTART.monsters.indexOf(m);
+    return '<button onclick="pickMonster('+idx+')" class="w-full text-left border border-gray-200 rounded-lg p-2.5 mb-2 hover:bg-gray-50">' +
+      '<div class="flex items-center justify-between mb-0.5">' +
+        '<span class="font-cinzel text-sm font-bold">' + esc(m.name) + '</span>' +
+        '<span class="font-cinzel text-[10px] text-gray-400">LV ' + m.lvl + ' &middot; AC ' + m.ac + ' &middot; HP ' + m.hp + '</span>' +
+      '</div>' +
+      '<div class="text-xs font-crimson text-gray-600">' + esc(m.atk) + '</div>' +
+      (m.desc ? '<div class="text-xs font-crimson text-gray-400 italic mt-0.5">' + esc(m.desc) + '</div>' : '') +
+    '</button>';
+  }).join('');
+}
+function pickMonster(idx){
+  var m = QUICKSTART.monsters[idx];
+  if (!m) return;
+  combatants.push({id:nextId++, name:m.name, desc:m.desc||'', hp:m.hp, hpMax:m.hp, ac:m.ac, attacks:m.atk||'', peerId:null});
+  renderCombat(); saveDashboard();
+  toast(m.name + ' added');
+  // Stay open so the GM can keep adding (e.g. a band of goblins). User closes via × or backdrop.
+}
+
+function openItemCatalog(target){
+  itemCatalogTarget = target;
+  catalogTab = 'weapons';
+  var sub = document.getElementById('item-catalog-subtitle');
+  if (target === 'treasure') {
+    sub.textContent = 'Tap to add to treasures';
+  } else if (target && target.shopId) {
+    var s = shops.find(function(s){return s.id === target.shopId;});
+    sub.textContent = 'Tap to add to ' + (s ? s.name : 'shop');
+  } else {
+    sub.textContent = 'Tap to add';
+  }
+  switchCatalogTab('weapons');
+  document.getElementById('item-search').value = '';
+  document.getElementById('item-catalog').classList.remove('hidden');
+}
+function closeItemCatalog(){
+  document.getElementById('item-catalog').classList.add('hidden');
+  itemCatalogTarget = null;
+}
+function switchCatalogTab(name){
+  catalogTab = name;
+  document.querySelectorAll('.cat-tab').forEach(function(b){
+    if (b.getAttribute('data-cat') === name) {
+      b.classList.add('border-black','text-black');
+      b.classList.remove('border-transparent','text-gray-400');
+    } else {
+      b.classList.remove('border-black','text-black');
+      b.classList.add('border-transparent','text-gray-400');
+    }
+  });
+  renderItemCatalog();
+}
+function renderItemCatalog(){
+  var q = (document.getElementById('item-search').value || '').toLowerCase();
+  var src = QUICKSTART[catalogTab] || [];
+  var list = src.filter(function(it){
+    return !q || it.name.toLowerCase().indexOf(q) !== -1 || (it.desc && it.desc.toLowerCase().indexOf(q) !== -1);
+  });
+  var container = document.getElementById('item-catalog-list');
+  if (!list.length) { container.innerHTML = '<p class="text-center text-xs text-gray-400 font-cinzel py-6">No matches.</p>'; return; }
+  container.innerHTML = list.map(function(it){
+    var idx = src.indexOf(it);
+    return '<button onclick="pickItem(\''+catalogTab+'\','+idx+')" class="w-full text-left border border-gray-200 rounded-lg p-2.5 mb-2 hover:bg-gray-50">' +
+      '<div class="flex items-center justify-between mb-0.5">' +
+        '<span class="font-cinzel text-sm font-bold">' + esc(it.name) + '</span>' +
+        '<span class="font-cinzel text-[10px] text-gray-500">' + it.price + ' ' + it.currency.toUpperCase() + '</span>' +
+      '</div>' +
+      (it.desc ? '<div class="text-xs font-crimson text-gray-500">' + esc(it.desc) + '</div>' : '') +
+    '</button>';
+  }).join('');
+}
+function pickItem(cat, idx){
+  var it = (QUICKSTART[cat] || [])[idx];
+  if (!it || !itemCatalogTarget) return;
+  if (itemCatalogTarget === 'treasure') {
+    tItems.push({id:tNextId++, kind:'item', val:it.name, target:''});
+    renderTreasure(); saveDashboard();
+    toast('Added "' + it.name + '"');
+  } else if (itemCatalogTarget.shopId) {
+    var s = shops.find(function(s){return s.id === itemCatalogTarget.shopId;});
+    if (s) {
+      s.items.push({id:sItemNextId++, name:it.name, price:it.price, currency:it.currency});
+      renderAllShops(); saveDashboard();
+      toast('Added "' + it.name + '" to ' + s.name);
+    }
+  }
+  // Stay open so the GM can stock multiple items in a row. User closes via × or backdrop.
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────
