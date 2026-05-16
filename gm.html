@@ -810,7 +810,7 @@ function renderAllShops(){
         '<select onchange="setShopTarget('+s.id+',this.value)" class="flex-1 border border-gray-200 rounded px-2 py-1.5 text-sm outline-none bg-white font-crimson">'+playerOpts+'</select>'+
       '</div>'+
       '<div>'+itemsHtml+'</div>'+
-      '<div class="flex gap-2 mt-2">'+
+      '<div class="flex flex-wrap gap-2 mt-2">'+
         '<button onclick="addShopItem('+s.id+')" class="border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Item</button>'+
         '<button onclick="openItemCatalog({shopId:'+s.id+'})" class="border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ From Quickstart</button>'+
       '</div>'+
@@ -1167,8 +1167,8 @@ function pickMonster(idx){
   if (!m) return;
   combatants.push({id:nextId++, name:m.name, desc:m.desc||'', hp:m.hp, hpMax:m.hp, ac:m.ac, attacks:m.atk||'', peerId:null});
   renderCombat(); saveDashboard();
-  toast(m.name + ' added to battlefield');
-  closeMonsterCatalog();
+  toast(m.name + ' added');
+  // Stay open so the GM can keep adding (e.g. a band of goblins). User closes via × or backdrop.
 }
 
 function openItemCatalog(target){
@@ -1229,7 +1229,7 @@ function pickItem(cat, idx){
   if (itemCatalogTarget === 'treasure') {
     tItems.push({id:tNextId++, kind:'item', val:it.name, target:''});
     renderTreasure(); saveDashboard();
-    toast('Added "' + it.name + '" to treasures');
+    toast('Added "' + it.name + '"');
   } else if (itemCatalogTarget.shopId) {
     var s = shops.find(function(s){return s.id === itemCatalogTarget.shopId;});
     if (s) {
@@ -1238,7 +1238,7 @@ function pickItem(cat, idx){
       toast('Added "' + it.name + '" to ' + s.name);
     }
   }
-  closeItemCatalog();
+  // Stay open so the GM can stock multiple items in a row. User closes via × or backdrop.
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────
