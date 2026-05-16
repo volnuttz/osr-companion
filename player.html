@@ -284,7 +284,7 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
           <p class="font-cinzel text-xs font-bold tracking-widest mb-2">8 · HIT POINTS &amp; GOLD</p>
           <div class="grid grid-cols-2 gap-2">
             <button onclick="cgRollHp()" class="border border-gray-300 rounded p-2 text-left hover:bg-gray-50">
-              <p class="font-cinzel text-[10px] font-bold text-gray-400">HP — 1d? + CON</p>
+              <p id="cg-hp-label" class="font-cinzel text-[10px] font-bold text-gray-400">HP — 1d? + CON</p>
               <p id="cg-hp-display" class="font-cinzel text-lg font-bold">—</p>
             </button>
             <button onclick="cgRollGold()" class="border border-gray-300 rounded p-2 text-left hover:bg-gray-50">
@@ -789,6 +789,7 @@ var CHARGEN = {
     Fighter: {
       hd: 8, title: 'Squire',
       features: [
+        'Proficiencies — All weapons and armor.',
         'Weapon Mastery — Choose two weapons; +1 attack and damage; +1 damage per Fighter level.',
         'Hauler — Add CON modifier (if positive) to total gear slots.',
         'Grit — Choose STR or DEX. Advantage on checks of that type to overcome an opposing force.'
@@ -797,6 +798,7 @@ var CHARGEN = {
     Priest: {
       hd: 6, title: 'Acolyte',
       features: [
+        'Proficiencies — All armor and shields. Weapons: club, crossbow, dagger, mace, longsword, staff, warhammer.',
         'Languages — Common, plus one of Celestial, Diabolic, or Primordial.',
         'Turn Undead — WIS check vs. DC 9 + undead level; success makes them flee.',
         'Spellcasting — Cast priest spells using WIS.'
@@ -805,6 +807,7 @@ var CHARGEN = {
     Thief: {
       hd: 4, title: 'Footpad',
       features: [
+        'Proficiencies — Leather armor, mithral chainmail (no shields). Weapons: club, crossbow, dagger, shortbow, shortsword.',
         'Backstab — +1 damage die per Thief level against unaware foes.',
         'Thievery — Proficient with tools, climbing, sneaking, hiding, disguises, traps, delicate tasks.'
       ]
@@ -812,6 +815,7 @@ var CHARGEN = {
     Wizard: {
       hd: 4, title: 'Apprentice',
       features: [
+        'Proficiencies — No armor or shields. Weapons: dagger, staff.',
         'Languages — Common, plus 2 random extra languages.',
         'Learning Spells — INT check to learn new spells.',
         'Spellcasting — Cast wizard spells using INT.'
@@ -982,8 +986,8 @@ function cgRollSpells() {
 
 function cgRefreshHpLabel() {
   var cls = document.getElementById('cg-class').value;
-  var btn = document.querySelector('#cg-hp-display').previousElementSibling;
-  btn.textContent = 'HP — 1d' + (cls ? CHARGEN.classes[cls].hd : '?') + ' + CON';
+  document.getElementById('cg-hp-label').textContent =
+    'HP — 1d' + (cls ? CHARGEN.classes[cls].hd : '?') + ' + CON';
 }
 
 function cgRollBackground() {
