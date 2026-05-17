@@ -30,7 +30,7 @@ input[type=number]{-moz-appearance:textfield;}
           <div class="bg-gray-50 border border-gray-200 rounded px-2 py-2 mb-2 break-all">
             <span id="room-code" class="font-cinzel text-sm font-bold text-black select-all">—</span>
           </div>
-          <button onclick="copyCode()" class="w-full font-cinzel text-xs border border-gray-300 bg-white text-gray-700 font-bold px-3 py-1.5 rounded hover:bg-gray-50 transition-colors">Copy</button>
+          <button onclick="copyCode()" class="w-full font-cinzel text-xs bg-black text-white font-bold px-3 py-1.5 rounded hover:bg-gray-800 transition-colors">Copy</button>
         </div>
       </div>
       <p id="peer-status" class="font-cinzel text-xs text-yellow-700 mt-2">Connecting…</p>
@@ -40,7 +40,7 @@ input[type=number]{-moz-appearance:textfield;}
       <p class="font-cinzel text-xs font-bold text-gray-400 tracking-widest mb-2">DASHBOARD</p>
       <div class="flex flex-col gap-2">
         <button onclick="downloadGmDashboard()" class="w-full border border-gray-300 bg-white font-cinzel text-xs text-gray-700 font-bold px-3 py-1.5 rounded hover:bg-gray-50">Download</button>
-        <button onclick="uploadGmDashboard()" class="w-full bg-black text-white font-cinzel text-xs font-bold px-3 py-1.5 rounded hover:bg-gray-800">Upload</button>
+        <button onclick="uploadGmDashboard()" class="w-full border border-gray-300 bg-white text-gray-700 font-cinzel text-xs font-bold px-3 py-1.5 rounded hover:bg-gray-50">Upload</button>
       </div>
     </div>
     <a href="player.html" class="font-cinzel text-xs text-gray-500 hover:text-black transition-colors block pt-3 border-t border-gray-100">Player Page</a>
@@ -285,19 +285,28 @@ input[type=number]{-moz-appearance:textfield;}
 <!-- FAB SPEED DIAL -->
 <div id="fab-container" class="fixed bottom-6 right-4 sm:bottom-6 sm:right-5 flex flex-col items-end gap-2 z-40" style="bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem))">
   <div id="fab-items" class="flex flex-col items-end gap-2 mb-1" style="display:none!important;">
-    <button onclick="quickRoll('1d4');toggleFab()" class="w-10 h-10 bg-white text-black font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-black/10 hover:bg-gray-100">d4</button>
-    <button onclick="quickRoll('1d6');toggleFab()" class="w-10 h-10 bg-white text-black font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-black/10 hover:bg-gray-100">d6</button>
-    <button onclick="quickRoll('1d8');toggleFab()" class="w-10 h-10 bg-white text-black font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-black/10 hover:bg-gray-100">d8</button>
-    <button onclick="quickRoll('1d10');toggleFab()" class="w-10 h-10 bg-white text-black font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-black/10 hover:bg-gray-100">d10</button>
-    <button onclick="quickRoll('1d12');toggleFab()" class="w-10 h-10 bg-white text-black font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-black/10 hover:bg-gray-100">d12</button>
-    <button onclick="quickRoll('1d20');toggleFab()" class="w-10 h-10 bg-white text-black font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-black/10 hover:bg-gray-100">d20</button>
+    <button onclick="quickRoll('1d4');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-white/10 hover:bg-gray-800">d4</button>
+    <button onclick="quickRoll('1d6');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-white/10 hover:bg-gray-800">d6</button>
+    <button onclick="quickRoll('1d8');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-white/10 hover:bg-gray-800">d8</button>
+    <button onclick="quickRoll('1d10');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-white/10 hover:bg-gray-800">d10</button>
+    <button onclick="quickRoll('1d12');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-white/10 hover:bg-gray-800">d12</button>
+    <button onclick="quickRoll('1d20');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-white/10 hover:bg-gray-800">d20</button>
   </div>
   <!-- Persistent Timer Button -->
-  <button onclick="startTimer()" class="h-10 px-3 bg-white text-black font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-black/10 hover:bg-gray-100 whitespace-nowrap">
+  <button onclick="startTimer()" class="h-10 px-3 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-white/10 hover:bg-gray-800 whitespace-nowrap">
     <span id="timer-display">Torch</span>
   </button>
   <!-- Main FAB -->
-  <button id="fab-main" onclick="toggleFab()" class="w-14 h-14 bg-amber-500 text-black rounded-full shadow-2xl ring-2 ring-amber-600/30 flex items-center justify-center text-xl hover:bg-amber-400 transition-transform duration-200">&#9858;</button>
+  <button id="fab-main" onclick="toggleFab()" aria-label="Quick roll dice" class="w-14 h-14 bg-black text-white rounded-xl shadow-2xl ring-2 ring-white/20 flex items-center justify-center hover:bg-gray-800 transition-transform duration-200">
+    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+      <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"></circle>
+      <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"></circle>
+      <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"></circle>
+      <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"></circle>
+      <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"></circle>
+    </svg>
+  </button>
 </div>
 
 <script>
