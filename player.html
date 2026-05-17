@@ -414,7 +414,7 @@ function loadSheetData(data) {
   });
   if (data.talents) data.talents.forEach(function(val) { addTalentRow(); var inputs = document.querySelectorAll('#talents-list textarea'); var ta = inputs[inputs.length-1]; ta.value = val; ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; });
   if (data.spells) data.spells.forEach(function(row) { addSpellRow(); var spellRow = document.querySelector('#spells-body .spell-row:last-child'); var inpEls = spellRow.querySelectorAll('input'); inpEls[0].value = row.inputs[0] || ''; inpEls[1].value = row.inputs[1] || ''; var ta = spellRow.querySelector('textarea'); ta.value = row.inputs[2] || ''; ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; row.selects.forEach(function(val, i) { var sel = spellRow.querySelectorAll('select')[i]; if (sel) sel.value = val; }); });
-  if (data.gear) data.gear.forEach(function(val) { addGearRow(); var inputs = document.querySelectorAll('#gear-list input'); inputs[inputs.length-1].value = val; });
+  if (data.gear) data.gear.forEach(function(val) { addGearRow(); var inputs = document.querySelectorAll('#gear-list input'); var inp = inputs[inputs.length-1]; inp.value = val; updateGearStat(inp); });
   if (data.freeCarry) data.freeCarry.forEach(function(val) { addFreeCarryRow(); var inputs = document.querySelectorAll('#free-carry-list input'); inputs[inputs.length-1].value = val; });
   isLoading = false;
   updateGearSlots();
@@ -528,12 +528,42 @@ function addSpellRow() {
   container.appendChild(div);
 }
 
+// Shadowdark Quickstart weapon damage / armor AC for inline display.
+var SD_GEAR_STATS = {
+  'club': '1d4', 'dagger': '1d4', 'staff': '1d4', 'javelin': '1d4',
+  'spear': '1d6', 'mace': '1d6', 'shortsword': '1d6', 'shortbow': '1d4',
+  'longsword': '1d8', 'longbow': '1d8', 'crossbow': '1d6',
+  'bastard sword': '1d8 / 1d10', 'greataxe': '1d8 / 1d10',
+  'greatsword': '1d12', 'warhammer': '1d10',
+  'leather armor': 'AC 11 + DEX', 'chainmail': 'AC 13 + DEX',
+  'plate mail': 'AC 15 + DEX', 'shield': '+1 AC',
+  'mithral chainmail': 'AC 13 + DEX', 'mithral plate mail': 'AC 15 + DEX',
+  'helmet': 'adv vs crit'
+};
+
+function gearStatFor(text) {
+  if (!text) return '';
+  var hay = text.toLowerCase();
+  var best = '';
+  Object.keys(SD_GEAR_STATS).forEach(function(name) {
+    if (hay.indexOf(name) !== -1 && name.length > best.length) best = name;
+  });
+  return best ? SD_GEAR_STATS[best] : '';
+}
+
+function updateGearStat(input) {
+  var stat = input.parentElement.querySelector('.gear-stat');
+  if (!stat) return;
+  var s = gearStatFor(input.value);
+  stat.textContent = s ? '(' + s + ')' : '';
+}
+
 function addGearRow() {
   var ul = document.getElementById('gear-list');
   var num = ul.children.length + 1;
   var li = document.createElement('li');
   li.className = 'flex items-center gap-2 border-b border-gray-100 py-2';
-  li.innerHTML = '<span class="gear-num font-cinzel text-xs text-gray-400 w-5">' + num + '.</span><input type="text" placeholder="Item..." oninput="updateGearSlots()" class="flex-1 text-sm outline-none font-crimson"><button onclick="removeGearRow(this)" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>';
+  li.innerHTML = '<span class="gear-num font-cinzel text-xs text-gray-400 w-5">' + num + '.</span><input type="text" placeholder="Item..." oninput="updateGearSlots();updateGearStat(this)" class="flex-1 min-w-0 text-sm outline-none font-crimson"><span class="gear-stat font-cinzel text-xs text-gray-400 whitespace-nowrap shrink-0"></span><button onclick="removeGearRow(this)" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>';
   ul.appendChild(li);
   if (!isLoading) li.querySelector('input').focus();
   updateGearSlots();
@@ -717,7 +747,9 @@ function handleDmMsg(data) {
     items.forEach(function(item) {
       addGearRow();
       var inputs = document.querySelectorAll('#gear-list input');
-      inputs[inputs.length - 1].value = item;
+      var inp = inputs[inputs.length - 1];
+      inp.value = item;
+      updateGearStat(inp);
     });
     if (data.gp) { var gp = document.getElementById('gp'); gp.value = (parseInt(gp.value) || 0) + data.gp; }
     if (data.sp) { var sp = document.getElementById('sp'); sp.value = (parseInt(sp.value) || 0) + data.sp; }
@@ -744,7 +776,9 @@ function handleDmMsg(data) {
     if (curEl) curEl.value = have - price;
     addGearRow();
     var inputs = document.querySelectorAll('#gear-list input');
-    inputs[inputs.length - 1].value = data.item;
+    var inp = inputs[inputs.length - 1];
+    inp.value = data.item;
+    updateGearStat(inp);
     updateGearSlots();
     scheduleSave();
     showDmMsg('Purchased: ' + data.item + ' (-' + price + ' ' + cur.toUpperCase() + ')');
@@ -1133,7 +1167,9 @@ function applyCharGen() {
   CHARGEN.freeGear.forEach(function(item) {
     addGearRow();
     var inputs = document.querySelectorAll('#gear-list input');
-    inputs[inputs.length - 1].value = item;
+    var inp = inputs[inputs.length - 1];
+    inp.value = item;
+    updateGearStat(inp);
   });
 
   // Gold
