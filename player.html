@@ -556,7 +556,7 @@ function addSpellRow() {
         '<option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>' +
       '</select>' +
       '<span class="text-gray-300 text-xs">·</span>' +
-      '<input type="text" placeholder="Duration..." class="text-sm outline-none font-crimson w-20">' +
+      '<input type="text" placeholder="Duration..." class="text-sm outline-none font-crimson flex-1 min-w-0">' +
       '<span class="text-gray-300 text-xs">·</span>' +
       '<select class="text-sm outline-none font-crimson" style="background:white;">' +
         '<option>Self</option><option>Close</option><option>Near</option><option>Far</option>' +
@@ -1092,9 +1092,10 @@ function cgUpdateClass() {
     spellsSec.style.display = 'block';
     spellsList.innerHTML = CHARGEN.spells[v].list.map(function(s, i) {
       if (s.tier !== '1') return '';
-      return '<label class="flex items-start gap-1.5 text-xs font-crimson py-0.5 cursor-pointer">' +
-        '<input type="checkbox" data-cg-spell="' + i + '" onchange="cgSpellChange()" class="mt-0.5 shrink-0">' +
-        '<span><span class="font-bold">' + s.name + '</span> <span class="text-gray-400">· ' + s.range + ' · ' + s.duration + '</span></span>' +
+      var locked = (v === 'Priest' && s.name === 'Turn Undead');
+      return '<label class="flex items-start gap-1.5 text-xs font-crimson py-0.5 ' + (locked ? 'cursor-not-allowed' : 'cursor-pointer') + '">' +
+        '<input type="checkbox" data-cg-spell="' + i + '"' + (locked ? ' data-cg-locked="1" checked disabled' : '') + ' onchange="cgSpellChange()" class="mt-0.5 shrink-0">' +
+        '<span><span class="font-bold">' + s.name + '</span> <span class="text-gray-400">· ' + s.range + ' · ' + s.duration + (locked ? ' · always known' : '') + '</span></span>' +
         '</label>';
     }).join('');
     cgSpellChange();
@@ -1108,7 +1109,7 @@ function cgSpellChange() {
   var v = document.getElementById('cg-class').value;
   if (!CHARGEN.spells[v]) return;
   var max = CHARGEN.spells[v].pick;
-  var boxes = Array.from(document.querySelectorAll('#cg-spells-list input'));
+  var boxes = Array.from(document.querySelectorAll('#cg-spells-list input')).filter(function(b) { return !b.hasAttribute('data-cg-locked'); });
   var checked = boxes.filter(function(b) { return b.checked; });
   if (checked.length > max) {
     // Uncheck the most recent
@@ -1119,9 +1120,11 @@ function cgSpellChange() {
     if (checked.length >= max && !b.checked) b.disabled = true;
     else b.disabled = false;
   });
+  var hasLocked = document.querySelector('#cg-spells-list input[data-cg-locked]');
   document.getElementById('cg-spells-info').textContent =
     'Pick ' + max + ' tier-1 ' + v.toLowerCase() + ' spell' + (max > 1 ? 's' : '') +
-    ' (' + checked.length + ' / ' + max + ')';
+    ' (' + checked.length + ' / ' + max + ')' +
+    (hasLocked ? ' · Turn Undead is always known' : '');
 }
 
 function cgRefreshHpLabel() {
@@ -1178,7 +1181,7 @@ function applyCharGen() {
   if (cgState.hp === null) missing.push('HP');
   if (CHARGEN.spells[cls]) {
     var need = CHARGEN.spells[cls].pick;
-    var got = document.querySelectorAll('#cg-spells-list input:checked').length;
+    var got = document.querySelectorAll('#cg-spells-list input:checked:not([data-cg-locked])').length;
     if (got !== need) missing.push(need + ' starting spells (have ' + got + ')');
   }
   if (missing.length) { showDmMsg('Missing: ' + missing.join(', ')); return; }
