@@ -83,22 +83,18 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
 
 <div class="max-w-2xl mx-auto bg-white p-2 sm:p-3 pb-24 font-crimson mt-12">
 
-  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
-    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">NAME</p><input type="text" class="w-full text-sm outline-none" placeholder="Character name..."></div>
-    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">ANCESTRY</p><input type="text" class="w-full text-sm outline-none" placeholder="Human, Elf..."></div>
-    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">CLASS</p><input type="text" class="w-full text-sm outline-none" placeholder="Fighter..."></div>
-    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">LEVEL</p><input type="number" class="w-full text-sm outline-none" placeholder="1"></div>
-    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">XP</p>
+  <div class="grid grid-cols-2 gap-2 mb-4">
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 col-span-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">NAME</p><input type="text" class="w-full text-sm outline-none" placeholder="Character name..."></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">ANCESTRY</p><input type="text" class="w-full text-sm outline-none truncate" placeholder="Human, Elf..."></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">CLASS</p><input type="text" class="w-full text-sm outline-none truncate" placeholder="Fighter..."></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">LEVEL</p><input type="number" class="w-full text-sm outline-none" placeholder="1"></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">XP</p>
       <div class="flex items-center gap-1"><input type="number" class="w-1/2 text-sm outline-none" placeholder="0"><span class="text-gray-300">/</span><input type="number" class="w-1/2 text-sm outline-none" placeholder="10"></div>
     </div>
-    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">TITLE</p><input type="text" class="w-full text-sm outline-none" placeholder="Wanderer..."></div>
-  </div>
-
-  <!-- SECOND ROW -->
-  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
     <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">ALIGNMENT</p><input type="text" class="w-full text-sm outline-none truncate" placeholder="Lawful..."></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">TITLE</p><input type="text" class="w-full text-sm outline-none truncate" placeholder="Wanderer..."></div>
     <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">BACKGROUND</p><input type="text" class="w-full text-sm outline-none truncate" placeholder="Soldier..."></div>
-    <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0 col-span-2 sm:col-span-1"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">DEITY</p><input type="text" class="w-full text-sm outline-none truncate" placeholder="God or none..."></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">DEITY</p><input type="text" class="w-full text-sm outline-none truncate" placeholder="God or none..."></div>
   </div>
 
   <!-- ABILITIES -->
@@ -331,15 +327,24 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
   <div id="fab-container" class="fixed bottom-6 right-4 sm:bottom-6 sm:right-5 flex flex-col items-end gap-2 z-40" style="bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem))">
     <!-- Dice options (hidden by default) -->
     <div id="fab-items" class="flex flex-col items-end gap-2 mb-1" style="display:none!important;">
-      <button onclick="quickRoll('1d4');toggleFab()" class="w-10 h-10 bg-white text-black font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-black/10 hover:bg-gray-100">d4</button>
-      <button onclick="quickRoll('1d6');toggleFab()" class="w-10 h-10 bg-white text-black font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-black/10 hover:bg-gray-100">d6</button>
-      <button onclick="quickRoll('1d8');toggleFab()" class="w-10 h-10 bg-white text-black font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-black/10 hover:bg-gray-100">d8</button>
-      <button onclick="quickRoll('1d10');toggleFab()" class="w-10 h-10 bg-white text-black font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-black/10 hover:bg-gray-100">d10</button>
-      <button onclick="quickRoll('1d12');toggleFab()" class="w-10 h-10 bg-white text-black font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-black/10 hover:bg-gray-100">d12</button>
-      <button onclick="quickRoll('1d20');toggleFab()" class="w-10 h-10 bg-white text-black font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-black/10 hover:bg-gray-100">d20</button>
+      <button onclick="quickRoll('1d4');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-white/10 hover:bg-gray-800">d4</button>
+      <button onclick="quickRoll('1d6');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-white/10 hover:bg-gray-800">d6</button>
+      <button onclick="quickRoll('1d8');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-white/10 hover:bg-gray-800">d8</button>
+      <button onclick="quickRoll('1d10');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-white/10 hover:bg-gray-800">d10</button>
+      <button onclick="quickRoll('1d12');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-white/10 hover:bg-gray-800">d12</button>
+      <button onclick="quickRoll('1d20');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg ring-1 ring-white/10 hover:bg-gray-800">d20</button>
     </div>
     <!-- Main FAB -->
-    <button id="fab-main" onclick="toggleFab()" class="w-14 h-14 bg-amber-500 text-black rounded-full shadow-2xl ring-2 ring-amber-600/30 flex items-center justify-center text-xl hover:bg-amber-400 transition-transform duration-200">&#9858;</button>
+    <button id="fab-main" onclick="toggleFab()" aria-label="Quick roll dice" class="w-14 h-14 bg-black text-white rounded-xl shadow-2xl ring-2 ring-white/20 flex items-center justify-center hover:bg-gray-800 transition-transform duration-200">
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+        <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"></circle>
+        <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"></circle>
+        <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"></circle>
+        <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"></circle>
+        <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"></circle>
+      </svg>
+    </button>
   </div>
 
 </div>
