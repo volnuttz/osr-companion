@@ -951,7 +951,6 @@ var CHARGEN = {
     Goblin: ['Hix','Iggs','Klick','Bibi','Krunch','Daisy','Lonk','Mibb','Niblet','Lucy','Riggle','Skitter','Olive','Snork','Pip','Squick','Twitch','Yark','Tessy'],
     'Half-Orc': ['Brakka','Greta','Drog','Henka','Gorvik','Magga','Lothar','Mazena','Mirana','Mort','Pranka','Murzol','Rok','Vorgaza','Sarkon','Yelena','Stranj','Zasha','Tarska']
   },
-  freeGear: ['Backpack','Flint and steel','Torch','Torch','Iron spikes (10)','Rope, 60ft','Rations (3 days)'],
   spells: {
     Wizard: {
       pick: 3,
@@ -1252,15 +1251,6 @@ function applyCharGen() {
       if (ta) { ta.value = spell.desc; ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
     });
   }
-
-  // Starting gear (Shadowdark Quickstart essentials)
-  CHARGEN.freeGear.forEach(function(item) {
-    addGearRow();
-    var inputs = document.querySelectorAll('#gear-list input');
-    var inp = inputs[inputs.length - 1];
-    inp.value = item;
-    updateGearStat(inp);
-  });
 
   // Gold
   document.getElementById('gp').value = cgState.gold || 0;
