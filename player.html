@@ -874,6 +874,13 @@ var CHARGEN = {
         'Weapon Mastery — Choose two weapons; +1 attack and damage; +1 damage per Fighter level.',
         'Hauler — Add CON modifier (if positive) to total gear slots.',
         'Grit — Choose STR or DEX. Advantage on checks of that type to overcome an opposing force.'
+      ],
+      levelTalents: [
+        '2 (2d6) — Gain Weapon Mastery with one additional weapon.',
+        '3–6 (2d6) — +1 to melee and ranged attacks.',
+        '7–9 (2d6) — +2 points to distribute between STR, DEX, or CON.',
+        '10–11 (2d6) — Choose one kind of armor; you get +1 AC from that armor.',
+        '12 (2d6) — Choose a talent or +2 points to distribute to stats.'
       ]
     },
     Priest: {
@@ -883,6 +890,13 @@ var CHARGEN = {
         'Languages — Common, plus one of Celestial, Diabolic, or Primordial.',
         'Turn Undead — WIS check vs. DC 9 + undead level; success makes them flee.',
         'Spellcasting — Cast priest spells using WIS.'
+      ],
+      levelTalents: [
+        '2 (2d6) — Gain advantage on casting one spell you know.',
+        '3–6 (2d6) — +1 to melee or ranged attacks.',
+        '7–9 (2d6) — +1 to priest spellcasting checks.',
+        '10–11 (2d6) — +2 points to distribute between STR or WIS.',
+        '12 (2d6) — Choose a talent or +2 points to distribute to stats.'
       ]
     },
     Thief: {
@@ -891,6 +905,13 @@ var CHARGEN = {
         'Proficiencies — Leather armor, mithral chainmail (no shields). Weapons: club, crossbow, dagger, shortbow, shortsword.',
         'Backstab — +1 damage die per Thief level against unaware foes.',
         'Thievery — Proficient with tools, climbing, sneaking, hiding, disguises, traps, delicate tasks.'
+      ],
+      levelTalents: [
+        '2 (2d6) — Gain advantage on initiative rolls (reroll if duplicate).',
+        '3–5 (2d6) — Your Backstab deals +1 dice of damage.',
+        '6–9 (2d6) — +2 points to distribute between STR, DEX, or CHA.',
+        '10–11 (2d6) — +1 to melee and ranged attacks.',
+        '12 (2d6) — Choose a talent or +2 points to distribute to stats.'
       ]
     },
     Wizard: {
@@ -900,6 +921,13 @@ var CHARGEN = {
         'Languages — Common, plus 2 random extra languages.',
         'Learning Spells — INT check to learn new spells.',
         'Spellcasting — Cast wizard spells using INT.'
+      ],
+      levelTalents: [
+        '2 (2d6) — Make one random magic item (GM determines).',
+        '3–7 (2d6) — +2 to INT stat or +1 to wizard spellcasting checks.',
+        '8–9 (2d6) — Gain advantage on casting one spell you know.',
+        '10–11 (2d6) — Learn one additional wizard spell of any tier you know.',
+        '12 (2d6) — Choose a talent or +2 points to distribute to stats.'
       ]
     }
   },
@@ -934,7 +962,19 @@ var CHARGEN = {
         { name: 'Mage Armor',           tier: '1', duration: '1 hour',            range: 'Self',  desc: 'Your AC becomes 14 + DEX (no shield).' },
         { name: 'Magic Missile',        tier: '1', duration: 'Instant',           range: 'Far',   desc: 'Unerring bolt of force damages a target.' },
         { name: 'Protection from Evil', tier: '1', duration: '10 min (focus)',    range: 'Close', desc: 'Target has disadvantage vs. evil attackers.' },
-        { name: 'Sleep',                tier: '1', duration: 'Instant',           range: 'Near',  desc: 'Weak creatures fall into magical slumber.' }
+        { name: 'Sleep',                tier: '1', duration: 'Instant',           range: 'Near',  desc: 'Weak creatures fall into magical slumber.' },
+        { name: 'Acid Arrow',           tier: '2', duration: 'Focus',             range: 'Far',   desc: 'Corrosive bolt hits one foe; 1d6 damage per round while you focus.' },
+        { name: 'Alter Self',           tier: '2', duration: 'Focus',             range: 'Self',  desc: 'Grow one body feature (gills, claws, etc.); no wings or extra limbs.' },
+        { name: 'Detect Thoughts',      tier: '2', duration: 'Focus',             range: 'Near',  desc: "Peer into a creature's mind; learn its immediate thoughts each round." },
+        { name: 'Fixed Object',         tier: '2', duration: '5 rounds',          range: 'Close', desc: 'An object up to 5 lb becomes fixed in place; supports up to 5,000 lb.' },
+        { name: 'Hold Person',          tier: '2', duration: 'Focus',             range: 'Near',  desc: 'Paralyze one humanoid of LV 4 or less you can see.' },
+        { name: 'Invisibility',         tier: '2', duration: '10 rounds',         range: 'Close', desc: 'Touched creature becomes invisible; ends if it attacks or casts.' },
+        { name: 'Knock',                tier: '2', duration: 'Instant',           range: 'Near',  desc: 'A door, lock, or portal opens with a loud knock audible to all nearby.' },
+        { name: 'Levitate',             tier: '2', duration: 'Focus',             range: 'Self',  desc: 'Float a near distance vertically each round; push off objects to move sideways.' },
+        { name: 'Mirror Image',         tier: '2', duration: '5 rounds',          range: 'Self',  desc: 'Illusory duplicates (½ level, min 1) absorb hits aimed at you.' },
+        { name: 'Misty Step',           tier: '2', duration: 'Instant',           range: 'Self',  desc: 'Teleport a near distance to a spot you can see in a puff of smoke.' },
+        { name: 'Silence',              tier: '2', duration: 'Focus',             range: 'Far',   desc: 'Mute all sound within a near-sized cube.' },
+        { name: 'Web',                  tier: '2', duration: '5 rounds',          range: 'Far',   desc: 'Sticky near-sized cube of web; STR check (vs. spellcasting) to break free.' }
       ]
     },
     Priest: {
@@ -945,7 +985,13 @@ var CHARGEN = {
         { name: 'Light',                tier: '1', duration: '1 hour',            range: 'Close', desc: 'Object sheds bright light in near radius.' },
         { name: 'Protection from Evil', tier: '1', duration: '10 min (focus)',    range: 'Close', desc: 'Target has disadvantage vs. evil attackers.' },
         { name: 'Shield of Faith',      tier: '1', duration: '5 rounds',          range: 'Self',  desc: '+2 AC, divine aura protects you.' },
-        { name: 'Turn Undead',          tier: '1', duration: 'Instant',           range: 'Near',  desc: 'Drive away undead by sheer faith.' }
+        { name: 'Turn Undead',          tier: '1', duration: 'Instant',           range: 'Near',  desc: 'Drive away undead by sheer faith.' },
+        { name: 'Augury',               tier: '2', duration: 'Instant',           range: 'Self',  desc: 'Ask the GM about a course of action; learn "weal" or "woe".' },
+        { name: 'Bless',                tier: '2', duration: 'Instant',           range: 'Close', desc: 'One creature you touch gains a luck token.' },
+        { name: 'Blind/Deafen',         tier: '2', duration: 'Focus',             range: 'Near',  desc: 'Divine censure blinds or deafens one creature you can see.' },
+        { name: 'Cleansing Weapon',     tier: '2', duration: '5 rounds',          range: 'Close', desc: 'A touched weapon deals +1d4 damage (1d6 vs. undead) for the duration.' },
+        { name: 'Smite',                tier: '2', duration: 'Instant',           range: 'Near',  desc: 'Call down punishing flames on a creature you can see.' },
+        { name: 'Zone of Truth',        tier: '2', duration: 'Focus',             range: 'Near',  desc: "Compel one creature you can see; it can't lie while in range." }
       ]
     }
   }
@@ -1040,6 +1086,7 @@ function cgUpdateClass() {
   if (CHARGEN.spells[v]) {
     spellsSec.style.display = 'block';
     spellsList.innerHTML = CHARGEN.spells[v].list.map(function(s, i) {
+      if (s.tier !== '1') return '';
       return '<label class="flex items-start gap-1.5 text-xs font-crimson py-0.5 cursor-pointer">' +
         '<input type="checkbox" data-cg-spell="' + i + '" onchange="cgSpellChange()" class="mt-0.5 shrink-0">' +
         '<span><span class="font-bold">' + s.name + '</span> <span class="text-gray-400">· ' + s.range + ' · ' + s.duration + '</span></span>' +
@@ -1253,6 +1300,11 @@ function cgTalentList() {
   Object.keys(CHARGEN.classes).forEach(function(c) {
     CHARGEN.classes[c].features.forEach(function(f) {
       out.push({ source: c, kind: 'Class', text: f });
+    });
+  });
+  Object.keys(CHARGEN.classes).forEach(function(c) {
+    (CHARGEN.classes[c].levelTalents || []).forEach(function(t) {
+      out.push({ source: c, kind: 'Level Talent', text: t });
     });
   });
   return out;
