@@ -20,10 +20,23 @@ A self-contained OSR TTRPG character sheet and GM dashboard designed for use wit
 
 - Ability scores (STR, INT, DEX, WIS, CON, CHA) with automatic modifier calculation
 - HP / AC tracking
-- Talents, Spells, Gear, and Free Carry item lists (gear slot counter respects STR and the Hauler talent)
+- Talents, Spells, Gear, and Free Carry item lists (gear slot counter respects STR and the Hauler talent; gear rows auto-annotate weapons with damage and armor with AC)
 - Currency tracking (GP / SP / CP)
-- Dice roller (d4–d20) with ability score generator
+- Floating dice roller (d4–d20) with ability score generator
 - Auto-saves to browser localStorage
+- **Download / Upload** the sheet as a JSON file from the sidebar (handy for backups or switching browsers)
+
+### Create Character
+
+The sidebar **Create Character** button opens a Shadowdark Quickstart character generator:
+
+- Pick or randomize ancestry, class, background, alignment, deity, and name
+- Roll 3d6 ability scores (in order), HP from the class hit die, and starting gold (2d6 × 10)
+- Class proficiencies, features, and the level-up talent table are previewed before you commit
+- Starting gear is filled in from the class's recommended kit, plus the free carry items
+- Wizard and Priest get a starting-spell picker drawn from the tier-1 spell list
+
+The **+ From Quickstart** buttons on the Talents and Spells sections open browsable catalogs (ancestry talents for talents; tier 1–2 Wizard/Priest spells for spells) so you can fill in entries with a click as you level up.
 
 ### GM Session panel
 
@@ -47,13 +60,17 @@ Peer-to-peer session management for the GM. No server or account required — Pe
 
 ### Session
 
-On load, a room code is generated and displayed in the sidebar menu. Share it with players so they can join. The player count updates as players connect and disconnect.
+On load, a room code is generated and displayed in the sidebar menu. Share it with players so they can join. The player count updates as players connect and disconnect, and toasts announce joins and drops. The whole dashboard (notes, NPC combatants, treasures, shops) can be exported and restored via **Download / Upload** in the sidebar.
+
+The bottom-right also exposes a floating dice roller and a **Torch** timer (one-hour countdown — click to start, click again to cancel; a modal pops when it finishes).
 
 ### Battlefield tab
 
 Combat tracker for encounters. Players are automatically added as combatant cards when they connect.
 
 - **Add Combatant** modal — enter Name, Description, HP, AC, and Attacks for any NPC or monster
+- **+ From Quickstart** — browse a searchable catalog of 64 Shadowdark Quickstart monsters and add them with one click
+- Click a connected player's combatant name to open a read-only character sheet (abilities, talents, spells, gear, currency)
 - Drag-and-drop reordering of combatant cards (desktop and touch)
 - HP controls on each card (+1/-1/+5/-5) update the player's sheet live if the combatant is a connected player
 - All NPC combatants are saved to localStorage and persist across page refreshes
@@ -62,7 +79,7 @@ Combat tracker for encounters. Players are automatically added as combatant card
 
 Send loot to players individually:
 
-- Add items with **+ Item** or currency with **+ Currency**
+- Add items with **+ Item** or currency with **+ Currency**, or pick from the **+ From Quickstart** catalog (weapons, armor, gear, magic items)
 - Each entry has its own player target selector (All Players or a specific player)
 - Click **Send** on any entry to deliver it — sent items are removed from the list
 - Treasure entries persist in localStorage
@@ -72,7 +89,7 @@ Send loot to players individually:
 Create multiple shops and sell items directly to players:
 
 1. Click **+ Add Shop** and enter a shop name via modal
-2. Add items with name, price, and currency (GP / SP / CP)
+2. Add items manually with name, price, and currency (GP / SP / CP), or use **+ From Quickstart** on each shop to drop in catalog items
 3. Select a connected player from the **Sell To** dropdown
 4. Click **Sell** next to any item — it is added to the player's gear and currency is deducted
 5. If the player doesn't have enough currency, the sale is rejected and the GM is notified
