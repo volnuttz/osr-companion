@@ -401,21 +401,46 @@ function getSheetData() {
   return data;
 }
 
+function autosizeTextarea(ta) {
+  if (!ta) return;
+  ta.style.height = 'auto';
+  ta.style.height = ta.scrollHeight + 'px';
+}
+
+function autosizeAllTextareas() {
+  document.querySelectorAll('#talents-list textarea, #spells-body textarea').forEach(autosizeTextarea);
+}
+
 function loadSheetData(data) {
   if (!data) return;
   isLoading = true;
-  ['str','int','dex','wis','con','cha','hp','hp-max','ac','gp','sp','cp'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el && data[id] !== undefined) { el.value = data[id]; if (['str','int','dex','wis','con','cha'].includes(id)) calcMod(id); }
-  });
-  document.querySelectorAll('input[type="text"], input[type="number"]').forEach(function(el, i) {
-    if (el.id) return;
-    if (data['input_' + i] !== undefined) el.value = data['input_' + i];
-  });
-  if (data.talents) data.talents.forEach(function(val) { addTalentRow(); var inputs = document.querySelectorAll('#talents-list textarea'); var ta = inputs[inputs.length-1]; ta.value = val; ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; });
-  if (data.spells) data.spells.forEach(function(row) { addSpellRow(); var spellRow = document.querySelector('#spells-body .spell-row:last-child'); var inpEls = spellRow.querySelectorAll('input'); inpEls[0].value = row.inputs[0] || ''; inpEls[1].value = row.inputs[1] || ''; var ta = spellRow.querySelector('textarea'); ta.value = row.inputs[2] || ''; ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; row.selects.forEach(function(val, i) { var sel = spellRow.querySelectorAll('select')[i]; if (sel) sel.value = val; }); });
-  if (data.gear) data.gear.forEach(function(val) { addGearRow(); var inputs = document.querySelectorAll('#gear-list input'); var inp = inputs[inputs.length-1]; inp.value = val; updateGearStat(inp); });
-  if (data.freeCarry) data.freeCarry.forEach(function(val) { addFreeCarryRow(); var inputs = document.querySelectorAll('#free-carry-list input'); inputs[inputs.length-1].value = val; });
+  try {
+    ['str','int','dex','wis','con','cha','hp','hp-max','ac','gp','sp','cp'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el && data[id] !== undefined) { el.value = data[id]; if (['str','int','dex','wis','con','cha'].includes(id)) calcMod(id); }
+    });
+    document.querySelectorAll('input[type="text"], input[type="number"]').forEach(function(el, i) {
+      if (el.id) return;
+      if (data['input_' + i] !== undefined) el.value = data['input_' + i];
+    });
+    if (data.talents) data.talents.forEach(function(val) { addTalentRow(); var inputs = document.querySelectorAll('#talents-list textarea'); var ta = inputs[inputs.length-1]; ta.value = val; autosizeTextarea(ta); });
+    if (data.spells) data.spells.forEach(function(row) {
+      addSpellRow();
+      // Skip rows from old save formats that don't match the current shape.
+      if (!row || !row.inputs) return;
+      var spellRow = document.querySelector('#spells-body .spell-row:last-child');
+      var inpEls = spellRow.querySelectorAll('input');
+      if (inpEls[0]) inpEls[0].value = row.inputs[0] || '';
+      if (inpEls[1]) inpEls[1].value = row.inputs[1] || '';
+      var ta = spellRow.querySelector('textarea');
+      if (ta) { ta.value = row.inputs[2] || ''; autosizeTextarea(ta); }
+      if (row.selects) row.selects.forEach(function(val, i) { var sel = spellRow.querySelectorAll('select')[i]; if (sel) sel.value = val; });
+    });
+    if (data.gear) data.gear.forEach(function(val) { addGearRow(); var inputs = document.querySelectorAll('#gear-list input'); var inp = inputs[inputs.length-1]; inp.value = val; updateGearStat(inp); });
+    if (data.freeCarry) data.freeCarry.forEach(function(val) { addFreeCarryRow(); var inputs = document.querySelectorAll('#free-carry-list input'); inputs[inputs.length-1].value = val; });
+  } catch(e) {
+    if (window.console) console.warn('Failed to fully load saved sheet:', e);
+  }
   isLoading = false;
   updateGearSlots();
 }
@@ -436,8 +461,17 @@ document.addEventListener('change', scheduleSave);
 // Load on startup
 var saved = null;
 try { saved = JSON.parse(localStorage.getItem(SAVE_KEY)); } catch(e) {}
-if (saved) loadSheetData(saved);
-else updateGearSlots();
+try {
+  if (saved) loadSheetData(saved);
+  else updateGearSlots();
+} catch(e) {
+  if (window.console) console.warn('Sheet load failed:', e);
+  updateGearSlots();
+}
+
+// Re-autosize textareas once fonts and Tailwind CSS have applied — scrollHeight
+// read at script-eval time can be off if styles haven't landed yet.
+window.addEventListener('load', autosizeAllTextareas);
 
 
 function calcMod(stat) {
@@ -500,7 +534,7 @@ function addTalentRow() {
   var ul = document.getElementById('talents-list');
   var li = document.createElement('li');
   li.className = 'flex items-start gap-2 border-b border-gray-100 py-2';
-  li.innerHTML = '<span class="text-gray-300 mt-1">&#8226;</span><textarea rows="1" placeholder="Talent..." oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';updateGearSlots()" class="flex-1 text-sm outline-none font-crimson resize-none overflow-hidden leading-snug"></textarea><button onclick="var li=this.closest(\'li\');li.remove();updateGearSlots();" class="text-gray-300 hover:text-gray-500 text-sm px-1 mt-1">&#x2715;</button>';
+  li.innerHTML = '<span class="text-gray-300 mt-1">&#8226;</span><textarea rows="1" placeholder="Talent..." oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';updateGearSlots()" class="flex-1 text-sm outline-none font-crimson resize-none overflow-hidden leading-snug"></textarea><button onclick="var li=this.closest(\'li\');li.remove();updateGearSlots();scheduleSave();" class="text-gray-300 hover:text-gray-500 text-sm px-1 mt-1">&#x2715;</button>';
   ul.appendChild(li);
   if (!isLoading) li.querySelector('textarea').focus();
 }
@@ -522,7 +556,7 @@ function addSpellRow() {
       '<select class="text-sm outline-none font-crimson" style="background:white;">' +
         '<option>Self</option><option>Close</option><option>Near</option><option>Far</option>' +
       '</select>' +
-      '<button onclick="this.closest(\'.spell-row\').remove()" class="ml-auto text-gray-300 hover:text-gray-500 text-sm">&#x2715;</button>' +
+      '<button onclick="this.closest(\'.spell-row\').remove();scheduleSave();" class="ml-auto text-gray-300 hover:text-gray-500 text-sm">&#x2715;</button>' +
     '</div>' +
     '<textarea placeholder="Effect..." rows="2" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\'" class="w-full text-xs outline-none font-crimson text-gray-500 mt-1 resize-none overflow-hidden"></textarea>';
   container.appendChild(div);
@@ -576,13 +610,14 @@ function removeGearRow(btn) {
     li.querySelector('.gear-num').textContent = (i + 1) + '.';
   });
   updateGearSlots();
+  scheduleSave();
 }
 
 function addFreeCarryRow() {
   var ul = document.getElementById('free-carry-list');
   var li = document.createElement('li');
   li.className = 'flex items-center gap-2 border-b border-gray-100 py-2';
-  li.innerHTML = '<span class="text-gray-300">&#8226;</span><input type="text" placeholder="Torches..." class="flex-1 text-sm outline-none font-crimson"><button onclick="this.closest(\'li\').remove()" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>';
+  li.innerHTML = '<span class="text-gray-300">&#8226;</span><input type="text" placeholder="Torches..." class="flex-1 text-sm outline-none font-crimson"><button onclick="this.closest(\'li\').remove();scheduleSave();" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>';
   ul.appendChild(li);
   if (!isLoading) li.querySelector('input').focus();
 }
