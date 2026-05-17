@@ -20,7 +20,7 @@ A self-contained OSR TTRPG character sheet and GM dashboard designed for use wit
 
 - Ability scores (STR, INT, DEX, WIS, CON, CHA) with automatic modifier calculation
 - HP / AC tracking
-- Talents, Attacks, Spells, Gear, and Free Carry item lists
+- Talents, Spells, Gear, and Free Carry item lists (gear slot counter respects STR and the Hauler talent)
 - Currency tracking (GP / SP / CP)
 - Dice roller (d4–d20) with ability score generator
 - Auto-saves to browser localStorage
