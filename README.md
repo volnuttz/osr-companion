@@ -33,8 +33,9 @@ The sidebar **Create Character** button opens a Shadowdark Quickstart character 
 - Pick or randomize ancestry, class, background, alignment, deity, and name
 - Roll 3d6 ability scores (in order), HP from the class hit die, and starting gold (2d6 × 10)
 - Class proficiencies, features, and the level-up talent table are previewed before you commit
-- Starting gear is filled in from the class's recommended kit, plus the free carry items
 - Wizard and Priest get a starting-spell picker drawn from the tier-1 spell list
+
+Gear is not pre-filled — add items manually with **+ Add Item**, pick from the GM's shop, or receive treasure during play.
 
 The **+ From Quickstart** buttons on the Talents and Spells sections open browsable catalogs (ancestry talents for talents; tier 1–2 Wizard/Priest spells for spells) so you can fill in entries with a click as you level up.
 

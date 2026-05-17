@@ -47,7 +47,7 @@ Everything is `localStorage`:
 
 Large data tables are embedded as JS object literals in the HTML files, not external JSON:
 
-- `CHARGEN` in player.html:865 — ancestries, classes (with `hd`, `features`, `levelTalents`), backgrounds, alignments, deities, names, freeGear, and the `spells` table for Wizard/Priest character creation.
+- `CHARGEN` in player.html:865 — ancestries, classes (with `hd`, `features`, `levelTalents`), backgrounds, alignments, deities, names, and the `spells` table for Wizard/Priest character creation. `applyCharGen` does not grant any starting gear — only rolled starting gold.
 - `QUICKSTART` in gm.html:1067 — `monsters`, `weapons`, `armor`, `gear`, `magic` browsed via the GM's catalog modals.
 
 Both are pure data; adding entries is a literal edit. There is no schema validation, but `pickMonster`/`pickItem`/`applyCharGen` read specific fields (`name`, `ac`, `hp`, `atk`, `desc`, `price`, `currency`, etc.) — keep those keys consistent.
