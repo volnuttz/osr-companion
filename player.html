@@ -83,22 +83,18 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
 
 <div class="max-w-2xl mx-auto bg-white p-2 sm:p-3 pb-24 font-crimson mt-12">
 
-  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
-    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">NAME</p><input type="text" class="w-full text-sm outline-none" placeholder="Character name..."></div>
-    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">ANCESTRY</p><input type="text" class="w-full text-sm outline-none" placeholder="Human, Elf..."></div>
-    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">CLASS</p><input type="text" class="w-full text-sm outline-none" placeholder="Fighter..."></div>
-    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">LEVEL</p><input type="number" class="w-full text-sm outline-none" placeholder="1"></div>
-    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">XP</p>
+  <div class="grid grid-cols-2 gap-2 mb-4">
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 col-span-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">NAME</p><input type="text" class="w-full text-sm outline-none" placeholder="Character name..."></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">ANCESTRY</p><input type="text" class="w-full text-sm outline-none truncate" placeholder="Human, Elf..."></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">CLASS</p><input type="text" class="w-full text-sm outline-none truncate" placeholder="Fighter..."></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">LEVEL</p><input type="number" class="w-full text-sm outline-none" placeholder="1"></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">XP</p>
       <div class="flex items-center gap-1"><input type="number" class="w-1/2 text-sm outline-none" placeholder="0"><span class="text-gray-300">/</span><input type="number" class="w-1/2 text-sm outline-none" placeholder="10"></div>
     </div>
-    <div class="border border-gray-200 rounded-lg shadow-sm p-2"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">TITLE</p><input type="text" class="w-full text-sm outline-none" placeholder="Wanderer..."></div>
-  </div>
-
-  <!-- SECOND ROW -->
-  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
     <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">ALIGNMENT</p><input type="text" class="w-full text-sm outline-none truncate" placeholder="Lawful..."></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">TITLE</p><input type="text" class="w-full text-sm outline-none truncate" placeholder="Wanderer..."></div>
     <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">BACKGROUND</p><input type="text" class="w-full text-sm outline-none truncate" placeholder="Soldier..."></div>
-    <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0 col-span-2 sm:col-span-1"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">DEITY</p><input type="text" class="w-full text-sm outline-none truncate" placeholder="God or none..."></div>
+    <div class="border border-gray-200 rounded-lg shadow-sm p-2 min-w-0"><p class="font-cinzel text-xs font-bold text-gray-400 mb-1">DEITY</p><input type="text" class="w-full text-sm outline-none truncate" placeholder="God or none..."></div>
   </div>
 
   <!-- ABILITIES -->
