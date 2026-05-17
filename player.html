@@ -139,23 +139,6 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
     </div>
   </div>
 
-  <!-- ATTACKS -->
-  <div class="border border-gray-200 rounded-xl shadow-sm p-3 sm:p-4 mb-4">
-    <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block mb-3">ATTACKS</span>
-    <div class="overflow-x-auto">
-    <table class="w-full" style="table-layout:fixed;border-collapse:collapse;min-width:280px;">
-      <thead><tr class="border-b-2 border-gray-100">
-        <th class="font-cinzel text-xs font-bold text-left py-1 px-1">WEAPON</th>
-        <th class="font-cinzel text-xs font-bold text-left py-1 px-1 w-16">MOD</th>
-        <th class="font-cinzel text-xs font-bold text-left py-1 px-1 w-20">DAMAGE</th>
-        <th class="w-6"></th>
-      </tr></thead>
-      <tbody id="attacks-body"></tbody>
-    </table>
-    </div>
-    <button onclick="addAttackRow()" class="mt-3 border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Attack</button>
-  </div>
-
   <!-- SPELLS -->
   <div class="border border-gray-200 rounded-xl shadow-sm p-3 sm:p-4 mb-4">
     <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block mb-3">SPELLS</span>
@@ -169,7 +152,10 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
   <!-- GEAR -->
   <div class="border border-gray-200 rounded-xl shadow-sm p-3 sm:p-4 mb-4">
     <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
-      <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block">GEAR</span>
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block">GEAR</span>
+        <span id="gear-slots" class="font-cinzel text-xs font-bold text-gray-500" title="Gear slots used / max (STR, min 10; Hauler adds CON mod)">0 / 10</span>
+      </div>
       <div class="flex gap-4 items-center">
         <div class="flex items-center gap-1"><span class="font-cinzel text-xs font-bold text-gray-500">GP</span><input id="gp" type="number" class="w-10 border-b border-gray-300 text-center text-sm outline-none" placeholder="0"></div>
         <div class="flex items-center gap-1"><span class="font-cinzel text-xs font-bold text-gray-500">SP</span><input id="sp" type="number" class="w-10 border-b border-gray-300 text-center text-sm outline-none" placeholder="0"></div>
@@ -402,10 +388,7 @@ function getSheetData() {
     data['input_' + i] = el.value;
   });
   // Dynamic lists
-  data.talents = Array.from(document.querySelectorAll('#talents-list input')).map(function(el) { return el.value; });
-  data.attacks = Array.from(document.querySelectorAll('#attacks-body tr')).map(function(tr) {
-    return Array.from(tr.querySelectorAll('input')).map(function(el) { return el.value; });
-  });
+  data.talents = Array.from(document.querySelectorAll('#talents-list textarea')).map(function(el) { return el.value; });
   data.spells = Array.from(document.querySelectorAll('#spells-body .spell-row')).map(function(row) {
     var inputs = Array.from(row.querySelectorAll('input')).map(function(el) { return el.value; });
     var selects = Array.from(row.querySelectorAll('select')).map(function(el) { return el.value; });
@@ -429,12 +412,12 @@ function loadSheetData(data) {
     if (el.id) return;
     if (data['input_' + i] !== undefined) el.value = data['input_' + i];
   });
-  if (data.talents) data.talents.forEach(function(val) { addTalentRow(); var inputs = document.querySelectorAll('#talents-list input'); inputs[inputs.length-1].value = val; });
-  if (data.attacks) data.attacks.forEach(function(row) { addAttackRow(); var tr = document.querySelector('#attacks-body tr:last-child'); row.forEach(function(val, i) { var inp = tr.querySelectorAll('input')[i]; if (inp) inp.value = val; }); });
+  if (data.talents) data.talents.forEach(function(val) { addTalentRow(); var inputs = document.querySelectorAll('#talents-list textarea'); var ta = inputs[inputs.length-1]; ta.value = val; ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; });
   if (data.spells) data.spells.forEach(function(row) { addSpellRow(); var spellRow = document.querySelector('#spells-body .spell-row:last-child'); var inpEls = spellRow.querySelectorAll('input'); inpEls[0].value = row.inputs[0] || ''; inpEls[1].value = row.inputs[1] || ''; var ta = spellRow.querySelector('textarea'); ta.value = row.inputs[2] || ''; ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; row.selects.forEach(function(val, i) { var sel = spellRow.querySelectorAll('select')[i]; if (sel) sel.value = val; }); });
-  if (data.gear) data.gear.forEach(function(val) { addGearRow(); var inputs = document.querySelectorAll('#gear-list input'); inputs[inputs.length-1].value = val; });
+  if (data.gear) data.gear.forEach(function(val) { addGearRow(); var inputs = document.querySelectorAll('#gear-list input'); var inp = inputs[inputs.length-1]; inp.value = val; updateGearStat(inp); });
   if (data.freeCarry) data.freeCarry.forEach(function(val) { addFreeCarryRow(); var inputs = document.querySelectorAll('#free-carry-list input'); inputs[inputs.length-1].value = val; });
   isLoading = false;
+  updateGearSlots();
 }
 
 function scheduleSave() {
@@ -454,14 +437,47 @@ document.addEventListener('change', scheduleSave);
 var saved = null;
 try { saved = JSON.parse(localStorage.getItem(SAVE_KEY)); } catch(e) {}
 if (saved) loadSheetData(saved);
+else updateGearSlots();
 
 
 function calcMod(stat) {
   var val = parseInt(document.getElementById(stat).value);
   var el = document.getElementById(stat + '-mod');
-  if (isNaN(val) || val < 1) { el.textContent = '—'; return; }
-  var mod = Math.floor((val - 10) / 2);
-  el.textContent = (mod >= 0 ? '+' : '') + mod;
+  if (isNaN(val) || val < 1) { el.textContent = '—'; }
+  else {
+    var mod = Math.floor((val - 10) / 2);
+    el.textContent = (mod >= 0 ? '+' : '') + mod;
+  }
+  if (stat === 'str' || stat === 'con') updateGearSlots();
+}
+
+function abilityMod(stat) {
+  var val = parseInt(document.getElementById(stat).value);
+  if (isNaN(val) || val < 1) return 0;
+  return Math.floor((val - 10) / 2);
+}
+
+// Gear slots: STR score (min 10). Hauler talent adds positive CON mod.
+function updateGearSlots() {
+  var el = document.getElementById('gear-slots');
+  if (!el) return;
+  var str = parseInt(document.getElementById('str').value);
+  var base = (isNaN(str) || str < 10) ? 10 : str;
+  var hasHauler = Array.from(document.querySelectorAll('#talents-list textarea')).some(function(t) {
+    return /hauler/i.test(t.value);
+  });
+  var bonus = 0;
+  if (hasHauler) {
+    var conMod = abilityMod('con');
+    if (conMod > 0) bonus = conMod;
+  }
+  var max = base + bonus;
+  var used = Array.from(document.querySelectorAll('#gear-list input')).filter(function(i) {
+    return i.value.trim() !== '';
+  }).length;
+  el.textContent = used + ' / ' + max;
+  el.classList.toggle('text-red-600', used > max);
+  el.classList.toggle('text-gray-500', used <= max);
 }
 
 function d(sides) { return Math.floor(Math.random() * sides) + 1; }
@@ -483,22 +499,10 @@ function quickRoll(expr) {
 function addTalentRow() {
   var ul = document.getElementById('talents-list');
   var li = document.createElement('li');
-  li.className = 'flex items-center gap-2 border-b border-gray-100 py-2';
-  li.innerHTML = '<span class="text-gray-300">&#8226;</span><input type="text" placeholder="Talent..." class="flex-1 text-sm outline-none font-crimson"><button onclick="this.closest(\'li\').remove()" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>';
+  li.className = 'flex items-start gap-2 border-b border-gray-100 py-2';
+  li.innerHTML = '<span class="text-gray-300 mt-1">&#8226;</span><textarea rows="1" placeholder="Talent..." oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\';updateGearSlots()" class="flex-1 text-sm outline-none font-crimson resize-none overflow-hidden leading-snug"></textarea><button onclick="var li=this.closest(\'li\');li.remove();updateGearSlots();" class="text-gray-300 hover:text-gray-500 text-sm px-1 mt-1">&#x2715;</button>';
   ul.appendChild(li);
-  if (!isLoading) li.querySelector('input').focus();
-}
-
-function addAttackRow() {
-  var tbody = document.getElementById('attacks-body');
-  var tr = document.createElement('tr');
-  tr.className = 'border-b border-gray-100';
-  tr.innerHTML =
-    '<td class="py-2 px-1"><input type="text" placeholder="Sword..." class="w-full text-sm outline-none font-crimson"></td>' +
-    '<td class="py-2 px-1"><input type="text" placeholder="+3..." class="w-full text-sm outline-none font-crimson"></td>' +
-    '<td class="py-2 px-1"><input type="text" placeholder="1d8..." class="w-full text-sm outline-none font-crimson"></td>' +
-    '<td class="py-2 px-1 text-center"><button onclick="this.closest(\'tr\').remove()" class="text-gray-300 hover:text-gray-500 text-sm">&#x2715;</button></td>';
-  tbody.appendChild(tr);
+  if (!isLoading) li.querySelector('textarea').focus();
 }
 
 function addSpellRow() {
@@ -524,14 +528,45 @@ function addSpellRow() {
   container.appendChild(div);
 }
 
+// Shadowdark Quickstart weapon damage / armor AC for inline display.
+var SD_GEAR_STATS = {
+  'club': '1d4', 'dagger': '1d4', 'staff': '1d4', 'javelin': '1d4',
+  'spear': '1d6', 'mace': '1d6', 'shortsword': '1d6', 'shortbow': '1d4',
+  'longsword': '1d8', 'longbow': '1d8', 'crossbow': '1d6',
+  'bastard sword': '1d8 / 1d10', 'greataxe': '1d8 / 1d10',
+  'greatsword': '1d12', 'warhammer': '1d10',
+  'leather armor': 'AC 11 + DEX', 'chainmail': 'AC 13 + DEX',
+  'plate mail': 'AC 15 + DEX', 'shield': '+1 AC',
+  'mithral chainmail': 'AC 13 + DEX', 'mithral plate mail': 'AC 15 + DEX',
+  'helmet': 'adv vs crit'
+};
+
+function gearStatFor(text) {
+  if (!text) return '';
+  var hay = text.toLowerCase();
+  var best = '';
+  Object.keys(SD_GEAR_STATS).forEach(function(name) {
+    if (hay.indexOf(name) !== -1 && name.length > best.length) best = name;
+  });
+  return best ? SD_GEAR_STATS[best] : '';
+}
+
+function updateGearStat(input) {
+  var stat = input.parentElement.querySelector('.gear-stat');
+  if (!stat) return;
+  var s = gearStatFor(input.value);
+  stat.textContent = s ? '(' + s + ')' : '';
+}
+
 function addGearRow() {
   var ul = document.getElementById('gear-list');
   var num = ul.children.length + 1;
   var li = document.createElement('li');
   li.className = 'flex items-center gap-2 border-b border-gray-100 py-2';
-  li.innerHTML = '<span class="gear-num font-cinzel text-xs text-gray-400 w-5">' + num + '.</span><input type="text" placeholder="Item..." class="flex-1 text-sm outline-none font-crimson"><button onclick="removeGearRow(this)" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>';
+  li.innerHTML = '<span class="gear-num font-cinzel text-xs text-gray-400 w-5">' + num + '.</span><input type="text" placeholder="Item..." oninput="updateGearSlots();updateGearStat(this)" class="flex-1 min-w-0 text-sm outline-none font-crimson"><span class="gear-stat font-cinzel text-xs text-gray-400 whitespace-nowrap shrink-0"></span><button onclick="removeGearRow(this)" class="text-gray-300 hover:text-gray-500 text-sm px-1">&#x2715;</button>';
   ul.appendChild(li);
   if (!isLoading) li.querySelector('input').focus();
+  updateGearSlots();
 }
 
 function removeGearRow(btn) {
@@ -540,6 +575,7 @@ function removeGearRow(btn) {
   Array.from(ul.children).forEach(function(li, i) {
     li.querySelector('.gear-num').textContent = (i + 1) + '.';
   });
+  updateGearSlots();
 }
 
 function addFreeCarryRow() {
@@ -632,20 +668,10 @@ function sendJoin() {
   });
   
   // Get talents
-  var talents = Array.from(document.querySelectorAll('#talents-list input')).map(function(el) { 
-    return el.value.trim(); 
+  var talents = Array.from(document.querySelectorAll('#talents-list textarea')).map(function(el) {
+    return el.value.trim();
   }).filter(function(val) { return val; });
-  
-  // Get attacks
-  var attacks = Array.from(document.querySelectorAll('#attacks-body tr')).map(function(tr) {
-    var inputs = Array.from(tr.querySelectorAll('input'));
-    return {
-      weapon: inputs[0] ? inputs[0].value.trim() : '',
-      modifier: inputs[1] ? inputs[1].value.trim() : '',
-      damage: inputs[2] ? inputs[2].value.trim() : ''
-    };
-  }).filter(function(attack) { return attack.weapon; });
-  
+
   // Get spells
   var spells = Array.from(document.querySelectorAll('#spells-body .spell-row')).map(function(row) {
     var inputs = Array.from(row.querySelectorAll('input'));
@@ -685,7 +711,6 @@ function sendJoin() {
     deity: deityEl ? deityEl.value.trim() : '',
     abilities: abilities,
     talents: talents,
-    attacks: attacks,
     spells: spells,
     gear: gear,
     freeCarry: freeCarry,
@@ -722,11 +747,14 @@ function handleDmMsg(data) {
     items.forEach(function(item) {
       addGearRow();
       var inputs = document.querySelectorAll('#gear-list input');
-      inputs[inputs.length - 1].value = item;
+      var inp = inputs[inputs.length - 1];
+      inp.value = item;
+      updateGearStat(inp);
     });
     if (data.gp) { var gp = document.getElementById('gp'); gp.value = (parseInt(gp.value) || 0) + data.gp; }
     if (data.sp) { var sp = document.getElementById('sp'); sp.value = (parseInt(sp.value) || 0) + data.sp; }
     if (data.cp) { var cp = document.getElementById('cp'); cp.value = (parseInt(cp.value) || 0) + data.cp; }
+    updateGearSlots();
     scheduleSave();
     var parts = [];
     if (items.length) parts.push(items.length + ' item' + (items.length > 1 ? 's' : ''));
@@ -748,7 +776,10 @@ function handleDmMsg(data) {
     if (curEl) curEl.value = have - price;
     addGearRow();
     var inputs = document.querySelectorAll('#gear-list input');
-    inputs[inputs.length - 1].value = data.item;
+    var inp = inputs[inputs.length - 1];
+    inp.value = data.item;
+    updateGearStat(inp);
+    updateGearSlots();
     scheduleSave();
     showDmMsg('Purchased: ' + data.item + ' (-' + price + ' ' + cur.toUpperCase() + ')');
   }
@@ -1068,7 +1099,6 @@ function applyCharGen() {
 
   // Wipe dynamic lists
   document.getElementById('talents-list').innerHTML = '';
-  document.getElementById('attacks-body').innerHTML = '';
   document.getElementById('spells-body').innerHTML = '';
   document.getElementById('gear-list').innerHTML = '';
   document.getElementById('free-carry-list').innerHTML = '';
@@ -1107,8 +1137,11 @@ function applyCharGen() {
   // Talents: ancestry talent + class features
   function addTalent(text) {
     addTalentRow();
-    var inputs = document.querySelectorAll('#talents-list input');
-    inputs[inputs.length - 1].value = text;
+    var inputs = document.querySelectorAll('#talents-list textarea');
+    var ta = inputs[inputs.length - 1];
+    ta.value = text;
+    ta.style.height = 'auto';
+    ta.style.height = ta.scrollHeight + 'px';
   }
   addTalent(ancestry + ': ' + CHARGEN.ancestries[ancestry].talent);
   CHARGEN.classes[cls].features.forEach(function(f) { addTalent(cls + ': ' + f); });
@@ -1130,11 +1163,13 @@ function applyCharGen() {
     });
   }
 
-  // Free carry essentials
+  // Starting gear (Shadowdark Quickstart essentials)
   CHARGEN.freeGear.forEach(function(item) {
-    addFreeCarryRow();
-    var inputs = document.querySelectorAll('#free-carry-list input');
-    inputs[inputs.length - 1].value = item;
+    addGearRow();
+    var inputs = document.querySelectorAll('#gear-list input');
+    var inp = inputs[inputs.length - 1];
+    inp.value = item;
+    updateGearStat(inp);
   });
 
   // Gold
@@ -1142,6 +1177,7 @@ function applyCharGen() {
   document.getElementById('sp').value = 0;
   document.getElementById('cp').value = 0;
 
+  updateGearSlots();
   scheduleSave();
   closeCharGen();
   showDmMsg('Character created: ' + name);
@@ -1218,8 +1254,12 @@ function pickTalent(idx) {
   var t = cgTalentList()[idx];
   if (!t) return;
   addTalentRow();
-  var inputs = document.querySelectorAll('#talents-list input');
-  inputs[inputs.length - 1].value = t.source + ': ' + t.text;
+  var inputs = document.querySelectorAll('#talents-list textarea');
+  var ta = inputs[inputs.length - 1];
+  ta.value = t.source + ': ' + t.text;
+  ta.style.height = 'auto';
+  ta.style.height = ta.scrollHeight + 'px';
+  updateGearSlots();
   scheduleSave();
   showDmMsg('Talent added');
 }
