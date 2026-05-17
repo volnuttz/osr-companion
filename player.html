@@ -133,7 +133,10 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
   <div class="border border-gray-200 rounded-xl shadow-sm p-3 sm:p-4 mb-4">
     <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block mb-3">TALENTS</span>
     <ul id="talents-list"></ul>
-    <button onclick="addTalentRow()" class="mt-3 border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Talent</button>
+    <div class="mt-3 flex flex-wrap gap-2">
+      <button onclick="addTalentRow()" class="border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Talent</button>
+      <button onclick="openTalentCatalog()" class="border border-dashed border-gray-300 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ From Quickstart</button>
+    </div>
   </div>
 
   <!-- ATTACKS -->
@@ -157,7 +160,10 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
   <div class="border border-gray-200 rounded-xl shadow-sm p-3 sm:p-4 mb-4">
     <span class="bg-black text-white font-cinzel text-xs font-bold tracking-widest px-2 py-0.5 rounded inline-block mb-3">SPELLS</span>
     <div id="spells-body"></div>
-    <button onclick="addSpellRow()" class="mt-3 border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Spell</button>
+    <div class="mt-3 flex flex-wrap gap-2">
+      <button onclick="addSpellRow()" class="border border-gray-200 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ Add Spell</button>
+      <button onclick="openSpellCatalog()" class="border border-dashed border-gray-300 rounded font-cinzel text-xs text-gray-400 font-bold px-3 py-1 hover:bg-gray-50">+ From Quickstart</button>
+    </div>
   </div>
 
   <!-- GEAR -->
@@ -195,19 +201,19 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
 
         <!-- ABILITY SCORES -->
         <section>
-          <div class="flex items-center justify-between mb-2">
-            <p class="font-cinzel text-xs font-bold tracking-widest">1 · ABILITY SCORES</p>
-            <button onclick="cgRollAbilities()" class="font-cinzel text-xs font-bold bg-black text-white px-3 py-1 rounded hover:bg-gray-800">Roll 3d6</button>
-          </div>
-          <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
-            <div class="border border-gray-200 rounded p-2 text-center"><p class="font-cinzel text-[10px] font-bold text-gray-400">STR</p><input id="cg-str" type="number" min="3" max="18" class="w-full text-center text-base outline-none" placeholder="—"></div>
-            <div class="border border-gray-200 rounded p-2 text-center"><p class="font-cinzel text-[10px] font-bold text-gray-400">INT</p><input id="cg-int" type="number" min="3" max="18" class="w-full text-center text-base outline-none" placeholder="—"></div>
-            <div class="border border-gray-200 rounded p-2 text-center"><p class="font-cinzel text-[10px] font-bold text-gray-400">DEX</p><input id="cg-dex" type="number" min="3" max="18" class="w-full text-center text-base outline-none" placeholder="—"></div>
-            <div class="border border-gray-200 rounded p-2 text-center"><p class="font-cinzel text-[10px] font-bold text-gray-400">WIS</p><input id="cg-wis" type="number" min="3" max="18" class="w-full text-center text-base outline-none" placeholder="—"></div>
-            <div class="border border-gray-200 rounded p-2 text-center"><p class="font-cinzel text-[10px] font-bold text-gray-400">CON</p><input id="cg-con" type="number" min="3" max="18" class="w-full text-center text-base outline-none" placeholder="—"></div>
-            <div class="border border-gray-200 rounded p-2 text-center"><p class="font-cinzel text-[10px] font-bold text-gray-400">CHA</p><input id="cg-cha" type="number" min="3" max="18" class="w-full text-center text-base outline-none" placeholder="—"></div>
-          </div>
-          <p class="font-crimson text-xs text-gray-500 italic mt-1">3d6 in order. Edit if your table allows.</p>
+          <p class="font-cinzel text-xs font-bold tracking-widest mb-2">1 · ABILITY SCORES</p>
+          <button onclick="cgRollAbilities()" class="w-full border border-gray-300 rounded p-2 text-left hover:bg-gray-50">
+            <p class="font-cinzel text-[10px] font-bold text-gray-400 mb-2">ABILITIES — 3d6 in order</p>
+            <div class="grid grid-cols-6 gap-1">
+              <div class="text-center"><p class="font-cinzel text-[9px] text-gray-500">STR</p><p id="cg-str-display" class="font-cinzel text-base font-bold">—</p></div>
+              <div class="text-center"><p class="font-cinzel text-[9px] text-gray-500">INT</p><p id="cg-int-display" class="font-cinzel text-base font-bold">—</p></div>
+              <div class="text-center"><p class="font-cinzel text-[9px] text-gray-500">DEX</p><p id="cg-dex-display" class="font-cinzel text-base font-bold">—</p></div>
+              <div class="text-center"><p class="font-cinzel text-[9px] text-gray-500">WIS</p><p id="cg-wis-display" class="font-cinzel text-base font-bold">—</p></div>
+              <div class="text-center"><p class="font-cinzel text-[9px] text-gray-500">CON</p><p id="cg-con-display" class="font-cinzel text-base font-bold">—</p></div>
+              <div class="text-center"><p class="font-cinzel text-[9px] text-gray-500">CHA</p><p id="cg-cha-display" class="font-cinzel text-base font-bold">—</p></div>
+            </div>
+          </button>
+          <p class="font-crimson text-xs text-gray-500 italic mt-1">Tap to roll all six.</p>
         </section>
 
         <!-- ANCESTRY -->
@@ -230,21 +236,15 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
 
         <!-- STARTING SPELLS (Wizard / Priest only) -->
         <section id="cg-spells-section" style="display:none">
-          <div class="flex items-center justify-between mb-2">
-            <p class="font-cinzel text-xs font-bold tracking-widest">3b · STARTING SPELLS</p>
-            <button onclick="cgRollSpells()" class="font-cinzel text-xs font-bold border border-gray-300 px-3 py-1 rounded hover:bg-gray-50">Roll random</button>
-          </div>
+          <p class="font-cinzel text-xs font-bold tracking-widest mb-2">3b · STARTING SPELLS</p>
           <p id="cg-spells-info" class="font-crimson text-xs text-gray-500 italic mb-1.5">—</p>
           <div id="cg-spells-list" class="grid grid-cols-1 sm:grid-cols-2 gap-1"></div>
         </section>
 
         <!-- BACKGROUND -->
         <section>
-          <div class="flex items-center justify-between mb-2">
-            <p class="font-cinzel text-xs font-bold tracking-widest">4 · BACKGROUND</p>
-            <button onclick="cgRollBackground()" class="font-cinzel text-xs font-bold border border-gray-300 px-3 py-1 rounded hover:bg-gray-50">Roll d20</button>
-          </div>
-          <select id="cg-background" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson bg-white">
+          <p class="font-cinzel text-xs font-bold tracking-widest mb-2">4 · BACKGROUND</p>
+          <select id="cg-background" onchange="cgUpdateBackground()" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson bg-white">
             <option value="">— choose —</option>
           </select>
         </section>
@@ -261,10 +261,7 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
 
         <!-- DEITY -->
         <section>
-          <div class="flex items-center justify-between mb-2">
-            <p class="font-cinzel text-xs font-bold tracking-widest">6 · DEITY</p>
-            <button onclick="cgRollDeity()" class="font-cinzel text-xs font-bold border border-gray-300 px-3 py-1 rounded hover:bg-gray-50">Roll</button>
-          </div>
+          <p class="font-cinzel text-xs font-bold tracking-widest mb-2">6 · DEITY</p>
           <select id="cg-deity" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson bg-white">
             <option value="">— choose alignment first —</option>
           </select>
@@ -272,10 +269,7 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
 
         <!-- NAME -->
         <section>
-          <div class="flex items-center justify-between mb-2">
-            <p class="font-cinzel text-xs font-bold tracking-widest">7 · NAME</p>
-            <button onclick="cgRollName()" class="font-cinzel text-xs font-bold border border-gray-300 px-3 py-1 rounded hover:bg-gray-50">Roll</button>
-          </div>
+          <p class="font-cinzel text-xs font-bold tracking-widest mb-2">7 · NAME</p>
           <input id="cg-name" type="text" placeholder="Character name…" class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm outline-none font-crimson">
         </section>
 
@@ -303,10 +297,44 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
     </div>
   </div>
 
+  <!-- TALENT CATALOG MODAL -->
+  <div id="talent-catalog" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+    <div onclick="closeTalentCatalog()" class="absolute inset-0 bg-black/40"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-3 flex flex-col" style="max-height:85vh">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 shrink-0">
+        <div>
+          <p class="font-cinzel text-xs font-bold text-gray-500 tracking-widest">QUICKSTART TALENTS</p>
+          <p class="font-crimson text-xs text-gray-400 italic">Tap to add to your sheet</p>
+        </div>
+        <button onclick="closeTalentCatalog()" class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-lg text-gray-400 text-lg leading-none">&times;</button>
+      </div>
+      <input id="talent-search" type="text" placeholder="Search…" oninput="renderTalentCatalog()" class="border-b border-gray-100 px-4 py-2 outline-none text-sm font-crimson">
+      <div id="talent-catalog-list" class="flex-1 overflow-y-auto p-2"></div>
+    </div>
+  </div>
+
+  <!-- SPELL CATALOG MODAL -->
+  <div id="spell-catalog" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+    <div onclick="closeSpellCatalog()" class="absolute inset-0 bg-black/40"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-3 flex flex-col" style="max-height:85vh">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 shrink-0">
+        <div>
+          <p class="font-cinzel text-xs font-bold text-gray-500 tracking-widest">QUICKSTART SPELLS</p>
+          <p class="font-crimson text-xs text-gray-400 italic">Tap to add to your sheet</p>
+        </div>
+        <button onclick="closeSpellCatalog()" class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-lg text-gray-400 text-lg leading-none">&times;</button>
+      </div>
+      <div class="flex border-b border-gray-100 shrink-0">
+        <button data-sp-tab="Wizard" onclick="switchSpellCatalogTab('Wizard')" class="sp-tab flex-1 font-cinzel text-xs py-2 border-b-2 border-black text-black">WIZARD</button>
+        <button data-sp-tab="Priest" onclick="switchSpellCatalogTab('Priest')" class="sp-tab flex-1 font-cinzel text-xs py-2 border-b-2 border-transparent text-gray-400">PRIEST</button>
+      </div>
+      <input id="spell-search" type="text" placeholder="Search…" oninput="renderSpellCatalog()" class="border-b border-gray-100 px-4 py-2 outline-none text-sm font-crimson">
+      <div id="spell-catalog-list" class="flex-1 overflow-y-auto p-2"></div>
+    </div>
+  </div>
+
   <!-- GM NOTIFICATION -->
   <div id="dm-msg" class="fixed top-4 left-1/2 -translate-x-1/2 bg-black text-white font-cinzel text-xs font-bold tracking-widest px-4 py-2 rounded-full shadow-lg transition-opacity duration-500 opacity-0 pointer-events-none z-50"></div>
-
-  <div id="roll-msg" class="fixed top-4 left-1/2 -translate-x-1/2 bg-black text-white font-cinzel text-xs font-bold tracking-widest px-4 py-2 rounded-full shadow-lg transition-opacity duration-500 opacity-0 pointer-events-none z-50">Scores rolled!</div>
 
 
 
@@ -317,7 +345,6 @@ input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px white inset !importa
   <div id="fab-container" class="fixed bottom-6 right-4 sm:bottom-6 sm:right-5 flex flex-col items-end gap-2 z-40" style="bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem))">
     <!-- Dice options (hidden by default) -->
     <div id="fab-items" class="flex flex-col items-end gap-2 mb-1" style="display:none!important;">
-      <button onclick="rollAllAbilities();toggleFab()" class="h-10 px-3 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800 whitespace-nowrap">Stats</button>
       <button onclick="quickRoll('1d4');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800">d4</button>
       <button onclick="quickRoll('1d6');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800">d6</button>
       <button onclick="quickRoll('1d8');toggleFab()" class="w-10 h-10 bg-black text-white font-cinzel text-xs font-bold rounded-full shadow-lg hover:bg-gray-800">d8</button>
@@ -438,18 +465,6 @@ function calcMod(stat) {
 }
 
 function d(sides) { return Math.floor(Math.random() * sides) + 1; }
-
-function rollAllAbilities() {
-  ['str','int','dex','wis','con','cha'].forEach(function(s) {
-    var total = d(6) + d(6) + d(6);
-    document.getElementById(s).value = total;
-    calcMod(s);
-  });
-  scheduleSave();
-  var msg = document.getElementById('roll-msg');
-  msg.style.opacity = '1';
-  setTimeout(function() { msg.style.opacity = '0'; }, 1500);
-}
 
 function quickRoll(expr) {
   var parts = expr.match(/(\d+)d(\d+)/i);
@@ -870,22 +885,26 @@ var CHARGEN = {
   }
 };
 
-var cgState = { hp: null, gold: null, alignment: '' };
+var cgState = { hp: null, gold: null, alignment: '', abilities: {} };
 
-function cgPopulateSelect(el, items, current) {
-  el.innerHTML = '<option value="">— choose —</option>' + items.map(function(v){
+function cgPopulateSelect(el, items, current, allowRandom) {
+  var opts = '<option value="">— choose —</option>';
+  if (allowRandom) opts += '<option value="__random__">🎲 Random</option>';
+  opts += items.map(function(v){
     var sel = v === current ? ' selected' : '';
     return '<option value="' + v + '"' + sel + '>' + v + '</option>';
   }).join('');
+  el.innerHTML = opts;
 }
 
 function openCharGen() {
   // Populate selects (only once would be fine, but idempotent is cheaper than a flag)
-  cgPopulateSelect(document.getElementById('cg-ancestry'), Object.keys(CHARGEN.ancestries));
-  cgPopulateSelect(document.getElementById('cg-class'), Object.keys(CHARGEN.classes));
-  cgPopulateSelect(document.getElementById('cg-background'), CHARGEN.backgrounds);
+  cgPopulateSelect(document.getElementById('cg-ancestry'), Object.keys(CHARGEN.ancestries), null, true);
+  cgPopulateSelect(document.getElementById('cg-class'), Object.keys(CHARGEN.classes), null, true);
+  cgPopulateSelect(document.getElementById('cg-background'), CHARGEN.backgrounds, null, true);
   // Reset state
-  cgState = { hp: null, gold: null, alignment: '' };
+  cgState = { hp: null, gold: null, alignment: '', abilities: {} };
+  ['str','int','dex','wis','con','cha'].forEach(function(s){ document.getElementById('cg-' + s + '-display').textContent = '—'; });
   document.getElementById('cg-hp-display').textContent = '—';
   document.getElementById('cg-gold-display').textContent = '—';
   document.getElementById('cg-ancestry-talent').textContent = '';
@@ -895,7 +914,6 @@ function openCharGen() {
   document.getElementById('cg-spells-section').style.display = 'none';
   document.getElementById('cg-spells-list').innerHTML = '';
   Array.from(document.querySelectorAll('.cg-align')).forEach(function(b){ b.classList.remove('bg-black','text-white'); b.classList.add('border-gray-300'); });
-  ['cg-str','cg-int','cg-dex','cg-wis','cg-con','cg-cha'].forEach(function(id){ document.getElementById(id).value = ''; });
   document.getElementById('chargen-backdrop').classList.remove('hidden');
   closeHamburger();
 }
@@ -905,19 +923,39 @@ function closeCharGen() {
 }
 
 function cgRollAbilities() {
-  ['cg-str','cg-int','cg-dex','cg-wis','cg-con','cg-cha'].forEach(function(id){
-    document.getElementById(id).value = d(6) + d(6) + d(6);
+  ['str','int','dex','wis','con','cha'].forEach(function(s){
+    var total = d(6) + d(6) + d(6);
+    cgState.abilities[s] = total;
+    document.getElementById('cg-' + s + '-display').textContent = total;
   });
 }
 
 function cgUpdateAncestry() {
-  var v = document.getElementById('cg-ancestry').value;
+  var el = document.getElementById('cg-ancestry');
+  if (el.value === '__random__') {
+    var list = Object.keys(CHARGEN.ancestries);
+    el.value = list[Math.floor(Math.random() * list.length)];
+  }
+  var v = el.value;
   document.getElementById('cg-ancestry-talent').textContent = v ? CHARGEN.ancestries[v].talent : '';
   if (cgState.hp !== null) cgRefreshHpLabel();
 }
 
+function cgUpdateBackground() {
+  var el = document.getElementById('cg-background');
+  if (el.value === '__random__') {
+    var list = CHARGEN.backgrounds;
+    el.value = list[Math.floor(Math.random() * list.length)];
+  }
+}
+
 function cgUpdateClass() {
-  var v = document.getElementById('cg-class').value;
+  var el = document.getElementById('cg-class');
+  if (el.value === '__random__') {
+    var classes = Object.keys(CHARGEN.classes);
+    el.value = classes[Math.floor(Math.random() * classes.length)];
+  }
+  var v = el.value;
   var ul = document.getElementById('cg-class-features');
   var spellsSec = document.getElementById('cg-spells-section');
   var spellsList = document.getElementById('cg-spells-list');
@@ -968,31 +1006,10 @@ function cgSpellChange() {
     ' (' + checked.length + ' / ' + max + ')';
 }
 
-function cgRollSpells() {
-  var v = document.getElementById('cg-class').value;
-  if (!CHARGEN.spells[v]) return;
-  var max = CHARGEN.spells[v].pick;
-  var n = CHARGEN.spells[v].list.length;
-  var picked = [];
-  while (picked.length < max) {
-    var i = Math.floor(Math.random() * n);
-    if (picked.indexOf(i) === -1) picked.push(i);
-  }
-  document.querySelectorAll('#cg-spells-list input').forEach(function(cb, i) {
-    cb.checked = picked.indexOf(i) !== -1;
-  });
-  cgSpellChange();
-}
-
 function cgRefreshHpLabel() {
   var cls = document.getElementById('cg-class').value;
   document.getElementById('cg-hp-label').textContent =
     'HP — 1d' + (cls ? CHARGEN.classes[cls].hd : '?') + ' + CON';
-}
-
-function cgRollBackground() {
-  var i = d(20) - 1;
-  document.getElementById('cg-background').value = CHARGEN.backgrounds[i];
 }
 
 function cgPickAlignment(a) {
@@ -1004,25 +1021,12 @@ function cgPickAlignment(a) {
   cgPopulateSelect(document.getElementById('cg-deity'), CHARGEN.deities[a]);
 }
 
-function cgRollDeity() {
-  if (!cgState.alignment) { showDmMsg('Pick an alignment first'); return; }
-  var list = CHARGEN.deities[cgState.alignment];
-  document.getElementById('cg-deity').value = list[Math.floor(Math.random() * list.length)];
-}
-
-function cgRollName() {
-  var a = document.getElementById('cg-ancestry').value;
-  if (!a) { showDmMsg('Pick an ancestry first'); return; }
-  var list = CHARGEN.names[a];
-  document.getElementById('cg-name').value = list[Math.floor(Math.random() * list.length)];
-}
-
 function cgRollHp() {
   var cls = document.getElementById('cg-class').value;
   if (!cls) { showDmMsg('Pick a class first'); return; }
   var hd = CHARGEN.classes[cls].hd;
-  var conVal = parseInt(document.getElementById('cg-con').value);
-  var conMod = isNaN(conVal) ? 0 : Math.floor((conVal - 10) / 2);
+  var conVal = cgState.abilities.con;
+  var conMod = (typeof conVal === 'number') ? Math.floor((conVal - 10) / 2) : 0;
   var roll = d(hd);
   if (document.getElementById('cg-ancestry').value === 'Dwarf') {
     var r2 = d(hd);
@@ -1051,6 +1055,8 @@ function applyCharGen() {
   if (!ancestry) missing.push('ancestry');
   if (!cls) missing.push('class');
   if (!cgState.alignment) missing.push('alignment');
+  var rolledAbilities = ['str','int','dex','wis','con','cha'].every(function(s){ return typeof cgState.abilities[s] === 'number'; });
+  if (!rolledAbilities) missing.push('ability scores');
   if (cgState.hp === null) missing.push('HP');
   if (CHARGEN.spells[cls]) {
     var need = CHARGEN.spells[cls].pick;
@@ -1083,9 +1089,9 @@ function applyCharGen() {
 
   // Abilities
   ['str','int','dex','wis','con','cha'].forEach(function(s) {
-    var v = parseInt(document.getElementById('cg-' + s).value);
+    var v = cgState.abilities[s];
     var el = document.getElementById(s);
-    el.value = isNaN(v) ? '' : v;
+    el.value = (typeof v === 'number') ? v : '';
     calcMod(s);
   });
 
@@ -1165,6 +1171,124 @@ function uploadCharacterSheet() {
     reader.readAsText(file);
   };
   input.click();
+}
+
+// ── TALENT CATALOG ───────────────────────────────────────────────────
+function cgTalentList() {
+  var out = [];
+  Object.keys(CHARGEN.ancestries).forEach(function(a) {
+    out.push({ source: a, kind: 'Ancestry', text: CHARGEN.ancestries[a].talent });
+  });
+  Object.keys(CHARGEN.classes).forEach(function(c) {
+    CHARGEN.classes[c].features.forEach(function(f) {
+      out.push({ source: c, kind: 'Class', text: f });
+    });
+  });
+  return out;
+}
+
+function openTalentCatalog() {
+  document.getElementById('talent-search').value = '';
+  renderTalentCatalog();
+  document.getElementById('talent-catalog').classList.remove('hidden');
+}
+function closeTalentCatalog() {
+  document.getElementById('talent-catalog').classList.add('hidden');
+}
+function renderTalentCatalog() {
+  var q = (document.getElementById('talent-search').value || '').toLowerCase();
+  var src = cgTalentList();
+  var list = src.filter(function(t) {
+    return !q || t.text.toLowerCase().indexOf(q) !== -1 || t.source.toLowerCase().indexOf(q) !== -1;
+  });
+  var container = document.getElementById('talent-catalog-list');
+  if (!list.length) { container.innerHTML = '<p class="text-center text-xs text-gray-400 font-cinzel py-6">No matches.</p>'; return; }
+  container.innerHTML = list.map(function(t) {
+    var idx = src.indexOf(t);
+    return '<button onclick="pickTalent(' + idx + ')" class="w-full text-left border border-gray-200 rounded-lg p-2.5 mb-2 hover:bg-gray-50">' +
+      '<div class="flex items-center justify-between mb-0.5">' +
+        '<span class="font-cinzel text-xs font-bold text-gray-500 tracking-widest">' + escHtml(t.source) + '</span>' +
+        '<span class="font-cinzel text-[10px] text-gray-400">' + escHtml(t.kind) + '</span>' +
+      '</div>' +
+      '<div class="text-xs font-crimson text-gray-600">' + escHtml(t.text) + '</div>' +
+    '</button>';
+  }).join('');
+}
+function pickTalent(idx) {
+  var t = cgTalentList()[idx];
+  if (!t) return;
+  addTalentRow();
+  var inputs = document.querySelectorAll('#talents-list input');
+  inputs[inputs.length - 1].value = t.source + ': ' + t.text;
+  scheduleSave();
+  showDmMsg('Talent added');
+}
+
+// ── SPELL CATALOG ────────────────────────────────────────────────────
+var spellCatalogTab = 'Wizard';
+
+function openSpellCatalog() {
+  spellCatalogTab = 'Wizard';
+  document.getElementById('spell-search').value = '';
+  switchSpellCatalogTab('Wizard');
+  document.getElementById('spell-catalog').classList.remove('hidden');
+}
+function closeSpellCatalog() {
+  document.getElementById('spell-catalog').classList.add('hidden');
+}
+function switchSpellCatalogTab(name) {
+  spellCatalogTab = name;
+  document.querySelectorAll('.sp-tab').forEach(function(b) {
+    if (b.getAttribute('data-sp-tab') === name) {
+      b.classList.add('border-black','text-black');
+      b.classList.remove('border-transparent','text-gray-400');
+    } else {
+      b.classList.remove('border-black','text-black');
+      b.classList.add('border-transparent','text-gray-400');
+    }
+  });
+  renderSpellCatalog();
+}
+function renderSpellCatalog() {
+  var q = (document.getElementById('spell-search').value || '').toLowerCase();
+  var src = (CHARGEN.spells[spellCatalogTab] || {}).list || [];
+  var list = src.filter(function(s) {
+    return !q || s.name.toLowerCase().indexOf(q) !== -1 || (s.desc && s.desc.toLowerCase().indexOf(q) !== -1);
+  });
+  var container = document.getElementById('spell-catalog-list');
+  if (!list.length) { container.innerHTML = '<p class="text-center text-xs text-gray-400 font-cinzel py-6">No matches.</p>'; return; }
+  container.innerHTML = list.map(function(s) {
+    var idx = src.indexOf(s);
+    return '<button onclick="pickSpellFromCatalog(\'' + spellCatalogTab + '\',' + idx + ')" class="w-full text-left border border-gray-200 rounded-lg p-2.5 mb-2 hover:bg-gray-50">' +
+      '<div class="flex items-center justify-between mb-0.5">' +
+        '<span class="font-cinzel text-sm font-bold">' + escHtml(s.name) + '</span>' +
+        '<span class="font-cinzel text-[10px] text-gray-400">T' + escHtml(s.tier) + ' · ' + escHtml(s.range) + ' · ' + escHtml(s.duration) + '</span>' +
+      '</div>' +
+      '<div class="text-xs font-crimson text-gray-500">' + escHtml(s.desc) + '</div>' +
+    '</button>';
+  }).join('');
+}
+function pickSpellFromCatalog(cls, idx) {
+  var spell = ((CHARGEN.spells[cls] || {}).list || [])[idx];
+  if (!spell) return;
+  addSpellRow();
+  var row = document.querySelector('#spells-body .spell-row:last-child');
+  var inputs = row.querySelectorAll('input');
+  var selects = row.querySelectorAll('select');
+  var ta = row.querySelector('textarea');
+  if (inputs[0]) inputs[0].value = spell.name;
+  if (inputs[1]) inputs[1].value = spell.duration;
+  if (selects[0]) selects[0].value = spell.tier;
+  if (selects[1]) selects[1].value = spell.range;
+  if (ta) { ta.value = spell.desc; ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+  scheduleSave();
+  showDmMsg('Spell added: ' + spell.name);
+}
+
+function escHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+  });
 }
 
 </script>
